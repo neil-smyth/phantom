@@ -1,0 +1,15 @@
+/*****************************************************************************
+ * Copyright (C) Neil Smyth 2022                                             *
+ *                                                                           *
+ * This file is part of phantom.                                             *
+ *                                                                           *
+ * This file is subject to the terms and conditions defined in the file      *
+ * 'LICENSE', which is part of this source code package.                     *
+ *****************************************************************************/
+
+#pragma once
+
+#define VERSION_MAJOR @VERSION_MAJOR@
+#define VERSION_MINOR @VERSION_MINOR@
+#define VERSION_PATCH @VERSION_PATCH@
+#define PHANTOM_BUILD_VERSION "@PHANTOM_BUILD_VERSION@"

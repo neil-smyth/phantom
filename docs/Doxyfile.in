@@ -1,0 +1,16 @@
+PROJECT_NAME           = "@CMAKE_PROJECT_NAME@"
+PROJECT_NUMBER         = @PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@.@PROJECT_VERSION_PATCH@
+
+OUTPUT_DIRECTORY       = @CMAKE_CURRENT_BINARY_DIR@/docs/doxygen
+INPUT                  = "include" "src" "bindings"
+RECURSIVE              = YES
+FILE_PATTERNS          = *.h \
+                         *.hpp \
+                         *.c \
+                         *.cpp
+EXCLUDE                = "src/utils/third_party/"
+
+PLANTUML_JAR_PATH      = "@PLANT_UML_PATH_LINUX@"
+DOT_PATH               = "@DOT_PATH_LINUX@"
+
+OUTPUT_LANGUAGE        = English

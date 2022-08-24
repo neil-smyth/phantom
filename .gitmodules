@@ -1,0 +1,7 @@
+[submodule "src/utils/third_party/json"]
+	path = src/utils/third_party/json
+	url = git@github.com:nlohmann/json.git
+	branch = master
+[submodule "src/utils/third_party/cpp-base64"]
+	path = src/utils/third_party/cpp-base64
+	url = git@github.com:ReneNyffenegger/cpp-base64.git

@@ -1,0 +1,11 @@
+.vscode/
+bindings/c#/FormatPreservingEncryption/obj/
+bindings/c#/PhantomDotNet/bin/
+bindings/c#/PhantomDotNet/obj/
+bindings/c#/ShamirsSecretSharing/bin/
+bindings/c#/ShamirsSecretSharing/obj/
+bindings/c#/UnitTest/bin/
+bindings/c#/UnitTest/obj/
+bindings/c#/FPE/bin/
+bindings/c#/FPE/obj/
+docs/doxygen/
