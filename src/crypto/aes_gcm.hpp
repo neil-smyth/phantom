@@ -21,7 +21,7 @@ namespace crypto {
  * @ingroup symmetric
  * @brief AES Galois Counter Mode authenticated encryption
  */
-class aes_gcm : public symmetric_key_auth_enc
+class aes_gcm : public symmetric_key_auth_enc, public aligned_base<DEFAULT_MEM_ALIGNMENT>
 {
 public:
     /**

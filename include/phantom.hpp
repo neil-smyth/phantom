@@ -46,7 +46,7 @@ public:
  * 
  * An interface class for the user context to a specific scheme and parameter set
  */
-class user_ctx
+class user_ctx : public aligned_base<DEFAULT_MEM_ALIGNMENT>
 {
 public:
     virtual ~user_ctx() {}

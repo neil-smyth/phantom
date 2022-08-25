@@ -31,7 +31,7 @@ enum aes_keylen_e {
 namespace crypto {
 
 /// A helper class used to store the key and associated parameters for AES
-struct aes_storage : public aligned_base<32>
+struct aes_storage : public aligned_base<DEFAULT_MEM_ALIGNMENT>
 {
     /// A union used to access individual bytes within a 32-bit word
     union aes_info_u
