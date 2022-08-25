@@ -299,8 +299,8 @@ private:
             new elliptic::weierstrass_prime_affine<T>(m_params.cfg, g_x, g_y));
 
         // Generate the base point for Shamir's trick
-        core::scalar_coding_e coding = core::ECC_PRE_8;
-        if (core::ECC_BINARY_DUAL == coding) {
+        core::scalar_coding_e coding = core::SCALAR_PRE_8;
+        if (core::SCALAR_BINARY_DUAL == coding) {
             core::mpz<T> g_x_dual(m_params.curve->g_x_dual, 16);
             core::mpz<T> g_y_dual(m_params.curve->g_y_dual, 16);
             auto pt = new elliptic::weierstrass_prime_affine<T>(m_params.cfg, g_x_dual, g_y_dual);
@@ -315,10 +315,10 @@ private:
         m_ecdsa_pk = std::unique_ptr<elliptic::ecc<T>>(new elliptic::ecc<T>(m_params.cfg,
                                                        m_params.field,
                                                        elliptic::POINT_COORD_JACOBIAN,
-                                                       core::ECC_PRE_5,
+                                                       core::SCALAR_PRE_5,
                                                        true));
 
-        if (core::ECC_BINARY_DUAL == coding) {
+        if (core::SCALAR_BINARY_DUAL == coding) {
             m_ecdsa->setup(*m_params.base.get(), *m_params.base_dual.get());
         }
         else {
@@ -360,12 +360,12 @@ private:
         m_ecdsa    = std::unique_ptr<elliptic::ecc<T>>(new elliptic::ecc<T>(m_params.cfg,
                                                        m_params.field,
                                                        elliptic::POINT_COORD_JACOBIAN,
-                                                       core::ECC_PRE_8,
+                                                       core::SCALAR_PRE_8,
                                                        true));
         m_ecdsa_pk = std::unique_ptr<elliptic::ecc<T>>(new elliptic::ecc<T>(m_params.cfg,
                                                        m_params.field,
                                                        elliptic::POINT_COORD_JACOBIAN,
-                                                       core::ECC_PRE_5,
+                                                       core::SCALAR_PRE_5,
                                                        true));
 
         m_ecdsa->setup(*m_params.base.get());

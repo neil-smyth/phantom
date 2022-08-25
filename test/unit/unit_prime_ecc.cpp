@@ -213,7 +213,7 @@ const lest::test specification[] =
         ecc_config<uint32_t> cfg = setup_32_p192();
 
         ecc<uint32_t> ec(cfg, field_e::WEIERSTRASS_PRIME_FIELD,
-            type_e::POINT_COORD_AFFINE, scalar_coding_e::ECC_BINARY);
+            type_e::POINT_COORD_AFFINE, scalar_coding_e::SCALAR_BINARY);
         retcode_e rc;
 
         auto secret = phantom_vector<uint8_t>();
@@ -237,7 +237,7 @@ const lest::test specification[] =
         ecc_config<uint32_t> cfg = setup_32_p192();
 
         ecc<uint32_t> ec(cfg, field_e::WEIERSTRASS_PRIME_FIELD,
-            type_e::POINT_COORD_AFFINE, scalar_coding_e::ECC_BINARY);
+            type_e::POINT_COORD_AFFINE, scalar_coding_e::SCALAR_BINARY);
         retcode_e rc;
 
         mpz<uint8_t> k("0", 10);
@@ -262,7 +262,7 @@ const lest::test specification[] =
         ecc_config<uint32_t> cfg = setup_32_p192();
 
         ecc<uint32_t> ec(cfg, field_e::WEIERSTRASS_PRIME_FIELD,
-            type_e::POINT_COORD_AFFINE, scalar_coding_e::ECC_BINARY);
+            type_e::POINT_COORD_AFFINE, scalar_coding_e::SCALAR_BINARY);
 
         mpz<uint8_t> k("1", 10);
         auto secret = phantom_vector<uint8_t>(k.get_limbs().begin(), k.get_limbs().end());
@@ -288,7 +288,7 @@ const lest::test specification[] =
         ecc_config<uint32_t> cfg = setup_32_p192();
 
         ecc<uint32_t> ec(cfg, field_e::WEIERSTRASS_PRIME_FIELD,
-            type_e::POINT_COORD_AFFINE, scalar_coding_e::ECC_PRE_2, false);
+            type_e::POINT_COORD_AFFINE, scalar_coding_e::SCALAR_PRE_2, false);
 
         mpz<uint8_t> k("1", 10);
         auto secret = phantom_vector<uint8_t>(k.get_limbs().begin(), k.get_limbs().end());
@@ -317,7 +317,7 @@ const lest::test specification[] =
         ecc_config<uint32_t> cfg = setup_32_p192();
 
         ecc<uint32_t> ec(cfg, field_e::WEIERSTRASS_PRIME_FIELD,
-            type_e::POINT_COORD_AFFINE, scalar_coding_e::ECC_BINARY);
+            type_e::POINT_COORD_AFFINE, scalar_coding_e::SCALAR_BINARY);
 
         mpz<uint8_t> k("2", 10);
         auto secret = phantom_vector<uint8_t>(k.get_limbs().begin(), k.get_limbs().end());
@@ -346,7 +346,7 @@ const lest::test specification[] =
         ecc_config<uint32_t> cfg = setup_32_p192();
 
         ecc<uint32_t> ec(cfg, field_e::WEIERSTRASS_PRIME_FIELD,
-            type_e::POINT_COORD_AFFINE, scalar_coding_e::ECC_BINARY);
+            type_e::POINT_COORD_AFFINE, scalar_coding_e::SCALAR_BINARY);
 
         mpz<uint8_t> k("6277101735386680763835789423176059013767194773182842284080", 10);
         auto secret = phantom_vector<uint8_t>(k.get_limbs().begin(), k.get_limbs().end());
@@ -375,7 +375,7 @@ const lest::test specification[] =
         ecc_config<uint32_t> cfg = setup_32_p192();
 
         ecc<uint32_t> ec(cfg, field_e::WEIERSTRASS_PRIME_FIELD,
-            type_e::POINT_COORD_AFFINE, scalar_coding_e::ECC_NAF_2, false);
+            type_e::POINT_COORD_AFFINE, scalar_coding_e::SCALAR_NAF_2, false);
 
         mpz<uint8_t> k("6277101735386680763835789423176059013767194773182842284080", 10);
         auto secret = phantom_vector<uint8_t>(k.get_limbs().begin(), k.get_limbs().end());
@@ -404,7 +404,7 @@ const lest::test specification[] =
         ecc_config<uint32_t> cfg = setup_32_p192();
 
         ecc<uint32_t> ec(cfg, field_e::WEIERSTRASS_PRIME_FIELD,
-            type_e::POINT_COORD_AFFINE, scalar_coding_e::ECC_PRE_2, false);
+            type_e::POINT_COORD_AFFINE, scalar_coding_e::SCALAR_PRE_2, false);
 
         mpz<uint8_t> k("6277101735386680763835789423176059013767194773182842284080", 10);
         auto secret = phantom_vector<uint8_t>(k.get_limbs().begin(), k.get_limbs().end());
@@ -433,7 +433,7 @@ const lest::test specification[] =
         ecc_config<uint32_t> cfg = setup_32_p192();
 
         ecc<uint32_t> ec(cfg, field_e::WEIERSTRASS_PRIME_FIELD,
-            type_e::POINT_COORD_AFFINE, scalar_coding_e::ECC_PRE_4, false);
+            type_e::POINT_COORD_AFFINE, scalar_coding_e::SCALAR_PRE_4, false);
 
         mpz<uint8_t> k("6277101735386680763835789423176059013767194773182842284080", 10);
         auto secret = phantom_vector<uint8_t>(k.get_limbs().begin(), k.get_limbs().end());
@@ -462,7 +462,7 @@ const lest::test specification[] =
         ecc_config<uint32_t> cfg = setup_32_p192();
 
         ecc<uint32_t> ec(cfg, field_e::WEIERSTRASS_PRIME_FIELD,
-            type_e::POINT_COORD_AFFINE, scalar_coding_e::ECC_PRE_6, false);
+            type_e::POINT_COORD_AFFINE, scalar_coding_e::SCALAR_PRE_6, false);
 
         mpz<uint8_t> k("6277101735386680763835789423176059013767194773182842284080", 10);
         auto secret = phantom_vector<uint8_t>(k.get_limbs().begin(), k.get_limbs().end());
@@ -488,7 +488,7 @@ const lest::test specification[] =
         ecc_config<uint32_t> cfg = setup_32_p192();
 
         ecc<uint32_t> ec(cfg, field_e::WEIERSTRASS_PRIME_FIELD,
-            type_e::POINT_COORD_PROJECTIVE, scalar_coding_e::ECC_BINARY);
+            type_e::POINT_COORD_PROJECTIVE, scalar_coding_e::SCALAR_BINARY);
 
         mpz<uint8_t> k("1", 10);
         auto secret = phantom_vector<uint8_t>(k.get_limbs().begin(), k.get_limbs().end());
@@ -517,7 +517,7 @@ const lest::test specification[] =
         ecc_config<uint32_t> cfg = setup_32_p192();
 
         ecc<uint32_t> ec(cfg, field_e::WEIERSTRASS_PRIME_FIELD,
-            type_e::POINT_COORD_PROJECTIVE, scalar_coding_e::ECC_BINARY);
+            type_e::POINT_COORD_PROJECTIVE, scalar_coding_e::SCALAR_BINARY);
 
         mpz<uint8_t> k("2", 10);
         auto secret = phantom_vector<uint8_t>(k.get_limbs().begin(), k.get_limbs().end());
@@ -546,7 +546,7 @@ const lest::test specification[] =
         ecc_config<uint32_t> cfg = setup_32_p192();
 
         ecc<uint32_t> ec(cfg, field_e::WEIERSTRASS_PRIME_FIELD,
-            type_e::POINT_COORD_PROJECTIVE, scalar_coding_e::ECC_BINARY);
+            type_e::POINT_COORD_PROJECTIVE, scalar_coding_e::SCALAR_BINARY);
 
         mpz<uint8_t> k("6277101735386680763835789423176059013767194773182842284080", 10);
         auto secret = phantom_vector<uint8_t>(k.get_limbs().begin(), k.get_limbs().end());
@@ -575,7 +575,7 @@ const lest::test specification[] =
         ecc_config<uint32_t> cfg = setup_32_p192();
 
         ecc<uint32_t> ec(cfg, field_e::WEIERSTRASS_PRIME_FIELD,
-            type_e::POINT_COORD_PROJECTIVE, scalar_coding_e::ECC_NAF_2, false);
+            type_e::POINT_COORD_PROJECTIVE, scalar_coding_e::SCALAR_NAF_2, false);
 
         mpz<uint8_t> k("6277101735386680763835789423176059013767194773182842284080", 10);
         auto secret = phantom_vector<uint8_t>(k.get_limbs().begin(), k.get_limbs().end());
@@ -604,7 +604,7 @@ const lest::test specification[] =
         ecc_config<uint32_t> cfg = setup_32_p192();
 
         ecc<uint32_t> ec(cfg, field_e::WEIERSTRASS_PRIME_FIELD,
-            type_e::POINT_COORD_AFFINE, scalar_coding_e::ECC_NAF_3, false);
+            type_e::POINT_COORD_AFFINE, scalar_coding_e::SCALAR_NAF_3, false);
 
         mpz<uint8_t> k("6277101735386680763835789423176059013767194773182842284080", 10);
         auto secret = phantom_vector<uint8_t>(k.get_limbs().begin(), k.get_limbs().end());
@@ -630,7 +630,7 @@ const lest::test specification[] =
         ecc_config<uint32_t> cfg = setup_32_p192();
 
         ecc<uint32_t> ec(cfg, field_e::WEIERSTRASS_PRIME_FIELD,
-            type_e::POINT_COORD_JACOBIAN, scalar_coding_e::ECC_BINARY);
+            type_e::POINT_COORD_JACOBIAN, scalar_coding_e::SCALAR_BINARY);
 
         mpz<uint8_t> k("1", 10);
         auto secret = phantom_vector<uint8_t>(k.get_limbs().begin(), k.get_limbs().end());
@@ -659,7 +659,7 @@ const lest::test specification[] =
         ecc_config<uint32_t> cfg = setup_32_p192();
 
         ecc<uint32_t> ec(cfg, field_e::WEIERSTRASS_PRIME_FIELD,
-            type_e::POINT_COORD_JACOBIAN, scalar_coding_e::ECC_BINARY);
+            type_e::POINT_COORD_JACOBIAN, scalar_coding_e::SCALAR_BINARY);
 
         mpz<uint8_t> k("2", 10);
         auto secret = phantom_vector<uint8_t>(k.get_limbs().begin(), k.get_limbs().end());
@@ -688,7 +688,7 @@ const lest::test specification[] =
         ecc_config<uint32_t> cfg = setup_32_p192();
 
         ecc<uint32_t> ec(cfg, field_e::WEIERSTRASS_PRIME_FIELD,
-            type_e::POINT_COORD_JACOBIAN, scalar_coding_e::ECC_BINARY);
+            type_e::POINT_COORD_JACOBIAN, scalar_coding_e::SCALAR_BINARY);
 
         mpz<uint8_t> k("6277101735386680763835789423176059013767194773182842284080", 10);
         auto secret = phantom_vector<uint8_t>(k.get_limbs().begin(), k.get_limbs().end());
@@ -717,7 +717,7 @@ const lest::test specification[] =
         ecc_config<uint32_t> cfg = setup_32_p192();
 
         ecc<uint32_t> ec(cfg, field_e::WEIERSTRASS_PRIME_FIELD,
-            type_e::POINT_COORD_JACOBIAN, scalar_coding_e::ECC_NAF_2, false);
+            type_e::POINT_COORD_JACOBIAN, scalar_coding_e::SCALAR_NAF_2, false);
 
         mpz<uint8_t> k("6277101735386680763835789423176059013767194773182842284080", 10);
         auto secret = phantom_vector<uint8_t>(k.get_limbs().begin(), k.get_limbs().end());
@@ -736,7 +736,7 @@ const lest::test specification[] =
         EXPECT(xr.get_str(16) == x2.get_str(16));
         EXPECT(yr.get_str(16) == y2.get_str(16));
     },
-    CASE("Projective XZ Montgomery ladder scalar multiplication, ECC_MONT_LADDER, k = large - 32-bit")
+    CASE("Projective XZ Montgomery ladder scalar multiplication, SCALAR_MONT_LADDER, k = large - 32-bit")
     {
         mpz<uint32_t> x1("9", 16);
         mpz<uint32_t> y1("20AE19A1B8A086B4E01EDD2C7748D14C923D4D7E6D7C61B229E9C5A27ECED3D9", 16);
@@ -746,7 +746,7 @@ const lest::test specification[] =
         ecc_config<uint32_t> cfg = setup_32_p255();
 
         ecc<uint32_t> ec(cfg, field_e::MONTGOMERY_PRIME_FIELD,
-            type_e::POINT_COORD_PROJECTIVE, scalar_coding_e::ECC_MONT_LADDER, false);
+            type_e::POINT_COORD_PROJECTIVE, scalar_coding_e::SCALAR_MONT_LADDER, false);
 
         mpz<uint8_t> k("6277101735386680763835789423176059013767194773182842284080", 10);
         auto secret = phantom_vector<uint8_t>(k.get_limbs().begin(), k.get_limbs().end());
@@ -775,7 +775,7 @@ const lest::test specification[] =
 
         ecc_config<uint32_t> cfg = setup_32_edwards448();
 
-        ecc<uint32_t> ec(cfg, field_e::EDWARDS_PRIME_FIELD, type_e::POINT_COORD_AFFINE, scalar_coding_e::ECC_BINARY);
+        ecc<uint32_t> ec(cfg, field_e::EDWARDS_PRIME_FIELD, type_e::POINT_COORD_AFFINE, scalar_coding_e::SCALAR_BINARY);
 
         mpz<uint8_t> k("2", 10);
         auto secret = phantom_vector<uint8_t>(k.get_limbs().begin(), k.get_limbs().end());
@@ -805,7 +805,7 @@ const lest::test specification[] =
 
         ecc_config<uint32_t> cfg = setup_32_edwards448();
 
-        ecc<uint32_t> ec(cfg, field_e::EDWARDS_PRIME_FIELD, type_e::POINT_COORD_AFFINE, scalar_coding_e::ECC_BINARY);
+        ecc<uint32_t> ec(cfg, field_e::EDWARDS_PRIME_FIELD, type_e::POINT_COORD_AFFINE, scalar_coding_e::SCALAR_BINARY);
 
         mpz<uint8_t> k("315879992934921009807084090", 10);
         auto secret = phantom_vector<uint8_t>(k.get_limbs().begin(), k.get_limbs().end());
@@ -835,7 +835,7 @@ const lest::test specification[] =
 
         ecc_config<uint32_t> cfg = setup_32_edwards448();
 
-        ecc<uint32_t> ec(cfg, field_e::EDWARDS_PRIME_FIELD, type_e::POINT_COORD_AFFINE, scalar_coding_e::ECC_BINARY);
+        ecc<uint32_t> ec(cfg, field_e::EDWARDS_PRIME_FIELD, type_e::POINT_COORD_AFFINE, scalar_coding_e::SCALAR_BINARY);
 
         mpz<uint8_t> k("2", 10);
         auto secret = phantom_vector<uint8_t>(k.get_limbs().begin(), k.get_limbs().end());
@@ -865,7 +865,7 @@ const lest::test specification[] =
 
         ecc_config<uint32_t> cfg = setup_32_edwards448();
 
-        ecc<uint32_t> ec(cfg, field_e::EDWARDS_PRIME_FIELD, type_e::POINT_COORD_AFFINE, scalar_coding_e::ECC_BINARY);
+        ecc<uint32_t> ec(cfg, field_e::EDWARDS_PRIME_FIELD, type_e::POINT_COORD_AFFINE, scalar_coding_e::SCALAR_BINARY);
 
         mpz<uint8_t> k("315879992934921009807084090", 10);
         auto secret = phantom_vector<uint8_t>(k.get_limbs().begin(), k.get_limbs().end());
@@ -895,7 +895,7 @@ const lest::test specification[] =
         ecc_config<uint32_t> cfg = setup_32_edwards25519();
 
         ecc<uint32_t> ec(cfg, field_e::EDWARDS_PRIME_FIELD,
-            type_e::POINT_COORD_PROJECTIVE, scalar_coding_e::ECC_BINARY);
+            type_e::POINT_COORD_PROJECTIVE, scalar_coding_e::SCALAR_BINARY);
 
         mpz<uint8_t> k("36144925721603087658594284515452164870581325872720374094707712194495455132720", 10);
         phantom_vector<uint8_t> vec = {

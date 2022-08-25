@@ -357,7 +357,7 @@ protected:
         e.get_bytes(e_bytes);
 
         // Use the scalar_parser to scan the bit sequence and perform recoding
-        core::scalar_parser bitgen(core::scalar_coding_e::ECC_BINARY, e_bytes);
+        core::scalar_parser bitgen(core::scalar_coding_e::SCALAR_BINARY, e_bytes);
         size_t num_bits = bitgen.num_symbols();
         if (0 == num_bits) {
             std::cout << "num_bits is zero" << std::endl;

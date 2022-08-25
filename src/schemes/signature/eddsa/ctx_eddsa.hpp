@@ -271,12 +271,12 @@ private:
             new elliptic::ecc<T>(m_params.cfg,
                                  m_params.field,
                                  elliptic::POINT_COORD_PROJECTIVE,
-                                 core::ECC_BINARY,
+                                 core::SCALAR_BINARY,
                                  false));
         m_eddsa_pk = std::unique_ptr<elliptic::ecc<T>>(new elliptic::ecc<T>(m_params.cfg,
                                                        m_params.field,
                                                        elliptic::POINT_COORD_PROJECTIVE,
-                                                       core::ECC_BINARY,
+                                                       core::SCALAR_BINARY,
                                                        false));
 
         m_eddsa->setup(*m_params.base.get());

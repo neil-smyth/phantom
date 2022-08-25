@@ -355,12 +355,12 @@ private:
         m_ecdh_init  = std::unique_ptr<elliptic::ecc<T>>(new elliptic::ecc<T>(m_params.cfg,
                                                          m_params.field,
                                                          elliptic::POINT_COORD_JACOBIAN,
-                                                         core::ECC_PRE_8,
+                                                         core::SCALAR_PRE_8,
                                                          true));
         m_ecdh_final = std::unique_ptr<elliptic::ecc<T>>(new elliptic::ecc<T>(m_params.cfg,
                                                          m_params.field,
                                                          elliptic::POINT_COORD_JACOBIAN,
-                                                         core::ECC_PRE_5,
+                                                         core::SCALAR_PRE_5,
                                                          true));
     }
 
@@ -418,12 +418,12 @@ private:
         m_ecdh_init  = std::unique_ptr<elliptic::ecc<T>>(new elliptic::ecc<T>(m_params.cfg,
                                                          m_params.field,
                                                          elliptic::POINT_COORD_PROJECTIVE,
-                                                         core::ECC_MONT_LADDER,
+                                                         core::SCALAR_MONT_LADDER,
                                                          false));
         m_ecdh_final = std::unique_ptr<elliptic::ecc<T>>(new elliptic::ecc<T>(m_params.cfg,
                                                          m_params.field,
                                                          elliptic::POINT_COORD_PROJECTIVE,
-                                                         core::ECC_MONT_LADDER,
+                                                         core::SCALAR_MONT_LADDER,
                                                          false));
     }
 
@@ -450,12 +450,12 @@ private:
         m_ecdh_init  = std::unique_ptr<elliptic::ecc<T>>(new elliptic::ecc<T>(m_params.cfg,
                                                          m_params.field,
                                                          elliptic::POINT_COORD_JACOBIAN,
-                                                         core::ECC_PRE_8,
+                                                         core::SCALAR_PRE_8,
                                                          true));
         m_ecdh_final = std::unique_ptr<elliptic::ecc<T>>(new elliptic::ecc<T>(m_params.cfg,
                                                          m_params.field,
                                                          elliptic::POINT_COORD_JACOBIAN,
-                                                         core::ECC_PRE_5,
+                                                         core::SCALAR_PRE_5,
                                                          true));
     }
 

@@ -74,7 +74,7 @@ const lest::test specification[] =
         ecc<uint32_t> ec(cfg,
                          field_e::WEIERSTRASS_BINARY_FIELD,
                          type_e::POINT_COORD_AFFINE,
-                         scalar_coding_e::ECC_BINARY);
+                         scalar_coding_e::SCALAR_BINARY);
         retcode_e rc;
 
         auto secret = phantom_vector<uint8_t>();
@@ -100,7 +100,7 @@ const lest::test specification[] =
         ecc<uint32_t> ec(cfg,
                          field_e::WEIERSTRASS_BINARY_FIELD,
                          type_e::POINT_COORD_AFFINE,
-                         scalar_coding_e::ECC_BINARY);
+                         scalar_coding_e::SCALAR_BINARY);
         retcode_e rc;
 
         mpz<uint8_t> k("0", 10);
@@ -125,7 +125,7 @@ const lest::test specification[] =
         ecc_config<uint32_t> cfg = setup_32_b163();
 
         ecc<uint32_t> ec(cfg, field_e::WEIERSTRASS_BINARY_FIELD,
-            type_e::POINT_COORD_AFFINE, scalar_coding_e::ECC_BINARY);
+            type_e::POINT_COORD_AFFINE, scalar_coding_e::SCALAR_BINARY);
 
         mpz<uint8_t> k("1", 10);
         auto secret = phantom_vector<uint8_t>(k.get_limbs().begin(), k.get_limbs().end());
@@ -151,7 +151,7 @@ const lest::test specification[] =
         ecc_config<uint32_t> cfg = setup_32_b163();
 
         ecc<uint32_t> ec(cfg, field_e::WEIERSTRASS_BINARY_FIELD,
-            type_e::POINT_COORD_AFFINE, scalar_coding_e::ECC_BINARY);
+            type_e::POINT_COORD_AFFINE, scalar_coding_e::SCALAR_BINARY);
 
         mpz<uint8_t> k("3", 10);
         auto secret = phantom_vector<uint8_t>(k.get_limbs().begin(), k.get_limbs().end());
@@ -177,7 +177,7 @@ const lest::test specification[] =
         ecc_config<uint32_t> cfg = setup_32_b163();
 
         ecc<uint32_t> ec(cfg, field_e::WEIERSTRASS_BINARY_FIELD,
-            type_e::POINT_COORD_AFFINE, scalar_coding_e::ECC_BINARY);
+            type_e::POINT_COORD_AFFINE, scalar_coding_e::SCALAR_BINARY);
 
         mpz<uint8_t> k("16", 10);
         auto secret = phantom_vector<uint8_t>(k.get_limbs().begin(), k.get_limbs().end());
@@ -203,7 +203,7 @@ const lest::test specification[] =
         ecc_config<uint32_t> cfg = setup_32_b163();
 
         ecc<uint32_t> ec(cfg, field_e::WEIERSTRASS_BINARY_FIELD,
-            type_e::POINT_COORD_AFFINE, scalar_coding_e::ECC_BINARY);
+            type_e::POINT_COORD_AFFINE, scalar_coding_e::SCALAR_BINARY);
 
         mpz<uint8_t> k("20", 10);
         auto secret = phantom_vector<uint8_t>(k.get_limbs().begin(), k.get_limbs().end());
@@ -229,7 +229,7 @@ const lest::test specification[] =
         ecc_config<uint32_t> cfg = setup_32_b163();
 
         ecc<uint32_t> ec(cfg, field_e::WEIERSTRASS_BINARY_FIELD,
-            type_e::POINT_COORD_AFFINE, scalar_coding_e::ECC_BINARY);
+            type_e::POINT_COORD_AFFINE, scalar_coding_e::SCALAR_BINARY);
 
         mpz<uint8_t> k("5846006549323611672814742442876390689256843201586", 10);
         auto secret = phantom_vector<uint8_t>(k.get_limbs().begin(), k.get_limbs().end());
@@ -259,7 +259,7 @@ const lest::test specification[] =
         ecc_config<uint32_t> cfg = setup_32_b233_koblitz();
 
         ecc<uint32_t> ec(cfg, field_e::WEIERSTRASS_BINARY_FIELD,
-            type_e::POINT_COORD_AFFINE, scalar_coding_e::ECC_BINARY);
+            type_e::POINT_COORD_AFFINE, scalar_coding_e::SCALAR_BINARY);
 
         mpz<uint8_t> k("3450873173395281893717377931138512760570940988862252126328087024741342", 10);
         auto secret = phantom_vector<uint8_t>(k.get_limbs().begin(), k.get_limbs().end());
@@ -289,7 +289,7 @@ const lest::test specification[] =
         ecc_config<uint32_t> cfg = setup_32_b233_koblitz();
 
         ecc<uint32_t> ec(cfg, field_e::WEIERSTRASS_BINARY_FIELD,
-            type_e::POINT_COORD_JACOBIAN, scalar_coding_e::ECC_BINARY);
+            type_e::POINT_COORD_JACOBIAN, scalar_coding_e::SCALAR_BINARY);
 
         mpz<uint8_t> k("2", 10);
         auto secret = phantom_vector<uint8_t>(k.get_limbs().begin(), k.get_limbs().end());
@@ -319,7 +319,7 @@ const lest::test specification[] =
         ecc_config<uint32_t> cfg = setup_32_b233_koblitz();
 
         ecc<uint32_t> ec(cfg, field_e::WEIERSTRASS_BINARY_FIELD,
-            type_e::POINT_COORD_JACOBIAN, scalar_coding_e::ECC_BINARY);
+            type_e::POINT_COORD_JACOBIAN, scalar_coding_e::SCALAR_BINARY);
 
         mpz<uint8_t> k("3", 10);
         auto secret = phantom_vector<uint8_t>(k.get_limbs().begin(), k.get_limbs().end());
@@ -349,7 +349,7 @@ const lest::test specification[] =
         ecc_config<uint32_t> cfg = setup_32_b233_koblitz();
 
         ecc<uint32_t> ec(cfg, field_e::WEIERSTRASS_BINARY_FIELD,
-            type_e::POINT_COORD_JACOBIAN, scalar_coding_e::ECC_BINARY);
+            type_e::POINT_COORD_JACOBIAN, scalar_coding_e::SCALAR_BINARY);
 
         mpz<uint8_t> k("3450873173395281893717377931138512760570940988862252126328087024741342", 10);
         auto secret = phantom_vector<uint8_t>(k.get_limbs().begin(), k.get_limbs().end());
