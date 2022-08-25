@@ -397,9 +397,11 @@ endif (BUILD_TESTS)
 # --------------------------------- cpplint --------------------------------- #
 
 include(cmake/cpplint.cmake)
-cpplint_add_subdirectory(src)
-cpplint_add_subdirectory(include)
-cpplint_add_subdirectory(bindings)
+if (CPPLINT)
+    cpplint_add_subdirectory(src)
+    cpplint_add_subdirectory(include)
+    cpplint_add_subdirectory(bindings)
+endif (CPPLINT)
 
 
 # ------------------------- Reference documentation ------------------------- #

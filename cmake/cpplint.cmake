@@ -64,65 +64,68 @@ find_file(CPPLINT cpplint)
 if(CPPLINT)
     message(STATUS "cpplint parser: ${CPPLINT}")
 else()
-    message(FATAL_ERROR "cpplint script: NOT FOUND! "
-                        "Please install cpplint as described on https://pypi.python.org/pypi/cpplint. "
-			"In most cases command 'sudo pip install cpplint' should be sufficent.")
+    message(STATUS "cpplint script: NOT FOUND! "
+                   "Please install cpplint as described on https://pypi.python.org/pypi/cpplint. "
+			       "In most cases command 'sudo pip install cpplint' should be sufficent.")
 endif()
 
+if(CPPLINT)
 
-# common target to concatenate all cpplint.py targets
-add_custom_target(${CPPLINT_TARGET})
+    # common target to concatenate all cpplint.py targets
+    add_custom_target(${CPPLINT_TARGET})
 
 
-# use cpplint.py to check source code files inside DIR directory
-function(cpplint_add_subdirectory DIR)
-    # create relative path to the directory
-    set(ABSOLUTE_DIR ${CMAKE_CURRENT_LIST_DIR}/${DIR})
+    # use cpplint.py to check source code files inside DIR directory
+    function(cpplint_add_subdirectory DIR)
+        # create relative path to the directory
+        set(ABSOLUTE_DIR ${CMAKE_CURRENT_LIST_DIR}/${DIR})
 
-    # add *.c files
-    if(CPPLINT_TEST_C_FILES)
-        set(EXTENSIONS       ${EXTENSIONS}c,)
-        set(FILES_TO_CHECK   ${FILES_TO_CHECK} ${ABSOLUTE_DIR}/*.c)
-    endif()
+        # add *.c files
+        if(CPPLINT_TEST_C_FILES)
+            set(EXTENSIONS       ${EXTENSIONS}c,)
+            set(FILES_TO_CHECK   ${FILES_TO_CHECK} ${ABSOLUTE_DIR}/*.c)
+        endif()
 
-    # add *.h files
-    if(CPPLINT_TEST_H_FILES)
-        set(EXTENSIONS       ${EXTENSIONS}h,)
-        set(FILES_TO_CHECK   ${FILES_TO_CHECK} ${ABSOLUTE_DIR}/*.h)
-    endif()
+        # add *.h files
+        if(CPPLINT_TEST_H_FILES)
+            set(EXTENSIONS       ${EXTENSIONS}h,)
+            set(FILES_TO_CHECK   ${FILES_TO_CHECK} ${ABSOLUTE_DIR}/*.h)
+        endif()
 
-    # add *.cpp files
-    if(CPPLINT_TEST_CPP_FILES)
-        set(EXTENSIONS       ${EXTENSIONS}cpp,)
-        set(FILES_TO_CHECK   ${FILES_TO_CHECK} ${ABSOLUTE_DIR}/*.cpp)
-    endif()
+        # add *.cpp files
+        if(CPPLINT_TEST_CPP_FILES)
+            set(EXTENSIONS       ${EXTENSIONS}cpp,)
+            set(FILES_TO_CHECK   ${FILES_TO_CHECK} ${ABSOLUTE_DIR}/*.cpp)
+        endif()
 
-    # add *.hpp files
-    if(CPPLINT_TEST_HPP_FILES)
-        set(EXTENSIONS       ${EXTENSIONS}hpp,)
-        set(FILES_TO_CHECK   ${FILES_TO_CHECK} ${ABSOLUTE_DIR}/*.hpp)
-    endif()
-  
-    # find all source files inside project
-    file(GLOB_RECURSE LIST_OF_FILES ${FILES_TO_CHECK})
-
-    # create valid target name for this check
-    string(REGEX REPLACE "/" "." TEST_NAME ${DIR})
-    set(TARGET_NAME ${CPPLINT_TARGET}.${TEST_NAME})
-
-    # perform cpplint check
-    add_custom_target(${TARGET_NAME}
-        COMMAND ${CPPLINT} "--extensions=${EXTENSIONS}"
-                           "--root=${CPPLINT_PROJECT_ROOT}"
-                           "--quiet"
-                           ${LIST_OF_FILES}
-        DEPENDS ${LIST_OF_FILES}
-        COMMENT "cpplint: Checking source code style"
-    )
-
-    # run this target when root cpplint.py test is triggered
-    add_dependencies(${CPPLINT_TARGET} ${TARGET_NAME})
+        # add *.hpp files
+        if(CPPLINT_TEST_HPP_FILES)
+            set(EXTENSIONS       ${EXTENSIONS}hpp,)
+            set(FILES_TO_CHECK   ${FILES_TO_CHECK} ${ABSOLUTE_DIR}/*.hpp)
+        endif()
     
-    # add this test to CTest
-    #add_test(${TARGET_NAME} ${CMAKE_MAKE_PROGRAM} ${TARGET_NAME})
-endfunction()
+        # find all source files inside project
+        file(GLOB_RECURSE LIST_OF_FILES ${FILES_TO_CHECK})
+
+        # create valid target name for this check
+        string(REGEX REPLACE "/" "." TEST_NAME ${DIR})
+        set(TARGET_NAME ${CPPLINT_TARGET}.${TEST_NAME})
+
+        # perform cpplint check
+        add_custom_target(${TARGET_NAME}
+            COMMAND ${CPPLINT} "--extensions=${EXTENSIONS}"
+                            "--root=${CPPLINT_PROJECT_ROOT}"
+                            "--quiet"
+                            ${LIST_OF_FILES}
+            DEPENDS ${LIST_OF_FILES}
+            COMMENT "cpplint: Checking source code style"
+        )
+
+        # run this target when root cpplint.py test is triggered
+        add_dependencies(${CPPLINT_TARGET} ${TARGET_NAME})
+        
+        # add this test to CTest
+        #add_test(${TARGET_NAME} ${CMAKE_MAKE_PROGRAM} ${TARGET_NAME})
+    endfunction()
+
+endif()

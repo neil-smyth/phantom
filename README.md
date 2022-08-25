@@ -103,6 +103,14 @@ The library is written in C++. For portability a range of C wrappers are provide
 This is a big item on the TODO list - the functional tests in the _test_ directory provide some timing and performance information. An automated test executable to generate the metrics and associated documentation is needed. I have Proxmox Epyc and Xeon servers available that may be configured with suitable OS and hardware settings in a VM to provide repeatable test results.
 
 
+## Static Analysis
+
+Support for _Cpplint_ is provided if the cmake project detects the presence of of the _Cpplint_ parser. If so, static analysis of the source code can be conveniently performed using the target _cpplint_, for example:
+
+```
+_make cpplint_
+```
+
 ## Reference Manual
 
 Documentation for developers describing the library software is contained in the reference manual _<build directory>/docs/phantom_reference.pdf_. This document is built using Doxygen using the _make_doc_ target within your build directory, Doxygen will also produce an html version of the reference manual.
