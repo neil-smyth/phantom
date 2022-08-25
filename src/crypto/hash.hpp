@@ -44,7 +44,7 @@ enum hash_alg_e {
  * 
  * Abstract base class to define a common interface for all hash algorithms.
  */
-class hash : public aligned_base<32>
+class hash : public aligned_base<DEFAULT_MEM_ALIGNMENT>
 {
 public:
     virtual ~hash() {}

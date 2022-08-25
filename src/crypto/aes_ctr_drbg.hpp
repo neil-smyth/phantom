@@ -32,7 +32,7 @@ namespace crypto {
  * @ingroup random
  * @brief AES CTR-DRBG CSPRNG, a deterministic random bit generator defined by NIST SP 800-90A
  */
-class aes_ctr_drbg : public aligned_base<32>
+class aes_ctr_drbg : public aligned_base<DEFAULT_MEM_ALIGNMENT>
 {
 public:
     aes_ctr_drbg(uint32_t seed_period, csprng_entropy_cb cb);
