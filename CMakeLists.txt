@@ -24,7 +24,7 @@ if (NOT DEFINED CMAKE_TOOLCHAIN_FILE)
     if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
         # Using Clang
         # TODO - Remove and fix warnings
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unused-variable -Wno-sign-compare -Wno-unused-label -Wno-array-bounds -Wno-unused-function -Wno-missing-braces")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-missing-braces")
     elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
         # Using GCC
         # TODO - Remove and fix warnings

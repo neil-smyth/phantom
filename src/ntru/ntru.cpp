@@ -1004,20 +1004,6 @@ void ntru::sub_scaled(uint32_t* x, size_t xlen,
     }
 }
 
-
-static inline uint32_t modp_set(int32_t x, uint32_t p)
-{
-    uint32_t w;
-    w  = static_cast<uint32_t>(x);
-    w += p & -(w >> 31);
-    return w;
-}
-
-static inline int32_t modp_norm(uint32_t x, uint32_t p)
-{
-    return static_cast<int32_t>(x - (p & (((x - ((p + 1) >> 1)) >> 31) - 1)));
-}
-
 static inline int64_t const_time_rint(double x)
 {
     // We do not want to use llrint() since it might be not
