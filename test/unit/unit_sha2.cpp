@@ -58,12 +58,12 @@ const lest::test specification[] =
         bool retval = hash->init(28);
         EXPECT(true == retval);
         size_t len = hash->get_length();
-        EXPECT(28 == len);
+        EXPECT(28U == len);
 
         retval = hash->init(224);
         EXPECT(true == retval);
         len = hash->get_length();
-        EXPECT(28 == len);
+        EXPECT(28U == len);
     },
     CASE("Hash Length 256")
     {
@@ -72,12 +72,12 @@ const lest::test specification[] =
         bool retval = hash->init(32);
         EXPECT(true == retval);
         size_t len = hash->get_length();
-        EXPECT(32 == len);
+        EXPECT(32U == len);
 
         retval = hash->init(256);
         EXPECT(true == retval);
         len = hash->get_length();
-        EXPECT(32 == len);
+        EXPECT(32U == len);
     },
     CASE("Hash Length 384")
     {
@@ -86,12 +86,12 @@ const lest::test specification[] =
         bool retval = hash->init(48);
         EXPECT(true == retval);
         size_t len = hash->get_length();
-        EXPECT(48 == len);
+        EXPECT(48U == len);
 
         retval = hash->init(384);
         EXPECT(true == retval);
         len = hash->get_length();
-        EXPECT(48 == len);
+        EXPECT(48U == len);
     },
     CASE("Hash Length 512")
     {
@@ -100,12 +100,12 @@ const lest::test specification[] =
         bool retval = hash->init(64);
         EXPECT(true == retval);
         size_t len = hash->get_length();
-        EXPECT(64 == len);
+        EXPECT(64U == len);
 
         retval = hash->init(512);
         EXPECT(true == retval);
         len = hash->get_length();
-        EXPECT(64 == len);
+        EXPECT(64U == len);
     },
     CASE("Hash copy")
     {
@@ -118,9 +118,9 @@ const lest::test specification[] =
 
         hash->init(64);
         size_t len = hash->get_length();
-        EXPECT(64 == len);
+        EXPECT(64U == len);
         len = hash2->get_length();
-        EXPECT(32 == len);
+        EXPECT(32U == len);
     },
 };
 

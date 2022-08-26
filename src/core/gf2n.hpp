@@ -137,7 +137,7 @@ public:
     static bool mod_mul_arr(phantom_vector<T>& r, const phantom_vector<T>& a,
         const phantom_vector<T>& b, const std::vector<int>& p)
     {
-        int zlen;
+        size_t zlen;
         phantom_vector<T> s;
         T x1, x0, y1, y0, zz[4];
 
@@ -177,7 +177,7 @@ public:
         size_t zlen = a.size() * 2;
         s.resize(zlen);
 
-        for (int i=0; i < a.size(); i++) {
+        for (size_t i=0; i < a.size(); i++) {
             s[2*i + 1] = square_1(a[i]);
             s[2*i    ] = square_0(a[i]);
         }

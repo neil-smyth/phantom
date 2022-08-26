@@ -119,9 +119,7 @@ void gf2n<uint8_t>::mul_1x1(uint8_t* r1, uint8_t* r0, const uint8_t a, const uin
 {
     uint8_t h, l, s;
     uint8_t tab[2];
-    uint8_t a1, a2;
-
-    a1 = a & (0x7F);
+    uint8_t a1 = a & (0x7F);
 
     tab[0] = 0;
     tab[1] = a1;

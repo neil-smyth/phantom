@@ -14,7 +14,7 @@ SET (CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 SET (CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 
 # Configure options for the build type
-SET (CMAKE_CXX_FLAGS_INIT                "-Wall -m64 -Wno-unused-variable -Wno-sign-compare -Wno-unused-label -Wno-array-bounds -Wno-unused-but-set-variable")
+SET (CMAKE_CXX_FLAGS_INIT                "-Wall -m64")
 SET (CMAKE_CXX_FLAGS_DEBUG_INIT          "-O0 -g -D_ENABLE_LOGGING")
 SET (CMAKE_CXX_FLAGS_MINSIZEREL_INIT     "-Os -DNDEBUG")
 SET (CMAKE_CXX_FLAGS_RELEASE_INIT        "-O2 -DNDEBUG")

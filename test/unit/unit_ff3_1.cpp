@@ -30,7 +30,6 @@ const lest::test specification[] =
         phantom_vector<uint8_t> tweak(7);
         phantom_vector<uint8_t> badtweak(8);
 
-        aes_fpe_ff3_1<int> uut;
         std::unique_ptr<fpe_ctx> ctx;
         ctx = aes_fpe_ff3_1<uint16_t>::create_ctx(user_key, aes_keylen_e::AES_128, badtweak);
         EXPECT(nullptr == ctx.get());
@@ -81,7 +80,7 @@ const lest::test specification[] =
         EXPECT_THROWS_AS(aes_fpe_ff3_1<uint16_t>::encrypt(badctx, 10, pt, ct), std::runtime_error);
 
         aes_fpe_ff3_1<uint16_t>::encrypt(ctx, 10, badpt, ct);
-        EXPECT(0 == ct.size());
+        EXPECT(0U == ct.size());
 
         aes_fpe_ff3_1<uint16_t>::encrypt(ctx, 10, pt, ct);
         EXPECT(pt.size() == ct.size());
@@ -102,7 +101,7 @@ const lest::test specification[] =
         EXPECT_THROWS_AS(aes_fpe_ff3_1<uint16_t>::decrypt(badctx, 10, ct, rt), std::runtime_error);
 
         aes_fpe_ff3_1<uint16_t>::decrypt(ctx, 10, badct, rt);
-        EXPECT(0 == rt.size());
+        EXPECT(0U == rt.size());
 
         aes_fpe_ff3_1<uint16_t>::decrypt(ctx, 10, ct, rt);
         EXPECT(ct.size() == rt.size());

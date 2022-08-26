@@ -155,7 +155,6 @@ static bool ecc_diffie_hellman(ctx_ecdh& myctx, const elliptic::point<T>& p_base
     const phantom_vector<uint8_t>& secret = myctx.sk();
 
     // Obtain common array lengths
-    size_t num_bits  = myctx.get_curve_bits();
     size_t num_bytes = myctx.get_curve_bytes();
 
     ctx_ecdh_tmpl<T>& ctx = dynamic_cast<ctx_ecdh_tmpl<T>&>(myctx);
@@ -343,9 +342,7 @@ bool ecdh_key_exchange::key_exchange_final(std::unique_ptr<user_ctx>& ctx, const
 {
     ctx_ecdh& myctx = dynamic_cast<ctx_ecdh&>(*ctx.get());
 
-    size_t num_bits  = myctx.get_curve_bits();
     size_t num_bytes = myctx.get_curve_bytes();
-    size_t num_words = (num_bits + myctx.get_wordsize() - 1) >> myctx.get_log2_wordsize();
 
     if (m.size() != 2 * num_bytes) {
         return false;

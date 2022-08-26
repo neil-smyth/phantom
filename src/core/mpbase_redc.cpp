@@ -90,7 +90,6 @@ T mpbase<T>::redc_2(T* r_limbs, T* u_limbs, const T* m_limbs, size_t n, const T*
 {
     T q[2];
     T upn;
-    T cy;
 
     assert(n > 0);
 

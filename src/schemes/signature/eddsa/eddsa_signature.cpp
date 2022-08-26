@@ -284,8 +284,6 @@ bool eddsa_signature::sign(const std::unique_ptr<user_ctx>& ctx,
 {
     ctx_eddsa& myctx = dynamic_cast<ctx_eddsa&>(*ctx.get());
 
-    size_t n = myctx.get_order_G_bits();
-
     switch (myctx.get_wordsize())
     {
         case 16:

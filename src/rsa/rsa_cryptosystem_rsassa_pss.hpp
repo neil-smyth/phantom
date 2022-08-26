@@ -226,7 +226,7 @@ private:
 
         // Set the leftmost 8emLen - emBits bits of the leftmost octet in DB to zero
         size_t zero_bits = 8*emlen - bits;
-        DB[0] &= (1UL << (8*emlen - bits)) - 1;
+        DB[0] &= (1UL << zero_bits) - 1;
 
         // If the emLen - hLen - sLen - 2 leftmost octets of DB are not
         // zero or if the octet at position emLen - hLen - sLen - 1 (the

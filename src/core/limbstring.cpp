@@ -18,20 +18,20 @@
 namespace phantom {
 namespace core {
 
-template<>
-const limbstring<uint64_t>::mpz_base_coding limbstring<uint64_t>::base_coding_64[5] =
+template<typename T>
+const mpz_base_coding limbstring<T>::base_coding_64[5] =
     { {64, 1}, {21, 3}, {16, 4}, {12, 5}, {10, 6} };
 
-template<>
-const limbstring<uint32_t>::mpz_base_coding limbstring<uint32_t>::base_coding_32[5] =
+template<typename T>
+const mpz_base_coding limbstring<T>::base_coding_32[5] =
     { {32, 1}, {10, 3}, { 8, 4}, { 6, 5}, { 5, 6} };
 
-template<>
-const limbstring<uint16_t>::mpz_base_coding limbstring<uint16_t>::base_coding_16[5] =
+template<typename T>
+const mpz_base_coding limbstring<T>::base_coding_16[5] =
     { {16, 1}, { 5, 3}, { 4, 4}, { 3, 5}, { 2, 6} };
 
-template<>
-const limbstring<uint8_t>::mpz_base_coding limbstring<uint8_t>::base_coding_8[5] =
+template<typename T>
+const mpz_base_coding limbstring<T>::base_coding_8[5] =
     { {8, 1}, { 2, 3}, { 2, 4}, { 2, 5}, { 1, 6} };
 
 
@@ -116,7 +116,7 @@ const char* limbstring<T>::_ascii_base64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghij
  */
 template<typename T>
 void limbstring<T>::init_power_2_string(phantom_vector<T>& limbs,
-    const typename limbstring<T>::mpz_base_coding* base_coding,
+    const mpz_base_coding* base_coding,
     const char* str, size_t base, size_t base_code)
 {
     // Get the length of string str
@@ -168,7 +168,7 @@ void limbstring<T>::init_power_2_string(phantom_vector<T>& limbs,
  */
 template<typename T>
 void limbstring<T>::init_basex_string(phantom_vector<T>& limbs,
-                                      const typename limbstring<T>::mpz_base_coding* base_coding,
+                                      const mpz_base_coding* base_coding,
                                       const char* str,
                                       const uint8_t* base_lut,
                                       size_t base)
@@ -324,12 +324,6 @@ std::string limbstring<T>::get_str(const mpz<T>& number, size_t base, bool upper
 
     auto n_used = bit_manipulation::clz(number[used-1]);
     if (64 == base) {
-        size_t bitsize = 6;
-        uint8_t mask = (1 << bitsize) - 1;
-
-        // Calculate the number of digits rounded up
-        size_t str_len = (used * std::numeric_limits<T>::digits + bitsize - 1 - n_used) / bitsize;
-
         size_t k = 0;
         std::vector<uint8_t> block;
         base64_gen_blocks(block, number.get_limbs().data(), number.sizeinbase(2));
@@ -345,12 +339,6 @@ std::string limbstring<T>::get_str(const mpz<T>& number, size_t base, bool upper
         }
     }
     else if (32 == base) {
-        size_t bitsize = 5;
-        uint8_t mask = (1 << bitsize) - 1;
-
-        // Calculate the number of digits rounded up
-        size_t str_len = (used * std::numeric_limits<T>::digits + bitsize - 1 - n_used) / bitsize;
-
         size_t k = 0;
         std::vector<uint8_t> block;
         base32_gen_blocks(block, number.get_limbs().data(), number.sizeinbase(2));
@@ -415,7 +403,6 @@ std::string limbstring<T>::get_str(const mpz<T>& number, size_t base, bool upper
             str[0] = ascii[0];
         }
         else {
-            size_t shift = 0;
             for (size_t j=0, k=str_len, shift=0; k-->0;) {
                 uint8_t c = number[j] >> shift;
                 shift += bitsize;
@@ -466,7 +453,7 @@ void limbstring<T>::set_str(phantom_vector<T>& limbs, bool& sign, const char* st
         throw std::runtime_error("base is invalid");
     }
 
-    const typename limbstring<T>::mpz_base_coding* base_coding;
+    const mpz_base_coding* base_coding;
     switch (std::numeric_limits<T>::digits)
     {
         case 64: base_coding = limbstring<T>::base_coding_64; break;

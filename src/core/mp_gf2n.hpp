@@ -367,7 +367,6 @@ public:
     {
         mpz<T> temp;
         temp.set_words(m_poly);
-        bool dummy;
         return limbstring<T>::get_str(temp, base, uppercase);
     }
 
@@ -805,7 +804,7 @@ public:
             return;
         }
 
-        size_t in_used = in1.size();
+        int in_used = in1.size();
         if (0 == in_used || (bits >= (in_used * std::numeric_limits<T>::digits))) {
             out.resize(0);
             return;

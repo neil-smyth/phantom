@@ -42,8 +42,8 @@ int main(int argc, char *argv[])
         rng->get_mem(user_key.data(), 16);
 
         fpe_format_e format = (i == 0)? FPE_STR_NUMERIC : FPE_STR_ALPHANUMERIC;
-        int num_char = (i == 0)? 8 : (i == 1)? 12 : 16;
-        int radix = (i < 1)? 10 : 62;
+        size_t num_char = (i == 0)? 8 : (i == 1)? 12 : 16;
+        size_t radix = (i < 1)? 10 : 62;
 
         std::unique_ptr<fpe_ctx> ctx = format_preserving_encryption::create_ctx(user_key, AES_FF3_1_128, format, tweak);
 

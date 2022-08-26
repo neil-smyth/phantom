@@ -132,11 +132,13 @@ public:
     /// Calculate 2^x mod q
     static T gen_Rx(T x, T q, T invq, T R, T R2, size_t b2 = std::numeric_limits<T>::digits)
     {
-        T z, y, cond;
+        T z, y;
+
         x--;
         y = R2;
         z = R;
-        for (size_t i=0; (1 << i) <= x; i++) {
+
+        for (size_t i=0; (1U << i) <= x; i++) {
             U a, b;
             if ((x & (1U << i)) != 0) {
                 U a, b;
@@ -154,6 +156,7 @@ public:
             a += q & -(a >> (std::numeric_limits<U>::digits - 1));
             y = static_cast<T>(a);
         }
+
         return z;
     }
 };
@@ -210,7 +213,6 @@ public:
     /// Convert an array from the reduction domain, with granular stride control
     static void static_convert_from(const reducer<T>& r, T *y, const T *x, size_t n, size_t stride = 1)
     {
-        const montgomery<T>& mont = static_cast<const montgomery<T>&>(r);
         for (size_t i = 0; i < n; i += stride) {
             y[i] = static_mul(r, x[i], 1);
         }

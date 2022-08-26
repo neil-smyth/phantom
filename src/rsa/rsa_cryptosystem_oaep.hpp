@@ -60,7 +60,6 @@ public:
 
         // Create a padding string and generate the datablock lHash || PS || 0x01 || M
         size_t pslen = k - pt.size() - 2*hlen - 2;
-        size_t dblen = k - hlen - 1;
         phantom_vector<uint8_t> ps, db;
         ps.resize(pslen);
         db.insert(db.end(), lhash.begin(), lhash.end());

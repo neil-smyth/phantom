@@ -22,7 +22,7 @@ const lest::test specification[] =
         mpz<uint16_t> a(uint16_t(0xFFFF));
         mpz<uint16_t> b(uint16_t(0x0001));
         mpz<uint16_t> s = a + b;
-        EXPECT(s.sizeinbase(2) == 17);
+        EXPECT(s.sizeinbase(2) == 17U);
         EXPECT(s[1] == 0x0001);
         EXPECT(s[0] == 0x0000);
         EXPECT(s.is_negative() == false);
@@ -32,7 +32,7 @@ const lest::test specification[] =
         mpz<uint16_t> a(uint16_t(0xFFFF));
         mpz<uint16_t> b(uint16_t(0x0001));
         mpz<uint16_t> s = a - b;
-        EXPECT(s.sizeinbase(2) == 16);
+        EXPECT(s.sizeinbase(2) == 16U);
         EXPECT(s[0] == 0xFFFE);
         EXPECT(s.is_negative() == false);
     },
@@ -41,7 +41,7 @@ const lest::test specification[] =
         mpz<uint16_t> a(uint16_t(0x0001));
         mpz<uint16_t> b(uint16_t(0x0002));
         mpz<uint16_t> s = a - b;
-        EXPECT(s.sizeinbase(2) == 1);
+        EXPECT(s.sizeinbase(2) == 1U);
         EXPECT(s[0] == 0x0001);
         EXPECT(s.is_negative() == true);
         EXPECT(static_cast<int16_t>(s) == int16_t(-1));
@@ -61,7 +61,7 @@ const lest::test specification[] =
         mpz<uint16_t> a(int16_t(-1));
         mpz<uint16_t> b(int16_t(-3));
         mpz<uint16_t> s = a + b;
-        EXPECT(s.sizeinbase(2) == 3);
+        EXPECT(s.sizeinbase(2) == 3U);
         EXPECT(s[0] == 0x0004);
         EXPECT(s.is_negative() == true);
         EXPECT(static_cast<int16_t>(s) == int16_t(-4));
@@ -71,7 +71,7 @@ const lest::test specification[] =
         mpz<uint16_t> a(int16_t(-1));
         int16_t b = -3;
         mpz<uint16_t> s = a + b;
-        EXPECT(s.sizeinbase(2) == 3);
+        EXPECT(s.sizeinbase(2) == 3U);
         EXPECT(s[0] == 0x0004);
         EXPECT(s.is_negative() == true);
         EXPECT(static_cast<int16_t>(s) == int16_t(-4));
@@ -81,7 +81,7 @@ const lest::test specification[] =
         mpz<uint16_t> a(int16_t(-1));
         int16_t b = 3;
         mpz<uint16_t> s = a - b;
-        EXPECT(s.sizeinbase(2) == 3);
+        EXPECT(s.sizeinbase(2) == 3U);
         EXPECT(s[0] == 0x0004);
         EXPECT(s.is_negative() == true);
         EXPECT(static_cast<int16_t>(s) == int16_t(-4));
@@ -91,7 +91,7 @@ const lest::test specification[] =
         mpz<uint16_t> a(int16_t(-1));
         int16_t b = -3;
         mpz<uint16_t> s = a - b;
-        EXPECT(s.sizeinbase(2) == 2);
+        EXPECT(s.sizeinbase(2) == 2U);
         EXPECT(s[0] == 0x0002);
         EXPECT(s.is_negative() == false);
         EXPECT(static_cast<int16_t>(s) == int16_t(2));
@@ -112,26 +112,26 @@ const lest::test specification[] =
         EXPECT(a++ == b);
         EXPECT(a != b);
         EXPECT(a == r);
-        EXPECT(a.sizeinbase(2) == 33);
-        EXPECT(b.sizeinbase(2) == 32);
+        EXPECT(a.sizeinbase(2) == 33U);
+        EXPECT(b.sizeinbase(2) == 32U);
     },
     CASE("Post-increment values- 16-bit")
     {
         mpz<uint16_t> a(int16_t(-2));
         a++;
-        EXPECT(a.sizeinbase(2) == 1);
+        EXPECT(a.sizeinbase(2) == 1U);
         EXPECT(a == int16_t(-1));
         EXPECT(a.is_negative() == true);
         a++;
-        EXPECT(a.sizeinbase(2) == 1);
+        EXPECT(a.sizeinbase(2) == 1U);
         EXPECT(a == int16_t(0));
         EXPECT(a.is_negative() == false);
         a++;
-        EXPECT(a.sizeinbase(2) == 1);
+        EXPECT(a.sizeinbase(2) == 1U);
         EXPECT(a == int16_t(1));
         EXPECT(a.is_negative() == false);
         a++;
-        EXPECT(a.sizeinbase(2) == 2);
+        EXPECT(a.sizeinbase(2) == 2U);
         EXPECT(a == int16_t(2));
         EXPECT(a.is_negative() == false);
     },
@@ -145,19 +145,19 @@ const lest::test specification[] =
     {
         mpz<uint16_t> a(int16_t(-2));
         ++a;
-        EXPECT(a.sizeinbase(2) == 1);
+        EXPECT(a.sizeinbase(2) == 1U);
         EXPECT(a == int16_t(-1));
         EXPECT(a.is_negative() == true);
         ++a;
-        EXPECT(a.sizeinbase(2) == 1);
+        EXPECT(a.sizeinbase(2) == 1U);
         EXPECT(a == int16_t(0));
         EXPECT(a.is_negative() == false);
         ++a;
-        EXPECT(a.sizeinbase(2) == 1);
+        EXPECT(a.sizeinbase(2) == 1U);
         EXPECT(a == int16_t(1));
         EXPECT(a.is_negative() == false);
         ++a;
-        EXPECT(a.sizeinbase(2) == 2);
+        EXPECT(a.sizeinbase(2) == 2U);
         EXPECT(a == int16_t(2));
         EXPECT(a.is_negative() == false);
     },
@@ -170,8 +170,8 @@ const lest::test specification[] =
         mpz<uint16_t> r(val2, 5);
         EXPECT(++a != b);
         EXPECT(a == r);
-        EXPECT(a.sizeinbase(2) == 33);
-        EXPECT(b.sizeinbase(2) == 32);
+        EXPECT(a.sizeinbase(2) == 33U);
+        EXPECT(b.sizeinbase(2) == 32U);
     },
     CASE("Post-decrement funtionality - 16-bit")
     {
@@ -190,26 +190,26 @@ const lest::test specification[] =
         mpz<uint16_t> r(val2, 4);
         EXPECT(--a == r);
         EXPECT(a != b);
-        EXPECT(a.sizeinbase(2) == 32);
-        EXPECT(b.sizeinbase(2) == 33);
+        EXPECT(a.sizeinbase(2) == 32U);
+        EXPECT(b.sizeinbase(2) == 33U);
     },
     CASE("Post-decrement values - 16-bit")
     {
         mpz<uint16_t> a(int16_t(2));
         a--;
-        EXPECT(a.sizeinbase(2) == 1);
+        EXPECT(a.sizeinbase(2) == 1U);
         EXPECT(a == int16_t(1));
         EXPECT(a.is_negative() == false);
         a--;
-        EXPECT(a.sizeinbase(2) == 1);
+        EXPECT(a.sizeinbase(2) == 1U);
         EXPECT(a == int16_t(0));
         EXPECT(a.is_negative() == false);
         a--;
-        EXPECT(a.sizeinbase(2) == 1);
+        EXPECT(a.sizeinbase(2) == 1U);
         EXPECT(a == int16_t(-1));
         EXPECT(a.is_negative() == true);
         a--;
-        EXPECT(a.sizeinbase(2) == 2);
+        EXPECT(a.sizeinbase(2) == 2U);
         EXPECT(a == int16_t(-2));
         EXPECT(a.is_negative() == true);
     },
@@ -223,19 +223,19 @@ const lest::test specification[] =
     {
         mpz<uint16_t> a(int16_t(2));
         --a;
-        EXPECT(a.sizeinbase(2) == 1);
+        EXPECT(a.sizeinbase(2) == 1U);
         EXPECT(a == int16_t(1));
         EXPECT(a.is_negative() == false);
         --a;
-        EXPECT(a.sizeinbase(2) == 1);
+        EXPECT(a.sizeinbase(2) == 1U);
         EXPECT(a == int16_t(0));
         EXPECT(a.is_negative() == false);
         --a;
-        EXPECT(a.sizeinbase(2) == 1);
+        EXPECT(a.sizeinbase(2) == 1U);
         EXPECT(a == int16_t(-1));
         EXPECT(a.is_negative() == true);
         --a;
-        EXPECT(a.sizeinbase(2) == 2);
+        EXPECT(a.sizeinbase(2) == 2U);
         EXPECT(a == int16_t(-2));
         EXPECT(a.is_negative() == true);
     },
@@ -248,8 +248,8 @@ const lest::test specification[] =
         mpz<uint16_t> r(val2, 4);
         EXPECT(--a == r);
         EXPECT(a != b);
-        EXPECT(a.sizeinbase(2) == 32);
-        EXPECT(b.sizeinbase(2) == 33);
+        EXPECT(a.sizeinbase(2) == 32U);
+        EXPECT(b.sizeinbase(2) == 33U);
     },
     CASE("Negate - 16-bit")
     {
@@ -272,7 +272,7 @@ const lest::test specification[] =
         temp2 = m;
 
         mpz<uint16_t>::gcdext(temp, s, t, R, temp2);
-        EXPECT(temp.get_limbsize() == 1);
+        EXPECT(temp.get_limbsize() == 1U);
         EXPECT(temp == uint16_t(1));
 
         uint16_t mont_inv = 0;
@@ -287,7 +287,7 @@ const lest::test specification[] =
         b = b.mul_mont(R2, mod);
         a = a.add_mod(b, mod);
         a = a.mul_mont(one, mod);
-        EXPECT(a.sizeinbase(2) == 17);
+        EXPECT(a.sizeinbase(2) == 17U);
         EXPECT(a[1] == 0x0001);
         EXPECT(a[0] == 0x0000);
         EXPECT(a.is_negative() == false);
@@ -306,7 +306,7 @@ const lest::test specification[] =
         temp2 = m;
 
         mpz<uint16_t>::gcdext(temp, s, t, R, temp2);
-        EXPECT(temp.get_limbsize() == 1);
+        EXPECT(temp.get_limbsize() == 1U);
         EXPECT(temp == uint16_t(1));
 
         uint16_t mont_inv = 0;
@@ -321,7 +321,7 @@ const lest::test specification[] =
         b = b.mul_mont(R2, mod);
         a = a.sub_mod(b, mod);
         a = a.mul_mont(one, mod);
-        EXPECT(a.sizeinbase(2) == 192);
+        EXPECT(a.sizeinbase(2) == 192U);
         EXPECT(a.get_str(16, true) == "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFE");
         EXPECT(a.is_negative() == false);
     },
@@ -339,7 +339,7 @@ const lest::test specification[] =
         temp2 = m;
 
         mpz<uint16_t>::gcdext(temp, s, t, R, temp2);
-        EXPECT(temp.get_limbsize() == 1);
+        EXPECT(temp.get_limbsize() == 1U);
         EXPECT(temp == uint16_t(1));
 
         uint16_t mont_inv = 0;
@@ -354,7 +354,7 @@ const lest::test specification[] =
         b = b.mul_mont(R2, mod);
         a = a.add_mod(b, mod);
         a = a.mul_mont(one, mod);
-        EXPECT(a.sizeinbase(2) == 192);
+        EXPECT(a.sizeinbase(2) == 192U);
         EXPECT(a.get_str(16, true) == "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFD");
         EXPECT(a.is_negative() == false);
     },

@@ -148,10 +148,6 @@ bool saber_pke::encrypt(const std::unique_ptr<user_ctx>& ctx, const phantom_vect
 
     LOG_DEBUG("Saber PKE Encrypt\n");
 
-    size_t et  = saber_indcpa::m_params[myctx.get_set()].et;
-    size_t l   = saber_indcpa::m_params[myctx.get_set()].l;
-    size_t ep  = saber_indcpa::m_params[myctx.get_set()].ep;
-
     phantom_vector<uint8_t> seed(32);
     myctx.pke()->get_prng()->get_mem(seed.data(), 32);
 
@@ -181,8 +177,6 @@ bool saber_pke::decrypt(const std::unique_ptr<user_ctx>& ctx, const phantom_vect
 
     LOG_DEBUG("Saber PKE Decrypt\n");
 
-    size_t et  = saber_indcpa::m_params[myctx.get_set()].et;
-
     // saber CPA Encryption of the public key
     phantom_vector<uint8_t> pt_vec(SABRE_MSG_LEN);
     phantom_vector<uint8_t> ct_vec(ct.size());
@@ -204,8 +198,6 @@ bool saber_pke::decrypt(const std::unique_ptr<user_ctx>& ctx, const phantom_vect
 
 size_t saber_pke::get_msg_len(const std::unique_ptr<user_ctx>& ctx) const
 {
-    ctx_saber_pke& myctx = dynamic_cast<ctx_saber_pke&>(*ctx.get());
-
     return SABRE_MSG_LEN;
 }
 

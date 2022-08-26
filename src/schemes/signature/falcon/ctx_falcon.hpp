@@ -60,7 +60,6 @@ public:
 
         uint32_t q     = m_params[m_set].q;
         uint32_t g     = m_params[m_set].g;
-        uint32_t inv_g = m_params[m_set].inv_g;
         size_t   n     = m_params[m_set].n;
         ntt_falcon* ntt32 = new ntt_falcon(m_reduction, g, n);
         if (!ntt32) {

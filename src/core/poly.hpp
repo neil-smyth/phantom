@@ -421,7 +421,6 @@ private:
     template<typename U, typename V, size_t n, size_t N_SB>
     static void toom_cook_4way(T *result, const T *a1, const T *b1)
     {
-        size_t N_RES    = n << 1;
         size_t N_SB_RES = 2 * N_SB - 1;
 
         T inv3 = 43691, inv9 = 36409, inv15 = 61167;

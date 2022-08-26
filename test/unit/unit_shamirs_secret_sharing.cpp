@@ -75,7 +75,7 @@ const lest::test specification[] =
 
         EXPECT(EXIT_SUCCESS == retval);
         bool mismatch = false;
-        for (int32_t i = 0; i < shamirs_secret_sharing::key_bytes; i++)
+        for (size_t i = 0; i < shamirs_secret_sharing::key_bytes; i++)
         {
             mismatch |= key[i] != keyout[i];
         }
@@ -84,7 +84,7 @@ const lest::test specification[] =
         retval = sss.combine(keyout, shares, 2);
         EXPECT(EXIT_SUCCESS == retval);
         mismatch = false;
-        for (int32_t i = 0; i < shamirs_secret_sharing::key_bytes; i++)
+        for (size_t i = 0; i < shamirs_secret_sharing::key_bytes; i++)
         {
             mismatch |= key[i] != keyout[i];
         }

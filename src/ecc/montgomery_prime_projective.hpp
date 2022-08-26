@@ -151,7 +151,6 @@ public:
         core::mpz<T>& X1, core::mpz<T>& Y1, core::mpz<T>& Z1, const core::mpz<T>& X2, const core::mpz<T>& Z2)
     {
         const core::mpz<T>& constant_a = dynamic_cast<const core::mpz<T>&>(*config.a.get());
-        const core::mpz<T>& constant_b = dynamic_cast<const core::mpz<T>&>(*config.b.get());
 
         core::mpz<T> t1, t2, t3, t4;
 
@@ -224,7 +223,6 @@ public:
     retcode_e doubling(const ecc_config<T>& config, size_t w) override
     {
         const core::mpz<T>& constant_a24 = dynamic_cast<const core::mpz<T>&>(*config.d.get());
-        const core::mpz<T>& constant_b = dynamic_cast<const core::mpz<T>&>(*config.b.get());
 
         do {
             if (y() == T(0)) {
@@ -254,8 +252,6 @@ public:
         return POINT_OK;
 
         const prime_point<T>& p_rhs = reinterpret_cast<const prime_point<T>&>(rhs);
-        const core::mpz<T>& constant_a = dynamic_cast<const core::mpz<T>&>(*config.a.get());
-        const core::mpz<T>& constant_b = dynamic_cast<const core::mpz<T>&>(*config.b.get());
 
         if (x() == p_rhs.x()) {
             if (y() != p_rhs.y()) {
@@ -293,7 +289,6 @@ public:
         prime_point<T>& p_rhs = reinterpret_cast<prime_point<T>&>(*p_other);
         const prime_point<T>& p_g = reinterpret_cast<const prime_point<T>&>(p_base);
         const core::mpz<T>& constant_a24 = dynamic_cast<const core::mpz<T>&>(*config.d.get());
-        const core::mpz<T>& constant_b = dynamic_cast<const core::mpz<T>&>(*config.b.get());
 
         if (x() == p_rhs.x()) {
             if (y() != p_rhs.y()) {

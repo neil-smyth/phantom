@@ -39,11 +39,11 @@ const lest::test specification[] =
         std::unique_ptr<csprng> rng = std::unique_ptr<csprng>(csprng::make(0, &test_cb));
 
         uint32_t bits = rng.get()->get_bits(0);
-        EXPECT(bits == 0);
+        EXPECT(bits == 0U);
 
         for (size_t i = 1; i < 32; i++) {
             uint32_t bits = rng.get()->get_bits(i);
-            EXPECT((bits & (0xffffffff << i)) == 0);
+            EXPECT((bits & (0xffffffff << i)) == 0U);
         }
     },
     CASE("CSPRNG memory")
@@ -79,8 +79,8 @@ const lest::test specification[] =
             sum += rng.get()->get<uint8_t>();
         }
 
-        EXPECT(sum != 0);
-        EXPECT(sum != 255000);
+        EXPECT(sum != 0U);
+        EXPECT(sum != 255000U);
     },
     CASE("CSPRNG 16-bit")
     {
@@ -91,8 +91,8 @@ const lest::test specification[] =
             sum += rng.get()->get<uint16_t>();
         }
 
-        EXPECT(sum != 0);
-        EXPECT(sum != 0xFFFF00);
+        EXPECT(sum != 0U);
+        EXPECT(sum != 0xFFFF00U);
     },
     CASE("CSPRNG 32-bit")
     {
@@ -103,8 +103,8 @@ const lest::test specification[] =
             sum += rng.get()->get<uint32_t>();
         }
 
-        EXPECT(sum != 0);
-        EXPECT(sum != 0xFFFFFFFF00);
+        EXPECT(sum != 0U);
+        EXPECT(sum != 0xFFFFFFFF00UL);
     },
     CASE("CSPRNG 64-bit")
     {
@@ -112,7 +112,7 @@ const lest::test specification[] =
 
         uint64_t v = rng.get()->get<uint64_t>();
 
-        EXPECT(v != 0);
+        EXPECT(v != 0U);
         EXPECT(v != 0xFFFFFFFFFFFFFFFFULL);
     },
     CASE("CSPRNG float")

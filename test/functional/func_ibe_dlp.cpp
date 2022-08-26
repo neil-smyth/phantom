@@ -40,9 +40,9 @@ int main(int argc, char *argv[])
     float fvalue = res;
     if (fvalue != -2.0) { exit(-1); }
     uint32_t mvalue = tdy * res;
-    if (mvalue != -2) { exit(-1); }
+    if (mvalue != static_cast<uint32_t>(-2)) { exit(-1); }
     uint32_t svalue = res * res;
-    if (svalue != 4) { exit(-1); }
+    if (svalue != static_cast<uint32_t>(4)) { exit(-1); }
 
     for (size_t i=0; i < 2; i++) {
 

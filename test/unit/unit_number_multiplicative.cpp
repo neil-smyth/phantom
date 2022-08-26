@@ -49,29 +49,29 @@ const lest::test specification[] =
     {
         uint32_t q;
         q = number<uint32_t>::udiv(uint32_t(0x00000000), uint32_t(0x00000001));
-        EXPECT(q == 0x00000000);
+        EXPECT(q == 0x00000000UL);
         q = number<uint32_t>::udiv(uint32_t(0x00000001), uint32_t(0x00000001));
-        EXPECT(q == 0x00000001);
+        EXPECT(q == 0x00000001UL);
         q = number<uint32_t>::udiv(uint32_t(0xffffffff), uint32_t(0x00000002));
-        EXPECT(q == 0x7fffffff);
+        EXPECT(q == 0x7fffffffUL);
         q = number<uint32_t>::udiv(uint32_t(0x88888888), uint32_t(0x00000008));
-        EXPECT(q == 0x11111111);
+        EXPECT(q == 0x11111111UL);
         q = number<uint32_t>::udiv(uint32_t(0xfffffffe), uint32_t(0xffffffff));
-        EXPECT(q == 0x00000000);
+        EXPECT(q == 0x00000000UL);
     },
     CASE("divide - 64-bit")
     {
         uint64_t q;
         q = number<uint64_t>::udiv(uint64_t(0x0000000000000000), uint64_t(0x0000000000000001));
-        EXPECT(q == 0x0000000000000000);
+        EXPECT(q == 0x0000000000000000ULL);
         q = number<uint64_t>::udiv(uint64_t(0x0000000000000001), uint64_t(0x0000000000000001));
-        EXPECT(q == 0x0000000000000001);
+        EXPECT(q == 0x0000000000000001ULL);
         q = number<uint64_t>::udiv(uint64_t(0xffffffffffffffff), uint64_t(0x0000000000000002));
-        EXPECT(q == 0x7fffffffffffffff);
+        EXPECT(q == 0x7fffffffffffffffULL);
         q = number<uint64_t>::udiv(uint64_t(0x8888888888888888), uint64_t(0x0000000000000008));
-        EXPECT(q == 0x1111111111111111);
+        EXPECT(q == 0x1111111111111111ULL);
         q = number<uint64_t>::udiv(uint64_t(0xfffffffffffffffe), uint64_t(0xffffffffffffffff));
-        EXPECT(q == 0x0000000000000000);
+        EXPECT(q == 0x0000000000000000ULL);
     },
     CASE("divide with remainder - 8-bit")
     {
@@ -115,39 +115,39 @@ const lest::test specification[] =
     {
         uint32_t q, r;
         number<uint32_t>::udiv_qrnd(&q, &r, uint32_t(0x00000000), uint32_t(0x00000001));
-        EXPECT(q == 0x00000000);
-        EXPECT(r == 0x00000000);
+        EXPECT(q == 0x00000000UL);
+        EXPECT(r == 0x00000000UL);
         number<uint32_t>::udiv_qrnd(&q, &r, uint32_t(0x00000001), uint32_t(0x00000001));
-        EXPECT(q == 0x00000001);
-        EXPECT(r == 0x00000000);
+        EXPECT(q == 0x00000001UL);
+        EXPECT(r == 0x00000000UL);
         number<uint32_t>::udiv_qrnd(&q, &r, uint32_t(0xffffffff), uint32_t(0x00000002));
-        EXPECT(q == 0x7fffffff);
-        EXPECT(r == 0x00000001);
+        EXPECT(q == 0x7fffffffUL);
+        EXPECT(r == 0x00000001UL);
         number<uint32_t>::udiv_qrnd(&q, &r, uint32_t(0x88888888), uint32_t(0x00000008));
-        EXPECT(q == 0x11111111);
-        EXPECT(r == 0x00000000);
+        EXPECT(q == 0x11111111UL);
+        EXPECT(r == 0x00000000UL);
         number<uint32_t>::udiv_qrnd(&q, &r, uint32_t(0xfffffffe), uint32_t(0xffffffff));
-        EXPECT(q == 0x00000000);
-        EXPECT(r == 0xfffffffe);
+        EXPECT(q == 0x00000000UL);
+        EXPECT(r == 0xfffffffeUL);
     },
     CASE("divide with remainder - 64-bit")
     {
         uint64_t q, r;
         number<uint64_t>::udiv_qrnd(&q, &r, uint64_t(0x0000000000000000), uint64_t(0x0000000000000001));
-        EXPECT(q == 0x0000000000000000);
-        EXPECT(r == 0x0000000000000000);
+        EXPECT(q == 0x0000000000000000ULL);
+        EXPECT(r == 0x0000000000000000ULL);
         number<uint64_t>::udiv_qrnd(&q, &r, uint64_t(0x0000000000000001), uint64_t(0x0000000000000001));
-        EXPECT(q == 0x0000000000000001);
-        EXPECT(r == 0x0000000000000000);
+        EXPECT(q == 0x0000000000000001ULL);
+        EXPECT(r == 0x0000000000000000ULL);
         number<uint64_t>::udiv_qrnd(&q, &r, uint64_t(0xffffffffffffffff), uint64_t(0x0000000000000002));
-        EXPECT(q == 0x7fffffffffffffff);
-        EXPECT(r == 0x0000000000000001);
+        EXPECT(q == 0x7fffffffffffffffULL);
+        EXPECT(r == 0x0000000000000001ULL);
         number<uint64_t>::udiv_qrnd(&q, &r, uint64_t(0x8888888888888888), uint64_t(0x0000000000000008));
-        EXPECT(q == 0x1111111111111111);
-        EXPECT(r == 0x0000000000000000);
+        EXPECT(q == 0x1111111111111111ULL);
+        EXPECT(r == 0x0000000000000000ULL);
         number<uint64_t>::udiv_qrnd(&q, &r, uint64_t(0xfffffffffffffffe), uint64_t(0xffffffffffffffff));
-        EXPECT(q == 0x0000000000000000);
-        EXPECT(r == 0xfffffffffffffffe);
+        EXPECT(q == 0x0000000000000000ULL);
+        EXPECT(r == 0xfffffffffffffffeULL);
     },
     CASE("divide double word numerator with remainder - 8-bit")
     {
@@ -191,44 +191,44 @@ const lest::test specification[] =
     {
         uint32_t q, r;
         number<uint32_t>::udiv_qrnnd(&q, &r, uint32_t(0x00000000), uint32_t(0x00000000), uint32_t(0x00000001));
-        EXPECT(q == 0x00000000);
-        EXPECT(r == 0x00000000);
+        EXPECT(q == 0x00000000UL);
+        EXPECT(r == 0x00000000UL);
         number<uint32_t>::udiv_qrnnd(&q, &r, uint32_t(0x00000000), uint32_t(0x00000001), uint32_t(0x00000001));
-        EXPECT(q == 0x00000001);
-        EXPECT(r == 0x00000000);
+        EXPECT(q == 0x00000001UL);
+        EXPECT(r == 0x00000000UL);
         number<uint32_t>::udiv_qrnnd(&q, &r, uint32_t(0x00000001), uint32_t(0xffffffff), uint32_t(0x00000002));
-        EXPECT(q == 0xffffffff);
-        EXPECT(r == 0x00000001);
+        EXPECT(q == 0xffffffffUL);
+        EXPECT(r == 0x00000001UL);
         number<uint32_t>::udiv_qrnnd(&q, &r, uint32_t(0x00000008), uint32_t(0x88888889), uint32_t(0x00000080));
-        EXPECT(q == 0x11111111);
-        EXPECT(r == 0x00000009);
+        EXPECT(q == 0x11111111UL);
+        EXPECT(r == 0x00000009UL);
         number<uint32_t>::udiv_qrnnd(&q, &r, uint32_t(0x0000000f), uint32_t(0xfffffffe), uint32_t(0xffffffff));
-        EXPECT(q == 0x00000010);
-        EXPECT(r == 0x0000000e);
+        EXPECT(q == 0x00000010UL);
+        EXPECT(r == 0x0000000eUL);
     },
     CASE("divide double word numerator with remainder - 64-bit")
     {
         uint64_t q, r;
         number<uint64_t>::udiv_qrnnd(&q, &r, uint64_t(0x0000000000000000),
             uint64_t(0x0000000000000000), uint64_t(0x0000000000000001));
-        EXPECT(q == 0x0000000000000000);
-        EXPECT(r == 0x0000000000000000);
+        EXPECT(q == 0x0000000000000000ULL);
+        EXPECT(r == 0x0000000000000000ULL);
         number<uint64_t>::udiv_qrnnd(&q, &r, uint64_t(0x0000000000000000),
             uint64_t(0x0000000000000001), uint64_t(0x0000000000000001));
-        EXPECT(q == 0x0000000000000001);
-        EXPECT(r == 0x0000000000000000);
+        EXPECT(q == 0x0000000000000001ULL);
+        EXPECT(r == 0x0000000000000000ULL);
         number<uint64_t>::udiv_qrnnd(&q, &r, uint64_t(0x0000000000000001),
             uint64_t(0xffffffffffffffff), uint64_t(0x0000000000000002));
-        EXPECT(q == 0xffffffffffffffff);
-        EXPECT(r == 0x0000000000000001);
+        EXPECT(q == 0xffffffffffffffffULL);
+        EXPECT(r == 0x0000000000000001ULL);
         number<uint64_t>::udiv_qrnnd(&q, &r, uint64_t(0x0000000000000008),
             uint64_t(0x8888888888888889), uint64_t(0x0000000000000080));
-        EXPECT(q == 0x1111111111111111);
-        EXPECT(r == 0x0000000000000009);
+        EXPECT(q == 0x1111111111111111ULL);
+        EXPECT(r == 0x0000000000000009ULL);
         number<uint64_t>::udiv_qrnnd(&q, &r, uint64_t(0x000000000000000f),
             uint64_t(0xfffffffffffffffe), uint64_t(0xffffffffffffffff));
-        EXPECT(q == 0x0000000000000010);
-        EXPECT(r == 0x000000000000000e);
+        EXPECT(q == 0x0000000000000010ULL);
+        EXPECT(r == 0x000000000000000eULL);
     },
     CASE("divide double word numerator with remainder and pre-inversion - 8-bit")
     {
@@ -284,28 +284,28 @@ const lest::test specification[] =
         d_inv = number<uint32_t>::uinverse(uint32_t(0x80000000));
         number<uint32_t>::udiv_qrnnd_preinv(&q, &r, uint32_t(0x00000000),
             uint32_t(0x00000000), uint32_t(0x80000000), d_inv);
-        EXPECT(q == 0x00000000);
-        EXPECT(r == 0x00000000);
+        EXPECT(q == 0x00000000UL);
+        EXPECT(r == 0x00000000UL);
         d_inv = number<uint32_t>::uinverse(uint32_t(0x80000000));
         number<uint32_t>::udiv_qrnnd_preinv(&q, &r, uint32_t(0x00000000),
             uint32_t(0x80000000), uint32_t(0x80000000), d_inv);
-        EXPECT(q == 0x00000001);
-        EXPECT(r == 0x00000000);
+        EXPECT(q == 0x00000001UL);
+        EXPECT(r == 0x00000000UL);
         d_inv = number<uint32_t>::uinverse(uint32_t(2 << 30));
         number<uint32_t>::udiv_qrnnd_preinv(&q, &r, uint32_t(0x7fffffff),
             uint32_t(0xc0000000), uint32_t(2 << 30), d_inv);
-        EXPECT(q == 0xffffffff);
-        EXPECT((r >> 30) == 0x00000001);
+        EXPECT(q == 0xffffffffUL);
+        EXPECT((r >> 30) == 0x00000001UL);
         d_inv = number<uint32_t>::uinverse(uint32_t(0x80 << 24));
         number<uint32_t>::udiv_qrnnd_preinv(&q, &r, uint32_t(0x08888888),
             uint32_t(0x89000000), uint32_t(0x80 << 24), d_inv);
-        EXPECT(q == 0x11111111);
-        EXPECT((r >> 24) == 0x00000009);
+        EXPECT(q == 0x11111111UL);
+        EXPECT((r >> 24) == 0x00000009UL);
         d_inv = number<uint32_t>::uinverse(uint32_t(0xffffffff));
         number<uint32_t>::udiv_qrnnd_preinv(&q, &r, uint32_t(0x0000000f),
             uint32_t(0xfffffffe), uint32_t(0xffffffff), d_inv);
-        EXPECT(q == 0x00000010);
-        EXPECT(r == 0x0000000e);
+        EXPECT(q == 0x00000010UL);
+        EXPECT(r == 0x0000000eUL);
     },
     CASE("divide double word numerator with remainder and pre-inversion - 64-bit")
     {
@@ -313,28 +313,28 @@ const lest::test specification[] =
         d_inv = number<uint64_t>::uinverse(uint64_t(0x8000000000000000));
         number<uint64_t>::udiv_qrnnd_preinv(&q, &r, uint64_t(0x0000000000000000),
             uint64_t(0x0000000000000000), uint64_t(0x8000000000000000), d_inv);
-        EXPECT(q == 0x0000000000000000);
-        EXPECT(r == 0x0000000000000000);
+        EXPECT(q == 0x0000000000000000ULL);
+        EXPECT(r == 0x0000000000000000ULL);
         d_inv = number<uint64_t>::uinverse(uint64_t(0x8000000000000000));
         number<uint64_t>::udiv_qrnnd_preinv(&q, &r, uint64_t(0x0000000000000000),
             uint64_t(0x8000000000000000), uint64_t(0x8000000000000000), d_inv);
-        EXPECT(q == 0x0000000000000001);
-        EXPECT(r == 0x0000000000000000);
+        EXPECT(q == 0x0000000000000001ULL);
+        EXPECT(r == 0x0000000000000000ULL);
         d_inv = number<uint64_t>::uinverse(uint64_t(2ULL << 62));
         number<uint64_t>::udiv_qrnnd_preinv(&q, &r, uint64_t(0x7fffffffffffffff),
             uint64_t(0xc000000000000000), uint64_t(2ULL << 62), d_inv);
-        EXPECT(q == 0xffffffffffffffff);
-        EXPECT((r >> 62ULL) == 0x0000000000000001);
+        EXPECT(q == 0xffffffffffffffffULL);
+        EXPECT((r >> 62ULL) == 0x0000000000000001ULL);
         d_inv = number<uint64_t>::uinverse(uint64_t(0x80ULL << 56));
         number<uint64_t>::udiv_qrnnd_preinv(&q, &r, uint64_t(0x0888888888888888),
             uint64_t(0x8900000000000000), uint64_t(0x80ULL << 56), d_inv);
-        EXPECT(q == 0x1111111111111111);
-        EXPECT((r >> 56ULL) == 0x0000000000000009);
+        EXPECT(q == 0x1111111111111111ULL);
+        EXPECT((r >> 56ULL) == 0x0000000000000009ULL);
         d_inv = number<uint64_t>::uinverse(uint64_t(0xffffffffffffffff));
         number<uint64_t>::udiv_qrnnd_preinv(&q, &r, uint64_t(0x000000000000000f),
             uint64_t(0xfffffffffffffffe), uint64_t(0xffffffffffffffff), d_inv);
-        EXPECT(q == 0x0000000000000010);
-        EXPECT(r == 0x000000000000000e);
+        EXPECT(q == 0x0000000000000010ULL);
+        EXPECT(r == 0x000000000000000eULL);
     },
     CASE("remainder - 8-bit")
     {
@@ -364,25 +364,25 @@ const lest::test specification[] =
     {
         uint32_t r;
         r = number<uint32_t>::urem(uint32_t(0x00000000), uint32_t(0x00000001));
-        EXPECT(r == 0x00000000);
+        EXPECT(r == 0x00000000UL);
         r = number<uint32_t>::urem(uint32_t(0x7fffffff), uint32_t(0x80000000));
-        EXPECT(r == 0x7fffffff);
+        EXPECT(r == 0x7fffffffUL);
         r = number<uint32_t>::urem(uint32_t(0x1fffffff), uint32_t(0x10000000));
-        EXPECT(r == 0x0fffffff);
+        EXPECT(r == 0x0fffffffUL);
         r = number<uint32_t>::urem(uint32_t(0x5fffffff), uint32_t(0x20000000));
-        EXPECT(r == 0x1fffffff);
+        EXPECT(r == 0x1fffffffUL);
     },
     CASE("remainder - 64-bit")
     {
         uint64_t r;
         r = number<uint64_t>::urem(uint64_t(0x0000000000000000), uint64_t(0x0000000000000001));
-        EXPECT(r == 0x0000000000000000);
+        EXPECT(r == 0x0000000000000000ULL);
         r = number<uint64_t>::urem(uint64_t(0x7fffffffffffffff), uint64_t(0x8000000000000000));
-        EXPECT(r == 0x7fffffffffffffff);
+        EXPECT(r == 0x7fffffffffffffffULL);
         r = number<uint64_t>::urem(uint64_t(0x1fffffffffffffff), uint64_t(0x1000000000000000));
-        EXPECT(r == 0x0fffffffffffffff);
+        EXPECT(r == 0x0fffffffffffffffULL);
         r = number<uint64_t>::urem(uint64_t(0x5fffffffffffffff), uint64_t(0x2000000000000000));
-        EXPECT(r == 0x1fffffffffffffff);
+        EXPECT(r == 0x1fffffffffffffffULL);
     },
     CASE("remainder - 8-bit")
     {
@@ -420,39 +420,39 @@ const lest::test specification[] =
     {
         uint32_t r;
         r = number<uint32_t>::umod_nnd(uint32_t(0x00000000), uint32_t(0x00000000), uint32_t(0x00000001));
-        EXPECT(r == 0x00000000);
+        EXPECT(r == 0x00000000UL);
         r = number<uint32_t>::umod_nnd(uint32_t(0x00000000), uint32_t(0x7fffffff), uint32_t(0x80000000));
-        EXPECT(r == 0x7fffffff);
+        EXPECT(r == 0x7fffffffUL);
         r = number<uint32_t>::umod_nnd(uint32_t(0x00000000), uint32_t(0x1fffffff), uint32_t(0x10000000));
-        EXPECT(r == 0x0fffffff);
+        EXPECT(r == 0x0fffffffUL);
         r = number<uint32_t>::umod_nnd(uint32_t(0x00000000), uint32_t(0x5fffffff), uint32_t(0x20000000));
-        EXPECT(r == 0x1fffffff);
+        EXPECT(r == 0x1fffffffUL);
         r = number<uint32_t>::umod_nnd(uint32_t(0x00000001), uint32_t(0xffffffff), uint32_t(0x20000000));
-        EXPECT(r == 0x1fffffff);
+        EXPECT(r == 0x1fffffffUL);
         r = number<uint32_t>::umod_nnd(uint32_t(0xffffffff), uint32_t(0xffffffff), uint32_t(0x10000000));
-        EXPECT(r == 0x0fffffff);
+        EXPECT(r == 0x0fffffffUL);
     },
     CASE("remainder - 64-bit")
     {
         uint64_t r;
         r = number<uint64_t>::umod_nnd(uint64_t(0x0000000000000000),
             uint64_t(0x0000000000000000), uint64_t(0x0000000000000001));
-        EXPECT(r == 0x0000000000000000);
+        EXPECT(r == 0x0000000000000000ULL);
         r = number<uint64_t>::umod_nnd(uint64_t(0x0000000000000000),
             uint64_t(0x7fffffffffffffff), uint64_t(0x8000000000000000));
-        EXPECT(r == 0x7fffffffffffffff);
+        EXPECT(r == 0x7fffffffffffffffULL);
         r = number<uint64_t>::umod_nnd(uint64_t(0x0000000000000000),
             uint64_t(0x1fffffffffffffff), uint64_t(0x1000000000000000));
-        EXPECT(r == 0x0fffffffffffffff);
+        EXPECT(r == 0x0fffffffffffffffULL);
         r = number<uint64_t>::umod_nnd(uint64_t(0x0000000000000000),
             uint64_t(0x5fffffffffffffff), uint64_t(0x2000000000000000));
-        EXPECT(r == 0x1fffffffffffffff);
+        EXPECT(r == 0x1fffffffffffffffULL);
         r = number<uint64_t>::umod_nnd(uint64_t(0x0000000000000001),
             uint64_t(0xffffffffffffffff), uint64_t(0x2000000000000000));
-        EXPECT(r == 0x1fffffffffffffff);
+        EXPECT(r == 0x1fffffffffffffffULL);
         r = number<uint64_t>::umod_nnd(uint64_t(0xffffffffffffffff),
             uint64_t(0xffffffffffffffff), uint64_t(0x1000000000000000));
-        EXPECT(r == 0x0fffffffffffffff);
+        EXPECT(r == 0x0fffffffffffffffULL);
     },
     CASE("multiply - 8-bit")
     {
@@ -490,33 +490,33 @@ const lest::test specification[] =
     {
         uint32_t h, l;
         number<uint32_t>::umul(&h, &l, uint32_t(0x00000000), uint32_t(0x00000000));
-        EXPECT(h == 0x00000000);
-        EXPECT(l == 0x00000000);
+        EXPECT(h == 0x00000000UL);
+        EXPECT(l == 0x00000000UL);
         number<uint32_t>::umul(&h, &l, uint32_t(0x00000000), uint32_t(0x00000001));
-        EXPECT(h == 0x00000000);
-        EXPECT(l == 0x00000000);
+        EXPECT(h == 0x00000000UL);
+        EXPECT(l == 0x00000000UL);
         number<uint32_t>::umul(&h, &l, uint32_t(0x00000001), uint32_t(0x00000001));
-        EXPECT(h == 0x00000000);
-        EXPECT(l == 0x00000001);
+        EXPECT(h == 0x00000000UL);
+        EXPECT(l == 0x00000001UL);
         number<uint32_t>::umul(&h, &l, uint32_t(0xffffffff), uint32_t(0xffffffff));
-        EXPECT(h == 0xfffffffe);
-        EXPECT(l == 0x00000001);
+        EXPECT(h == 0xfffffffeUL);
+        EXPECT(l == 0x00000001UL);
     },
     CASE("multiply - 64-bit")
     {
         uint64_t h, l;
         number<uint64_t>::umul(&h, &l, uint64_t(0x0000000000000000), uint64_t(0x0000000000000000));
-        EXPECT(h == 0x0000000000000000);
-        EXPECT(l == 0x0000000000000000);
+        EXPECT(h == 0x0000000000000000ULL);
+        EXPECT(l == 0x0000000000000000ULL);
         number<uint64_t>::umul(&h, &l, uint64_t(0x0000000000000000), uint64_t(0x0000000000000001));
-        EXPECT(h == 0x0000000000000000);
-        EXPECT(l == 0x0000000000000000);
+        EXPECT(h == 0x0000000000000000ULL);
+        EXPECT(l == 0x0000000000000000ULL);
         number<uint64_t>::umul(&h, &l, uint64_t(0x0000000000000001), uint64_t(0x0000000000000001));
-        EXPECT(h == 0x0000000000000000);
-        EXPECT(l == 0x0000000000000001);
+        EXPECT(h == 0x0000000000000000ULL);
+        EXPECT(l == 0x0000000000000001ULL);
         number<uint64_t>::umul(&h, &l, uint64_t(0xffffffffffffffff), uint64_t(0xffffffffffffffff));
-        EXPECT(h == 0xfffffffffffffffe);
-        EXPECT(l == 0x0000000000000001);
+        EXPECT(h == 0xfffffffffffffffeULL);
+        EXPECT(l == 0x0000000000000001ULL);
     }
 };
 

@@ -658,7 +658,7 @@ public:
             return;
         }
 
-        size_t in_used = in1.get_limbsize();
+        int in_used = in1.get_limbsize();
         if (0 == in_used || (bits >= (in_used * std::numeric_limits<T>::digits))) {
             m_limbs.resize(0);
             m_sign = false;
@@ -796,8 +796,7 @@ public:
             }
 
             bool is_composite = true;
-            size_t j;
-            for (j=1; j < a; j++) {
+            for (int j=1; j < a; j++) {
                 z.square_mod(cfg);
                 if (z == T(1)) {
                     return MILLER_RABIN_COMPOSITE_NOT_POWER_OF_PRIME;
@@ -818,7 +817,6 @@ public:
             }
         }
 
-outer_loop:
         return MILLER_RABIN_PROBABLY_PRIME;
     }
 
@@ -1375,7 +1373,7 @@ outer_loop:
     static bool tonelli_shanks(const mod_config<T>& cfg, mpz<T>& r, const mpz<T>& n)
     {
         mpz<T> q, z, c, t, n_inv, tmp, pso, x, b, g;
-        size_t i, s, m;
+        size_t s, m;
 
         q.set(cfg.mod);
         q = q - T(1);
@@ -1406,7 +1404,7 @@ outer_loop:
         m = T(s);
 
         while (t.cmp_ui(1) != 0) {
-            int i = 1;
+            size_t i = 1;
             x.set(t).square_mod(cfg);
             while (x.cmp_ui(1) != 0 && i < m) {
                 x.square_mod(cfg);
@@ -1703,7 +1701,7 @@ outer_loop:
             T* r2 = rp.get_limbs().data();
             T* xp, *yp, *odd_inv_2exp;
             size_t t;
-            int bcnt;
+            size_t bcnt;
 
             if (bn < ncnt) {
                 phantom_vector<T> newbp(ncnt);
@@ -2015,7 +2013,6 @@ outer_loop:
     {
         size_t n_used = n.get_limbsize();
         size_t d_used = d.get_limbsize();
-        size_t r_used;
 
         // Check for divide by zero
         if (0 == d_used) {
@@ -2024,7 +2021,6 @@ outer_loop:
 
         // Check for a single precision divisor that is a power of 2
         if (1 == d_used && !(d.m_limbs[0] & (d.m_limbs[0] - 1))) {
-            T retval = 0;
             T ctz    = bit_manipulation::ctz(d.m_limbs[0]);
             div_r_2exp(r, n, ctz, mode);
             return r.get_limbsize() > 0;
@@ -2064,7 +2060,6 @@ outer_loop:
             mpz<T> temp_r = n;
             T* n_limbs = temp_r.m_limbs.data();
             const T* d_limbs = d.m_limbs.data();
-            size_t q_used  = n_used - d_used + 1;
 
             // Obtain the quotient
             mpbase<T>::div_qr(nullptr, n_limbs, n_used, d_limbs, d_used);
@@ -2111,7 +2106,6 @@ outer_loop:
     {
         size_t n_used = n.get_limbsize();
         size_t d_used = d.get_limbsize();
-        size_t r_used;
 
         // Check for divide by zero
         if (0 == d_used) {
@@ -2270,14 +2264,13 @@ outer_loop:
         }
 
         // Allocate memory for the quotient if necessary
-        size_t q_used  = n_used;
-        T*     q_limbs = nullptr;
+        size_t q_used    = n_used;
+        T*     q_limbs   = nullptr;
 
         // Obtain the result of q / d
         const T* n_limbs = n.m_limbs.data();
-        T  r_lsw   = mpbase<T>::div_qr_1(q_limbs, n_limbs, q_used, d);
-        size_t r_used = r_lsw > 0;
-        bool   r_sign = n.m_sign;
+        T        r_lsw   = mpbase<T>::div_qr_1(q_limbs, n_limbs, q_used, d);
+        bool     r_sign  = n.m_sign;
 
         // If q/d is non-zero then apply rounding
         if (r_lsw > 0) {
@@ -2312,8 +2305,6 @@ outer_loop:
         // Obtain the result of q / d
         T* n_limbs = const_cast<T*>(n.m_limbs.data());
         T  r_lsw   = mpbase<T>::div_qr_1(q_limbs, n_limbs, q_used, d);
-        size_t r_used = r_lsw > 0;
-        bool   r_sign = n.m_sign;
 
         // If q/d is non-zero then apply rounding
         if (r_lsw > 0) {

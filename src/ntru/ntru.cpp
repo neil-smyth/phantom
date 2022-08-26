@@ -277,8 +277,7 @@ void ntru::poly_sub_scaled(uint32_t *_RESTRICT_ F, size_t Flen, size_t Fstride,
     // which is efficient in space (no extra buffer needed) but slow at
     // high degree.
 
-    size_t n   = 1 << logn;
-    size_t hn  = n >> 1;
+    size_t   n   = 1 << logn;
     uint32_t sch = core::bit_manipulation::fast_div31(sc);   // sc / 31
     uint32_t scl = sc - (31 * sch);  // sc % 31
 
@@ -1003,20 +1002,6 @@ void ntru::sub_scaled(uint32_t* x, size_t xlen,
         x[u] = w & 0x7FFFFFFF;
         cc = w >> 31;
     }
-}
-
-
-static inline uint32_t modp_set(int32_t x, uint32_t p)
-{
-    uint32_t w;
-    w  = static_cast<uint32_t>(x);
-    w += p & -(w >> 31);
-    return w;
-}
-
-static inline int32_t modp_norm(uint32_t x, uint32_t p)
-{
-    return static_cast<int32_t>(x - (p & (((x - ((p + 1) >> 1)) >> 31) - 1)));
 }
 
 static inline int64_t const_time_rint(double x)

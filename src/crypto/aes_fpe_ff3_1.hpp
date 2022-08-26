@@ -111,10 +111,10 @@ public:
         phantom_vector<uint8_t> P(16);
         phantom_vector<uint8_t> vecBytes;
 
-        for (int i = 0; i < ff3_rounds; i++) {
+        for (size_t i = 0; i < ff3_rounds; i++) {
 
             // i If odd m = v and W = Tr, if even m = u and W = Tl
-            int m = (i & 1)? v: u;
+            size_t m = (i & 1)? v: u;
 
             // ii Calculate P
             int offset = (i & 1)? 4 : 0;

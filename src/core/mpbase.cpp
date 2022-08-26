@@ -200,13 +200,13 @@ T mpbase<T>::getbits(const T *in, uint32_t bi, uint32_t nbits)
         return in[0] & ((static_cast<T>(1) << bi) - 1);
     }
     else {
-        bi -= nbits;                                           // bit index of low bit to extract
-        uint32_t i = bi >> bits_log2<T>::value();              // word index of low bit to extract
-        bi &= ((1 << bits_log2<T>::value()) - 1);              // bit index in low word
-        T r = in[i] >> bi;                                     // extract (low) bits
-        int nbits_in_r = std::numeric_limits<T>::digits - bi;  // number of bits now in r
-        if (nbits_in_r < nbits) {                              // did we get enough bits?
-            r += in[i + 1] << nbits_in_r;                      // prepend bits from higher word
+        bi -= nbits;                                                // bit index of low bit to extract
+        uint32_t i = bi >> bits_log2<T>::value();                   // word index of low bit to extract
+        bi &= ((1 << bits_log2<T>::value()) - 1);                   // bit index in low word
+        T r = in[i] >> bi;                                          // extract (low) bits
+        uint32_t nbits_in_r = std::numeric_limits<T>::digits - bi;  // number of bits now in r
+        if (nbits_in_r < nbits) {                                   // did we get enough bits?
+            r += in[i + 1] << nbits_in_r;                           // prepend bits from higher word
         }
         return r & ((static_cast<T>(1) << nbits) - 1);
     }

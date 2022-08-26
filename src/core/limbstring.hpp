@@ -28,6 +28,11 @@ template<typename T>
 class mpz;
 
 
+struct mpz_base_coding {
+    size_t max_digits;
+    size_t log2_base;
+};
+
 /** 
  * @brief Template class for conversion of mpz objects to/from strings
  * 
@@ -62,11 +67,6 @@ class limbstring
 
 private:
 
-    struct mpz_base_coding {
-        size_t max_digits;
-        size_t log2_base;
-    };
-
     /// Digits per word and the log2 of the base are stored in a machine-word size specific LUT
     /// @{
     static const size_t coding_levels = 5;
@@ -85,7 +85,7 @@ private:
      * @param base_code Internal code describing the base (0:2-bit, 1:8-bit, 2:16-bit)
      */
     static void init_power_2_string(phantom_vector<T> &limbs,
-                                    const typename limbstring<T>::mpz_base_coding *base_coding,
+                                    const mpz_base_coding *base_coding,
                                     const char *str, size_t base, size_t base_code);
 
     /**
@@ -96,7 +96,7 @@ private:
      * @param base_lut A LUT describing conversion from 8-bit ASCII to an integer
      * @param base The base number system of the input string
      */
-    static void init_basex_string(phantom_vector<T> &limbs, const typename limbstring<T>::mpz_base_coding *base_coding,
+    static void init_basex_string(phantom_vector<T> &limbs, const mpz_base_coding *base_coding,
                                   const char *str, const uint8_t *base_lut, size_t base);
 
     /**
@@ -142,18 +142,6 @@ public:
     static void set_str(phantom_vector<T> &limbs, bool &sign, const char *str, size_t base);
 };
 
-
-template<>
-const limbstring<uint64_t>::mpz_base_coding limbstring<uint64_t>::base_coding_64[5];
-
-template <>
-const limbstring<uint32_t>::mpz_base_coding limbstring<uint32_t>::base_coding_32[5];
-
-template<>
-const limbstring<uint16_t>::mpz_base_coding limbstring<uint16_t>::base_coding_16[5];
-
-template <>
-const limbstring<uint8_t>::mpz_base_coding limbstring<uint8_t>::base_coding_8[5];
 
 // Forward declaration of common sizes
 extern template class limbstring<uint8_t>;

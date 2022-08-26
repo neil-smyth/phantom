@@ -114,8 +114,8 @@ extern "C" {
             keyBytes[i] = static_cast<uint8_t>(decodedKey.c_str()[i]);
         }
 
-        int n = p_sss->ctx.n;
-        int k = p_sss->ctx.k;
+        size_t n = p_sss->ctx.n;
+        size_t k = p_sss->ctx.k;
         phantom::phantom_vector<uint8_t> user_shares[n];
         p_sss->obj->create(user_shares, keyBytes.data(), n, k);
 
@@ -131,7 +131,7 @@ extern "C" {
 
     const char* shamirs_secret_sharing_combine(csss *p_sss)
     {
-        int k = p_sss->ctx.k;
+        size_t k = p_sss->ctx.k;
 
         if (p_sss->ctx.shards.size() < k) {
             return nullptr;

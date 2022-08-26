@@ -86,7 +86,7 @@ public:
         T v = inlen - u;
         phantom_vector<T> outA(in.begin(), in.begin() + u);
         phantom_vector<T> outB(in.begin() + u, in.end());
-        T *A = outA.data(), *B = outB.data();
+        T *B = outB.data();
         pow_uv(qpow_u, qpow_v, radix, u, v);
 
         int ceil_vlog2, b, d, tweaklen, pad, Qlen;
@@ -105,10 +105,10 @@ public:
         int Slen = 16 + cnt * 16;
         phantom_vector<uint8_t> S(Slen);
         phantom_vector<uint8_t> vecBytes;
-        for (int i = 0; i < ff1_rounds; i++) {
+        for (size_t i = 0; i < ff1_rounds; i++) {
 
             // v
-            int m = (i & 1)? v: u;
+            size_t m = (i & 1) ? v : u;
 
             // i
             Q[tweaklen + pad] = i & 0xff;
@@ -135,7 +135,6 @@ public:
 
             // Swap A and B
             outA.swap(outB);
-            A = outA.data();
             B = outB.data();
 
             // anum = (anum + y) mod qpow_uv
@@ -169,7 +168,7 @@ public:
         T v = inlen - u;
         phantom_vector<T> outA(in.begin(), in.begin() + u);
         phantom_vector<T> outB(in.begin() + u, in.end());
-        T *A = outA.data(), *B = outB.data();
+        T *A = outA.data();
         pow_uv(qpow_u, qpow_v, radix, u, v);
 
         int ceil_vlog2, b, d, tweaklen, pad, Qlen;
@@ -217,7 +216,6 @@ public:
             // Swap A and B
             outA.swap(outB);
             A = outA.data();
-            B = outB.data();
 
             // bnum = (bnum - y) mod qpow_uv
             core::mpz<T> q, r, n;
@@ -298,7 +296,7 @@ private:
 
         std::copy(R.begin(), R.begin() + 16, S.begin());
 
-        for (uint32_t j=1; j <= cnt; j++) {
+        for (int j=1; j <= cnt; j++) {
             std::copy(R.begin(), R.begin() + 16, tmp.begin());
 
 #if PLATFORM_BYTE_ORDER == IS_LITTLE_ENDIAN

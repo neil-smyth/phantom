@@ -65,13 +65,12 @@ alignas(DEFAULT_MEM_ALIGNMENT) const size_t keccak::i1mod5[5] = {1, 2, 3, 4, 0};
 void keccak::core(uint64_t* _RESTRICT_ st, size_t rounds)
 {
     // variables
-    size_t i, j, r;
     alignas(DEFAULT_MEM_ALIGNMENT) uint64_t bc[5];
 
 #if PLATFORM_BYTE_ORDER == IS_BIG_ENDIAN
     // endianess conversion. this is redundant on little-endian targets
 #if defined(KECCAKF_ROLLED)
-    for (i = 0; i < 25; i++) {
+    for (size_t i = 0; i < 25; i++) {
         st[i] = ((st[i] & UINT64_C(0xFF00000000000000)) >> 56) |
                 ((st[i] & UINT64_C(0x00FF000000000000)) >> 40) |
                 ((st[i] & UINT64_C(0x0000FF0000000000)) >> 24) |
@@ -111,22 +110,22 @@ void keccak::core(uint64_t* _RESTRICT_ st, size_t rounds)
 #endif
 
 #if defined(KECCAKF_ROLLED)
-    for (r = 0; r < rounds; r++) {
+    for (size_t r = 0; r < rounds; r++) {
 
         // Theta
-        for (i = 0; i < 5; i++) {
+        for (size_t i = 0; i < 5; i++) {
             bc[i] = st[i] ^ st[i + 5] ^ st[i + 10] ^ st[i + 15] ^ st[i + 20];
         }
 
-        for (i = 0; i < 5; i++) {
+        for (size_t i = 0; i < 5; i++) {
             t = bc[i4mod5[i]] ^ ROTL64(bc[i1mod5[i]], 1);
-            for (j = 0; j < 25; j += 5)
+            for (size_t j = 0; j < 25; j += 5)
                 st[j + i] ^= t;
         }
 
         // Rho Pi
         t = st[1];
-        for (i = 0; i < 24; i++) {
+        for (size_t i = 0; i < 24; i++) {
             j = keccakf_piln[i];
             bc[0] = st[j];
             st[j] = ROTL64(t, keccakf_rotc[i]);
@@ -134,11 +133,11 @@ void keccak::core(uint64_t* _RESTRICT_ st, size_t rounds)
         }
 
         //  Chi
-        for (j = 0; j < 25; j += 5) {
-            for (i = 0; i < 5; i++) {
+        for (size_t j = 0; j < 25; j += 5) {
+            for (size_t i = 0; i < 5; i++) {
                 bc[i] = st[j + i];
             }
-            for (i = 0; i < 5; i++) {
+            for (size_t i = 0; i < 5; i++) {
                 st[j + i] ^= (~bc[i1mod5[i]]) & bc[i2mod5[i]];
             }
         }
@@ -147,7 +146,7 @@ void keccak::core(uint64_t* _RESTRICT_ st, size_t rounds)
         st[0] ^= keccakf_rndc[r];
     }
 #else
-    for (r = 0; r < rounds; r++) {
+    for (size_t r = 0; r < rounds; r++) {
 
         // Theta
         const uint64_t c0 = st[0] ^ st[5] ^ st[10] ^ st[15] ^ st[20];
@@ -273,7 +272,7 @@ void keccak::core(uint64_t* _RESTRICT_ st, size_t rounds)
 #if PLATFORM_BYTE_ORDER == IS_BIG_ENDIAN
     // endianess conversion. this is redundant on little-endian targets
 #if defined(KECCAKF_ROLLED)
-    for (i = 0; i < 25; i++) {
+    for (size_t i = 0; i < 25; i++) {
         st[i] = ((st[i] & UINT64_C(0xFF00000000000000)) >> 56) |
                 ((st[i] & UINT64_C(0x00FF000000000000)) >> 40) |
                 ((st[i] & UINT64_C(0x0000FF0000000000)) >> 24) |

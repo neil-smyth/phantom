@@ -181,8 +181,6 @@ public:
 
     retcode_e doubling(const ecc_config<T>& config, size_t w) override
     {
-        const core::mpz<T>& constant_d = dynamic_cast<const core::mpz<T>&>(*config.d.get());
-
         core::mpz<T> a, b, c, d, e;
 
         a.set(m_x).square_mod(config.mod);

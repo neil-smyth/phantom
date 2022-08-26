@@ -127,7 +127,6 @@ size_t scalar_parser::binary_dual(phantom_vector<uint8_t>& recoded, const phanto
 size_t scalar_parser::naf(phantom_vector<uint8_t>& recoded, const mpz<uint32_t>& secret, size_t w)
 {
     size_t   max         = secret.sizeinbase(2);
-    size_t   num_ones    = 0;
     uint32_t wmask       = (1 << w) - 1;
     uint32_t wmax        = wmask >> 1;
 
@@ -135,11 +134,8 @@ size_t scalar_parser::naf(phantom_vector<uint8_t>& recoded, const mpz<uint32_t>&
 
     mpz<uint32_t> e = secret;
 
-    // Retrieve a pointer to the limbs of the scalar value
-    const uint32_t *limbs = e.get_limbs().data();
-
     // The NAF encoding routine
-    size_t idx = 0, code = 0;
+    size_t code = 0;
     while (1) {
         uint32_t limb = e[0] & wmask;
         uint32_t zi = 0;
@@ -264,7 +260,6 @@ uint32_t scalar_parser::pull()
     }
 
     uint16_t bit;
-    uint16_t word, shift;
 
     // Obtain the bit depending upon the coding mode
     if (scalar_coding_e::SCALAR_BINARY == m_coding || scalar_coding_e::SCALAR_MONT_LADDER == m_coding) {

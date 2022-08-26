@@ -173,7 +173,7 @@ void saber_indcpa::gen_matrix_shake128(uint16_t* _RESTRICT_ A, const uint8_t* se
     }
 }
 
-uint64_t saber_indcpa::load_littleendian(const uint8_t *x, int bytes)
+uint64_t saber_indcpa::load_littleendian(const uint8_t *x, size_t bytes)
 {
     uint64_t r = x[0];
     for (size_t i = 1; i < bytes; i++) {
@@ -472,7 +472,6 @@ void saber_indcpa::dec(const phantom_vector<uint8_t>& sk, const phantom_vector<u
     size_t   eq       = m_params[m_set].eq;
     size_t   ep       = m_params[m_set].ep;
     size_t   et       = m_params[m_set].et;
-    size_t   mu       = m_params[m_set].mu;
     size_t   h2       = m_params[m_set].h2;
 
     phantom_vector<uint16_t> storage(SABER_N * (2 + 2*l));

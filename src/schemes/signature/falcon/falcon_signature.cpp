@@ -208,7 +208,6 @@ restart:
 
     retval = num_retries;
 
-finish:
     return retval;
 }
 
@@ -217,7 +216,6 @@ bool falcon_signature::set_public_key(std::unique_ptr<user_ctx>& ctx, const phan
     ctx_falcon& myctx = dynamic_cast<ctx_falcon&>(*ctx.get());
 
     size_t   n      = ctx_falcon::m_params[myctx.get_set()].n;
-    uint32_t q      = ctx_falcon::m_params[myctx.get_set()].q;
     size_t   q_bits = ctx_falcon::m_params[myctx.get_set()].q_bits;
     size_t   logn   = ctx_falcon::m_params[myctx.get_set()].n_bits;
 
@@ -460,10 +458,6 @@ bool falcon_signature::verify(const std::unique_ptr<user_ctx>& ctx,
     core::poly<int32_t>::centre(s1.data(), q, n);
 
     return true;
-
-finish_error:
-
-    return false;
 }
 
 size_t falcon_signature::get_msg_len(const std::unique_ptr<user_ctx>& ctx) const
