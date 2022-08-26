@@ -345,7 +345,8 @@ public:
         }
 
         size_t sub_offset = 0;
-        if (core::scalar_coding_e::SCALAR_NAF_2 <= m_coding_type && core::scalar_coding_e::SCALAR_NAF_7 >= m_coding_type) {
+        if (core::scalar_coding_e::SCALAR_NAF_2 <= m_coding_type &&
+            core::scalar_coding_e::SCALAR_NAF_7 >= m_coding_type) {
             sub_offset = (1 << ((static_cast<size_t>(m_coding_type) & 0x3f) - 1)) - 2;
         }
 
