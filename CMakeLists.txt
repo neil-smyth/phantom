@@ -28,7 +28,7 @@ if (NOT DEFINED CMAKE_TOOLCHAIN_FILE)
     elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
         # Using GCC
         # TODO - Remove and fix warnings
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unused-variable -Wno-sign-compare -Wno-unused-label -Wno-array-bounds")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unused-variable -Wno-sign-compare -Wno-unused-label")
     elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
         # Using Intel C++
     elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")

@@ -586,6 +586,7 @@ public:
                             size_t col, T* scratch)
     {
         assert(col < 2);
+        col &= 1;  // This fixes GCC warnings for -Warray-bounds
 
         if (qn == 1) {
             T q = q_limbs[0];
