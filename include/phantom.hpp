@@ -74,11 +74,13 @@ public:
 
     /// Create a context for the pkc instance based on the required security strength
     std::unique_ptr<user_ctx> create_ctx(security_strength_e strength,
-                                         cpu_word_size_e size_hint = NATIVE_CPU_WORD_SIZE) const;
+                                         cpu_word_size_e size_hint = NATIVE_CPU_WORD_SIZE,
+                                         bool masking = true) const;
 
     /// Create a context for the pkc instance based on a specific parameter set
     std::unique_ptr<user_ctx> create_ctx(size_t set,
-                                         cpu_word_size_e size_hint = NATIVE_CPU_WORD_SIZE) const;
+                                         cpu_word_size_e size_hint = NATIVE_CPU_WORD_SIZE,
+                                         bool masking = true) const;
 
     /// @brief Key generation - creates a public/private key pair
     /// @param ctx The user context containing the key

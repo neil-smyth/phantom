@@ -18,7 +18,7 @@ using namespace phantom;    // NOLINT
 using namespace utilities;  // NOLINT
 using namespace core;     // NOLINT
 
-#define NUM_ITER   1
+#define NUM_ITER   128
 
 
 int main(int argc, char *argv[])
@@ -49,25 +49,17 @@ int main(int argc, char *argv[])
                 std::cerr << "get_private_key() failed" << std::endl;
                 return EXIT_FAILURE;
             }
-            std::cerr << "!!! privkey = " << mpz<uint8_t>(privkey.data(), privkey.size()).get_str(16) << std::endl;
 
             phantom_vector<uint8_t> pubkey;
             if (!ecdsa.get_public_key(ctx, pubkey)) {
                 std::cerr << "get_private_key() failed" << std::endl;
                 return EXIT_FAILURE;
             }
-            std::cerr << "!!! pubkey = " << mpz<uint8_t>(pubkey.data(), pubkey.size()).get_str(16) << std::endl;
-
-            std::cerr << "!!! j = " << j << std::endl;
 
             phantom_vector<uint8_t> s;
             sw_sign.start();
             ecdsa.sig_sign(ctx, m, s);
             sw_sign.stop();
-
-            std::cerr << "!!! s = " << mpz<uint8_t>(s.data(), s.size()).get_str(16) << std::endl;
-
-            std::cerr << "!!! Verify" << std::endl;
 
             sw_verify.start();
             bool verified = ecdsa.sig_verify(ctx, m, s);

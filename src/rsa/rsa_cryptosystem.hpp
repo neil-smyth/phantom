@@ -54,18 +54,168 @@ enum rsacode_e {
 template<typename T>
 class rsa_cryptosystem
 {
+protected:
+    static const size_t pre_width = 8;
+
+    /// S ahred pointer to a CSPRNG
+    std::shared_ptr<csprng> m_prng;
+
+    /// 2^16 value used in an exponent range check by SP800 56B
+    const core::mpz<T> m_e_2_16;
+
+    /// 2^256 value used in an exponent range check by SP800 56B
+    const core::mpz<T> m_e_2_256;
+
+    /// 2^256/sqrt(2)
+    const core::mpz<T> m_inv_sqrt2;
+
+    /// The exponent recoding to be used
+    const core::scalar_coding_e m_coding_type;
+
+    /// A flag to indicate if square-and-multiply masking is required (default: true)
+    const bool m_masking;
+
+    /// Precomputed base values for use with exponent recoding
+    std::unique_ptr<core::mpz<T>> m_base_pre[1 << pre_width];
+
 public:
     /// Class constructor
-    rsa_cryptosystem() : m_inv_sqrt2("b504f333f9df16e717f7ce02303e69cd2d040bb5b7bd8e638f26d2ef9cadb727", 16)
+    rsa_cryptosystem(core::scalar_coding_e coding = core::scalar_coding_e::SCALAR_BINARY,
+                     bool masking = true)
+        : m_e_2_16("10000", 16),
+          m_e_2_256("100000000", 16),
+          m_inv_sqrt2("b504f333f9df16e717f7ce02303e69cd2d040bb5b7bd8e638f26d2ef9cadb727", 16),
+          m_coding_type(masking ? core::scalar_coding_e::SCALAR_MONT_LADDER : coding),
+          m_masking(masking)
     {
-        m_e_2_16  = T(0x10000);
-        m_e_2_256 = m_e_2_16 * m_e_2_16;
-
         m_prng = std::shared_ptr<csprng>(csprng::make(0x10000000, random_seed::seed_cb));
     }
 
     /// Class destructor
     virtual ~rsa_cryptosystem() {}
+
+    /**
+     * @brief Memory allocation for base values used with exponent recoding
+     * 
+     * @param cfg Modulus configuration and information for reduction
+     */
+    void precomputation_alloc(const core::mod_config<T>& cfg)
+    {
+        m_base_pre[0] = std::unique_ptr<core::mpz<T>>(new core::mpz<T>());
+
+        switch (m_coding_type)
+        {
+            case core::scalar_coding_e::SCALAR_BINARY_DUAL:
+            {
+                m_base_pre[1] = std::unique_ptr<core::mpz<T>>(new core::mpz<T>());
+                m_base_pre[2] = std::unique_ptr<core::mpz<T>>(new core::mpz<T>());
+            } break;
+
+            case core::scalar_coding_e::SCALAR_NAF_2:
+            case core::scalar_coding_e::SCALAR_NAF_3:
+            case core::scalar_coding_e::SCALAR_NAF_4:
+            case core::scalar_coding_e::SCALAR_NAF_5:
+            case core::scalar_coding_e::SCALAR_NAF_6:
+            case core::scalar_coding_e::SCALAR_NAF_7:
+            {
+                size_t w = (1 << ((static_cast<size_t>(m_coding_type) ^ SCALAR_CODING_NAF_BIT) - 1)) - 1;
+
+                for (size_t i=1; i < 2*w; i++) {
+                    m_base_pre[i] = std::unique_ptr<core::mpz<T>>(new core::mpz<T>());
+                }
+            } break;
+
+            case core::scalar_coding_e::SCALAR_PRE_2:
+            case core::scalar_coding_e::SCALAR_PRE_3:
+            case core::scalar_coding_e::SCALAR_PRE_4:
+            case core::scalar_coding_e::SCALAR_PRE_5:
+            case core::scalar_coding_e::SCALAR_PRE_6:
+            case core::scalar_coding_e::SCALAR_PRE_7:
+            case core::scalar_coding_e::SCALAR_PRE_8:
+            {
+                size_t w = (1 << (static_cast<size_t>(m_coding_type) ^ SCALAR_CODING_PRE_BIT));
+
+                for (size_t i=1; i < w; i++) {
+                    m_base_pre[i] = std::unique_ptr<core::mpz<T>>(new core::mpz<T>());
+                }
+            } break;
+
+            default: {}
+        }
+    }
+
+    /**
+     * @brief Precomputation of values needed for suqre-and-multiply with exponent recoding
+     * 
+     * @param b Base value
+     * @param cfg Modulus configuration and information for reduction
+     * @return bool True on success, flaseon failure
+     */
+    bool precomputation(const core::mpz<T>& b, const core::mod_config<T>& cfg)
+    {
+        m_base_pre[0]->set(b);
+
+        // Transform base value to Montgomery domain
+        if (core::REDUCTION_MONTGOMERY == cfg.reduction) {
+            m_base_pre[0]->mul_mont(cfg.mont_R2, cfg);
+        }
+
+        switch (m_coding_type)
+        {
+            case core::scalar_coding_e::SCALAR_BINARY_DUAL: break;
+
+            case core::scalar_coding_e::SCALAR_NAF_2:
+            case core::scalar_coding_e::SCALAR_NAF_3:
+            case core::scalar_coding_e::SCALAR_NAF_4:
+            case core::scalar_coding_e::SCALAR_NAF_5:
+            case core::scalar_coding_e::SCALAR_NAF_6:
+            case core::scalar_coding_e::SCALAR_NAF_7:
+            {
+                size_t w = static_cast<size_t>(m_coding_type) ^ SCALAR_CODING_NAF_BIT;
+                size_t r = (1 << (w - 1)) - 1;
+
+                for (size_t i=1; i < r; i++) {
+                    m_base_pre[i]->set(*m_base_pre[i-1].get());
+                    m_base_pre[i]->mul_mod(*m_base_pre[0].get(), cfg);
+                }
+
+                // Calculate the inverse of b
+                if (!core::mpz<T>::invert(*m_base_pre[r], b, cfg.mod)) {
+                    return false;
+                }
+                m_base_pre[r]->mul_mont(cfg.mont_R2, cfg);
+
+                for (size_t i=r+1; i < r+r; i++) {
+                    m_base_pre[i]->set(*m_base_pre[i-1]);
+                    m_base_pre[i]->mul_mont(*m_base_pre[r], cfg);
+                }
+            } break;
+
+            case core::scalar_coding_e::SCALAR_PRE_2:
+            case core::scalar_coding_e::SCALAR_PRE_3:
+            case core::scalar_coding_e::SCALAR_PRE_4:
+            case core::scalar_coding_e::SCALAR_PRE_5:
+            case core::scalar_coding_e::SCALAR_PRE_6:
+            case core::scalar_coding_e::SCALAR_PRE_7:
+            case core::scalar_coding_e::SCALAR_PRE_8:
+            {
+                size_t w = static_cast<size_t>(m_coding_type) ^ SCALAR_CODING_PRE_BIT;
+                size_t r = 1 << w;
+
+                m_base_pre[1]->set(*m_base_pre[0].get());
+                m_base_pre[1]->square_mod(cfg, 1);
+
+                for (size_t i=2; i < r; i++) {
+                    m_base_pre[i]->set(*m_base_pre[i-1].get());
+                    m_base_pre[i]->mul_mod(*m_base_pre[0].get(), cfg);
+                }
+            } break;
+
+            default: {}
+        }
+
+        return true;
+    }
 
     /**
      * @brief Key generation for the given context
@@ -352,32 +502,46 @@ protected:
     virtual rsacode_e exponentiation(core::mpz<T>& r, core::mpz<T>& b, const core::mpz<T>& e,
         const core::mod_config<T>& cfg)
     {
+        // Allocate memory for the base values if not already done so
+        precomputation_alloc(cfg);
+
+        // A flag to indicate if a windowed mode is to be used and the window size
+        size_t w = 1;
+        bool is_windowed = (m_coding_type & SCALAR_CODING_PRE_BIT);
+        if (is_windowed) {
+            w = static_cast<size_t>(m_coding_type & 0x3f);
+        }
+
+        size_t sub_offset = 0;
+        if (core::scalar_coding_e::SCALAR_NAF_2 <= m_coding_type &&
+            core::scalar_coding_e::SCALAR_NAF_7 >= m_coding_type) {
+            sub_offset = (1 << ((static_cast<size_t>(m_coding_type) & 0x3f) - 1)) - 2;
+        }
+
         // Convert the exponent to a byte array
         phantom_vector<uint8_t> e_bytes;
         e.get_bytes(e_bytes);
 
         // Use the scalar_parser to scan the bit sequence and perform recoding
-        core::scalar_parser bitgen(core::scalar_coding_e::SCALAR_BINARY, e_bytes);
+        core::scalar_parser bitgen(m_coding_type, e_bytes);
         size_t num_bits = bitgen.num_symbols();
         if (0 == num_bits) {
-            std::cout << "num_bits is zero" << std::endl;
             return RSA_EXPONENT_IS_ZERO;
         }
 
-        // Pull the first encoded bit and ensure it is asserted
-        num_bits--;
-        if (SCALAR_IS_LOW == bitgen.pull()) {
-            std::cout << "initial bit is zero" << std::endl;
-            return RSA_RECODING_ERROR;
-        }
+        // Precomputation for exponent recoding and conversion to Montgomery domain
+        precomputation(b, cfg);
 
         // Square-and-multiply
-        if (core::REDUCTION_MONTGOMERY == cfg.reduction) {
-            b.mul_mont(cfg.mont_R2, cfg);
+        rsacode_e rsacode;
+        /*if (core::SCALAR_MONT_LADDER == m_coding_type) {
+            rsacode = montgomery_ladder(r, b, bitgen, num_bits, w, sub_offset, cfg);
+        }
+        else */{
+            rsacode = square_and_multiply(r, b, bitgen, num_bits, w, sub_offset, cfg);
         }
 
-        rsacode_e rsacode = square_and_multiply(r, b, bitgen, num_bits, 1, 0, cfg);
-
+        // If necessary convert result from Montgomery domain
         if (core::REDUCTION_MONTGOMERY == cfg.reduction) {
             r.reduce_mont(cfg);
         }
@@ -397,15 +561,21 @@ protected:
      * @param cfg Modulus configuration
      * @return rsacode_e Enumerated return code, RSA_OK indicates success
      */
-    static rsacode_e square_and_multiply(core::mpz<T>& r, const core::mpz<T>& b, core::scalar_parser& bitgen,
+    rsacode_e square_and_multiply(core::mpz<T>& r, const core::mpz<T>& b, core::scalar_parser& bitgen,
         size_t num_bits, size_t w, size_t sub_offset, const core::mod_config<T>& cfg)
     {
-        uint16_t bit;
+        // Pull the first encoded bit and ensure it is asserted
+        uint32_t bit = bitgen.pull();
+        num_bits--;
+        if (SCALAR_IS_LOW == bit) {
+            return RSA_RECODING_ERROR;
+        }
 
-        r = b;
+        // Set the initial value according to the encoding - it is guaranteed to be positive non-zero
+        r.set(*m_base_pre[(bit - 1) & ((1 << (static_cast<size_t>(m_coding_type) & 0x3f)) - 1)].get());
 
         while (num_bits--) {
-            r.square_mod(cfg);
+            r.square_mod(cfg, w);
 
             // Obtain the next integer bit to be encoded
             bit = bitgen.pull();
@@ -413,12 +583,86 @@ protected:
             // Decode the bit to determine the operation to be performed
             bool subtract = bit & SCALAR_IS_SUBTRACT;
             bool is_zero  = bit == SCALAR_IS_LOW;
-            bit &= 0x0f;
 
             if (!is_zero) {
-                r.mul_mod(b, cfg);
+                bit &= 0xff;
+                T pre_idx  = subtract ? 0 : (bit - 1) & 0xff;
+                T sub_idx  = (subtract ? bit & 0xff : 0) + sub_offset;
+
+                // Determine the value to be multiplied
+                core::mpz<T>* mpz_b = subtract ? m_base_pre[sub_idx].get()
+                                               : m_base_pre[pre_idx].get();
+
+                r.mul_mod(*mpz_b, cfg);
             }
         }
+
+        return RSA_OK;
+    }
+
+    /**
+     * @brief Constant-time swap of two pointers
+     * @param swap Flag indicating if swap should occur
+     * @param s Pointer to swap
+     * @param r Pointer to swap
+     */
+    static void cswap(bool swap, intptr_t& s, intptr_t& r)
+    {
+        intptr_t dummy = -intptr_t(swap) & (s ^ r);
+        s ^= dummy;
+        r ^= dummy;
+    }
+
+    rsacode_e montgomery_ladder(core::mpz<T>& r, const core::mpz<T>& b, core::scalar_parser& bitgen,
+        size_t num_bits, size_t w, size_t sub_offset, const core::mod_config<T>& cfg)
+    {
+        (void) w;
+        (void) sub_offset;
+
+        // Pull the first encoded bit and ensure it is asserted
+        uint32_t bit = bitgen.pull();
+        num_bits--;
+        if (SCALAR_IS_LOW == bit) {
+            return RSA_RECODING_ERROR;
+        }
+
+        // Set the initial value according to the encoding - it is guaranteed to be positive non-zero
+        //r.set(*m_base_pre[(bit - 1) & ((1 << (static_cast<size_t>(m_coding_type) & 0x3f)) - 1)].get());
+
+        if (core::REDUCTION_MONTGOMERY == cfg.reduction) {
+            r = cfg.mont_R2;
+        }
+        else {
+            r.set(T(1));
+        }
+
+        core::mpz<T> b1;
+        b1.set(b);
+        b1.square_mod(cfg);
+
+        // Set pointers
+        intptr_t r0 = intptr_t(&r);
+        intptr_t r1 = intptr_t(&b1);
+
+        bool swap = false;
+        while (num_bits--) {
+            // Obtain the next integer bit to be encoded
+            bit = bitgen.pull();
+
+            // Conditionally swap s and r
+            swap ^= bit == SCALAR_IS_LOW;
+            cswap(swap, r0, r1);
+            swap = bit == SCALAR_IS_LOW;
+
+            core::mpz<T>* mpz_r0 = reinterpret_cast<core::mpz<T>*>(r0);
+            core::mpz<T>* mpz_r1 = reinterpret_cast<core::mpz<T>*>(r1);
+
+            mpz_r0->mul_mod(*mpz_r1, cfg);
+            mpz_r1->square_mod(cfg);
+        }
+
+        core::mpz<T>* res = reinterpret_cast<core::mpz<T>*>(r0);
+        r.set(*res);
 
         return RSA_OK;
     }
@@ -677,18 +921,6 @@ protected:
      * @return std::shared_ptr<csprng> CSPRNG
      */
     std::shared_ptr<csprng> get_prng() { return m_prng; }
-
-    /// S ahred pointer to a CSPRNG
-    std::shared_ptr<csprng> m_prng;
-
-    /// 2^16 value used in an exponent range check by SP800 56B
-    core::mpz<T> m_e_2_16;
-
-    /// 2^256 value used in an exponent range check by SP800 56B
-    core::mpz<T> m_e_2_256;
-
-    /// 2^256/sqrt(2)
-    const core::mpz<T> m_inv_sqrt2;
 };
 
 }  // namespace rsa

@@ -332,7 +332,6 @@ public:
         core::scalar_parser bitgen(m_coding_type, secret);
         size_t num_bits = bitgen.num_symbols();
         if (0 == num_bits) {
-            std::cerr << "!!! SECRET_IS_ZERO" << std::endl;
             return SECRET_IS_ZERO;
         }
 
@@ -340,7 +339,6 @@ public:
         num_bits--;
         uint32_t bit = bitgen.pull();
         if (SCALAR_IS_LOW == bit) {
-            std::cerr << "!!! RECODING_ERROR" << std::endl;
             return RECODING_ERROR;
         }
 
@@ -353,19 +351,16 @@ public:
         retcode_e retcode;
         if (core::SCALAR_MONT_LADDER == m_coding_type) {
             if (POINT_OK != (retcode = montgomery_ladder(bitgen, num_bits, w, bit, sub_offset))) {
-                std::cerr << "!!! montgomery_ladder() failed" << std::endl;
                 return retcode;
             }
         }
         else if (m_masking) {
             if (POINT_OK != (retcode = double_and_add(bitgen, num_bits, w, bit, sub_offset))) {
-                std::cerr << "!!! double_and_add() failed" << std::endl;
                 return retcode;
             }
         }
         else {
             if (POINT_OK != (retcode = double_and_add_unmasked(bitgen, num_bits, w, bit, sub_offset))) {
-                std::cerr << "!!! double_and_add_unmasked() failed" << std::endl;
                 return retcode;
             }
         }

@@ -109,10 +109,6 @@ size_t scalar_parser::binary_dual(phantom_vector<uint8_t>& recoded, const phanto
 
     recoded = phantom_vector<uint8_t>(num_codes);
 
-    std::cerr << "!!! binary_dual secret = "
-              << mpz<uint8_t>(const_cast<uint8_t*>(secret.data()), secret.size()).get_str(16)
-              << std::endl;
-
     for (size_t i=0; i < secret.size() * 8 - num_codes; i++) {
         recoded[i] = (secret[(i>>3)] >> (i & 0x7)) & 1;
         std::cerr << " " << static_cast<int>(recoded[i]);

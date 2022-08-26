@@ -428,6 +428,56 @@ public:
         return used;
     }
 
+    // Montgomery squaring
+    static int32_t square_mont(T* out, const T* in, size_t in_used, const T* m, size_t n, T m_inv)
+    {
+        if (0 == in_used) {
+            return 0;
+        }
+
+        // Reset the output to 0
+        std::fill(out, out + n + 1, 0);
+
+        // Simultaneously multiply and reduce
+        for (auto i=0; i < n; i++) {
+            D in1_masked = (i >= in_used)? 0 : in[i];
+            T h, ui;
+            number<T>::umul(&h, &ui, static_cast<T>(in1_masked), in[0]);
+            number<T>::umul(&h, &ui, out[0] + ui, m_inv);
+
+            ui    = (out[0] + in1_masked * in[0]) * m_inv;
+            D uid = ui;
+
+            D z1 = static_cast<D>(in[0]) * in1_masked + out[0];
+            D z2 = static_cast<D>(m[0]) * uid + (z1 & LIMB_MASK);
+            T k1 = z1 >> std::numeric_limits<T>::digits;
+            T k2 = z2 >> std::numeric_limits<T>::digits;
+
+            for (S j = 1; j < n; j++) {
+                D in2_masked = (j >= in_used)? 0 : in[j];
+                z1 = in2_masked * in1_masked + out[j] + k1;
+                z2 = static_cast<D>(m[j]) * uid + (z1 & LIMB_MASK) + k2;
+                k1 = z1 >> std::numeric_limits<T>::digits;
+                k2 = z2 >> std::numeric_limits<T>::digits;
+                out[j-1] = z2;
+            }
+
+            D tmp = static_cast<D>(out[n]) + k1 + k2;
+            out[n-1] = tmp;
+            out[n]   = tmp >> std::numeric_limits<T>::digits;
+        }
+
+        // Reduce the output if it is equal or larger than the modulus
+        if (mpbase<T>::cmp_n(out, mpbase<T>::normalized_size(out, n+1), m, n) != -1) {
+            mpbase<T>::sub(out, out, n+1, m, n);
+        }
+
+        // Reduce the output size if the MSW are zero
+        int32_t used = mpbase<T>::normalized_size(out, n);
+
+        return used;
+    }
+
     // Montgomery reduction
     static int32_t reduce_mont(T* out, const T* in, size_t in_used, const T* m, size_t n, T m_inv)
     {

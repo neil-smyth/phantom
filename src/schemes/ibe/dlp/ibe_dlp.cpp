@@ -66,7 +66,9 @@ ibe_dlp::~ibe_dlp()
 {
 }
 
-std::unique_ptr<user_ctx> ibe_dlp::create_ctx(security_strength_e bits, cpu_word_size_e size_hint) const
+std::unique_ptr<user_ctx> ibe_dlp::create_ctx(security_strength_e bits,
+                                              cpu_word_size_e size_hint,
+                                              bool masking) const
 {
     ctx_ibe_dlp* ctx = new ctx_ibe_dlp(ibe_dlp::bits_2_set(bits));
     if (ctx->get_set() > 1) {
@@ -75,7 +77,9 @@ std::unique_ptr<user_ctx> ibe_dlp::create_ctx(security_strength_e bits, cpu_word
     return std::unique_ptr<user_ctx>(ctx);
 }
 
-std::unique_ptr<user_ctx> ibe_dlp::create_ctx(size_t set, cpu_word_size_e size_hint) const
+std::unique_ptr<user_ctx> ibe_dlp::create_ctx(size_t set,
+                                              cpu_word_size_e size_hint,
+                                              bool masking) const
 {
     ctx_ibe_dlp* ctx = new ctx_ibe_dlp(set);
     if (ctx->get_set() > 1) {

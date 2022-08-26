@@ -61,7 +61,9 @@ eddsa_signature::~eddsa_signature()
 {
 }
 
-std::unique_ptr<user_ctx> eddsa_signature::create_ctx(security_strength_e bits, cpu_word_size_e size_hint) const
+std::unique_ptr<user_ctx> eddsa_signature::create_ctx(security_strength_e bits,
+                                                      cpu_word_size_e size_hint,
+                                                      bool masking) const
 {
     user_ctx* ctx;
     switch (size_hint)
@@ -81,7 +83,9 @@ std::unique_ptr<user_ctx> eddsa_signature::create_ctx(security_strength_e bits, 
     return std::unique_ptr<user_ctx>(ctx);
 }
 
-std::unique_ptr<user_ctx> eddsa_signature::create_ctx(size_t set, cpu_word_size_e size_hint) const
+std::unique_ptr<user_ctx> eddsa_signature::create_ctx(size_t set,
+                                                      cpu_word_size_e size_hint,
+                                                      bool masking) const
 {
     user_ctx* ctx;
     switch (size_hint)

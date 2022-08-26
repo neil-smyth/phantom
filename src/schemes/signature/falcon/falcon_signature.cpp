@@ -60,7 +60,9 @@ falcon_signature::~falcon_signature()
 {
 }
 
-std::unique_ptr<user_ctx> falcon_signature::create_ctx(security_strength_e bits, cpu_word_size_e size_hint) const
+std::unique_ptr<user_ctx> falcon_signature::create_ctx(security_strength_e bits,
+                                                       cpu_word_size_e size_hint,
+                                                       bool masking) const
 {
     ctx_falcon* ctx = new ctx_falcon(falcon_signature::bits_2_set(bits));
     if (ctx->get_set() > 1) {
@@ -69,7 +71,9 @@ std::unique_ptr<user_ctx> falcon_signature::create_ctx(security_strength_e bits,
     return std::unique_ptr<user_ctx>(ctx);
 }
 
-std::unique_ptr<user_ctx> falcon_signature::create_ctx(size_t set, cpu_word_size_e size_hint) const
+std::unique_ptr<user_ctx> falcon_signature::create_ctx(size_t set,
+                                                       cpu_word_size_e size_hint,
+                                                       bool masking) const
 {
     ctx_falcon* ctx = new ctx_falcon(set);
     if (ctx->get_set() > 1) {
