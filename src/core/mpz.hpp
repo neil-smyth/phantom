@@ -818,7 +818,6 @@ public:
             }
         }
 
-outer_loop:
         return MILLER_RABIN_PROBABLY_PRIME;
     }
 

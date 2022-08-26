@@ -208,7 +208,6 @@ restart:
 
     retval = num_retries;
 
-finish:
     return retval;
 }
 
@@ -460,10 +459,6 @@ bool falcon_signature::verify(const std::unique_ptr<user_ctx>& ctx,
     core::poly<int32_t>::centre(s1.data(), q, n);
 
     return true;
-
-finish_error:
-
-    return false;
 }
 
 size_t falcon_signature::get_msg_len(const std::unique_ptr<user_ctx>& ctx) const
