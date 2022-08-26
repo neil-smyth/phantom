@@ -173,7 +173,7 @@ void saber_indcpa::gen_matrix_shake128(uint16_t* _RESTRICT_ A, const uint8_t* se
     }
 }
 
-uint64_t saber_indcpa::load_littleendian(const uint8_t *x, int bytes)
+uint64_t saber_indcpa::load_littleendian(const uint8_t *x, size_t bytes)
 {
     uint64_t r = x[0];
     for (size_t i = 1; i < bytes; i++) {

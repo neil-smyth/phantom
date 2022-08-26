@@ -730,7 +730,8 @@ protected:
      */
     static bool check_pminusq_diff(const core::mpz<T>& p, const core::mpz<T>& q, int nbits)
     {
-        const int bitlen = (nbits >> 1) - 100;
+        assert(nbits >= 200);
+        const size_t bitlen = (nbits >> 1) - 100;
 
         core::mpz<T> diff;
         diff = p - q;
@@ -825,16 +826,16 @@ protected:
     virtual bool derive_prime(core::mpz<T>& prime_factor, core::mpz<T>& rand_out,
         const core::mpz<T>& aux_prime_1, const core::mpz<T>& aux_prime_2, const core::mpz<T>& e, size_t nbits)
     {
-        const int bits = nbits >> 1;
+        const size_t bits = nbits >> 1;
 
         // 2^256/sqrt(2)
-        const int inv_sqrt2_bits = m_inv_sqrt2.sizeinbase(2);
+        const size_t inv_sqrt2_bits = m_inv_sqrt2.sizeinbase(2);
 
         if (bits < inv_sqrt2_bits) {
             return false;
         }
         const core::mpz<T> base  = m_inv_sqrt2 << int(bits - inv_sqrt2_bits);
-        const core::mpz<T> range = (core::mpz<T>(T(1)) << bits) - base;
+        const core::mpz<T> range = (core::mpz<T>(T(1)) << static_cast<int>(bits)) - base;
 
         // Verify that 2gcd(*aux_prime_1, aux_prime_2) == 1
         const core::mpz<T> r1x2 = core::mpz<T>(aux_prime_1).add(aux_prime_1);

@@ -57,7 +57,7 @@ const lest::test specification[] =
         mpz<uint32_t> xr, yr;
         phantom_vector<uint8_t> s;
         eddsa_signature::compression<uint32_t>(cfg, x1, y1, s);
-        EXPECT(s.size() == 32);
+        EXPECT(s.size() == 32U);
         eddsa_signature::decompression<uint32_t>(cfg, xr, yr, s);
 
         EXPECT(xr.get_str(16) == x1.get_str(16));
@@ -86,7 +86,7 @@ const lest::test specification[] =
         mpz<uint32_t> xr, yr;
         phantom_vector<uint8_t> s;
         eddsa_signature::compression<uint32_t>(cfg, x1, y1, s);
-        EXPECT(s.size() == 57);
+        EXPECT(s.size() == 57U);
         eddsa_signature::decompression<uint32_t>(cfg, xr, yr, s);
 
         EXPECT(xr.get_str(16) == x1.get_str(16));

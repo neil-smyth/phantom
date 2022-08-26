@@ -20,7 +20,7 @@ const lest::test specification[] =
     CASE("Instantiation from lower case hex prefix string - 16-bit")
     {
         mpz<uint16_t> a("0x0123456789abcdef", 16);
-        EXPECT(a.sizeinbase(2) == 57);
+        EXPECT(a.sizeinbase(2) == 57U);
         EXPECT(a[3] == uint16_t(0x0123));
         EXPECT(a[2] == uint16_t(0x4567));
         EXPECT(a[1] == uint16_t(0x89ab));
@@ -30,7 +30,7 @@ const lest::test specification[] =
     CASE("Instantiation from upper case hex prefix string - 16-bit")
     {
         mpz<uint16_t> a("0x0123456789ABCDEF", 16);
-        EXPECT(a.sizeinbase(2) == 57);
+        EXPECT(a.sizeinbase(2) == 57U);
         EXPECT(a[3] == uint16_t(0x0123));
         EXPECT(a[2] == uint16_t(0x4567));
         EXPECT(a[1] == uint16_t(0x89ab));
@@ -40,7 +40,7 @@ const lest::test specification[] =
     CASE("Instantiation from lower case hex upper prefix string - 16-bit")
     {
         mpz<uint16_t> a("0X0123456789abcdef", 16);
-        EXPECT(a.sizeinbase(2) == 57);
+        EXPECT(a.sizeinbase(2) == 57U);
         EXPECT(a[3] == uint16_t(0x0123));
         EXPECT(a[2] == uint16_t(0x4567));
         EXPECT(a[1] == uint16_t(0x89ab));
@@ -50,7 +50,7 @@ const lest::test specification[] =
     CASE("Instantiation from lower case hex non-prefix string - 16-bit")
     {
         mpz<uint16_t> a("0123456789abcdef", 16);
-        EXPECT(a.sizeinbase(2) == 57);
+        EXPECT(a.sizeinbase(2) == 57U);
         EXPECT(a[3] == uint16_t(0x0123));
         EXPECT(a[2] == uint16_t(0x4567));
         EXPECT(a[1] == uint16_t(0x89ab));
@@ -60,32 +60,32 @@ const lest::test specification[] =
     CASE("Instantiation from lower case binary non-prefix string - 16-bit")
     {
         mpz<uint16_t> a("1011001", 2);
-        EXPECT(a.sizeinbase(2) == 7);
+        EXPECT(a.sizeinbase(2) == 7U);
         EXPECT(a == uint16_t(0x59));
     },
     CASE("Instantiation from lower case binary negative string - 16-bit")
     {
         mpz<uint16_t> a("-111111111111111", 2);
-        EXPECT(a.sizeinbase(2) == 15);
+        EXPECT(a.sizeinbase(2) == 15U);
         EXPECT(a == int16_t(-0x7fff));
     },
     CASE("Instantiation from decimal negative string - 16-bit")
     {
         mpz<uint16_t> a("-32767", 10);
-        EXPECT(a.sizeinbase(2) == 15);
+        EXPECT(a.sizeinbase(2) == 15U);
         EXPECT(a == int16_t(-0x7fff));
     },
     CASE("Instantiation from decimal negative string - 16-bit")
     {
         mpz<uint16_t> a("100001", 10);
-        EXPECT(a.sizeinbase(2) == 17);
+        EXPECT(a.sizeinbase(2) == 17U);
         EXPECT(a[1] == uint16_t(0x0001));
         EXPECT(a[0] == uint16_t(0x86a1));
     },
     CASE("Instantiation from decimal negative string with leading zeros - 16-bit")
     {
         mpz<uint16_t> a("000000000000100001", 10);
-        EXPECT(a.sizeinbase(2) == 17);
+        EXPECT(a.sizeinbase(2) == 17U);
         EXPECT(a[1] == uint16_t(0x0001));
         EXPECT(a[0] == uint16_t(0x86a1));
         EXPECT(a.get_str(10) == "100001");
@@ -93,21 +93,21 @@ const lest::test specification[] =
     CASE("Instantiation from base32 - 16-bit")
     {
         mpz<uint16_t> a("AA======", 32);
-        EXPECT(a.sizeinbase(2) == 1);
+        EXPECT(a.sizeinbase(2) == 1U);
         EXPECT(a == uint16_t(0));
         EXPECT(a.get_str(32) == "AA======");
     },
     CASE("Instantiation from base32 - 16-bit")
     {
         mpz<uint16_t> a("AE======", 32);
-        EXPECT(a.sizeinbase(2) == 1);
+        EXPECT(a.sizeinbase(2) == 1U);
         EXPECT(a == uint16_t(1));
         EXPECT(a.get_str(32) == "AE======");
     },
     CASE("Instantiation from base32 - 16-bit")
     {
         mpz<uint16_t> a("AH77777774======", 32);
-        EXPECT(a.sizeinbase(2) == 41);
+        EXPECT(a.sizeinbase(2) == 41U);
         EXPECT(a[2] == uint16_t(0x1ff));
         EXPECT(a[1] == uint16_t(0xffff));
         EXPECT(a[0] == uint16_t(0xffff));
@@ -116,7 +116,7 @@ const lest::test specification[] =
     CASE("Instantiation from base32 - 16-bit")
     {
         mpz<uint16_t> a("AH7777777777777777777777777Q====", 32);
-        EXPECT(a.sizeinbase(2) == 129);
+        EXPECT(a.sizeinbase(2) == 129U);
         EXPECT(a[8] == uint16_t(0x1));
         EXPECT(a[7] == uint16_t(0xffff));
         EXPECT(a[6] == uint16_t(0xffff));
@@ -131,21 +131,21 @@ const lest::test specification[] =
     CASE("Instantiation from base64 - 16-bit")
     {
         mpz<uint16_t> a("AA==", 64);
-        EXPECT(a.sizeinbase(2) == 1);
+        EXPECT(a.sizeinbase(2) == 1U);
         EXPECT(a == uint16_t(0));
         EXPECT(a.get_str(64) == "AA==");
     },
     CASE("Instantiation from base64 - 16-bit")
     {
         mpz<uint16_t> a("AQ==", 64);
-        EXPECT(a.sizeinbase(2) == 1);
+        EXPECT(a.sizeinbase(2) == 1U);
         EXPECT(a == uint16_t(1));
         EXPECT(a.get_str(64) == "AQ==");
     },
     CASE("Instantiation from base64 - 16-bit")
     {
         mpz<uint16_t> a("Af//////", 64);
-        EXPECT(a.sizeinbase(2) == 41);
+        EXPECT(a.sizeinbase(2) == 41U);
         EXPECT(a[2] == uint16_t(0x1ff));
         EXPECT(a[1] == uint16_t(0xffff));
         EXPECT(a[0] == uint16_t(0xffff));
@@ -153,127 +153,127 @@ const lest::test specification[] =
     CASE("String output binary - 16-bit")
     {
         mpz<uint16_t> a("0x186a1", 16);
-        EXPECT(a.sizeinbase(2) == 17);
+        EXPECT(a.sizeinbase(2) == 17U);
         EXPECT(a.get_str(2) == "11000011010100001");
     },
     CASE("String output octal - 16-bit")
     {
         mpz<uint16_t> a("0x186a1", 16);
-        EXPECT(a.sizeinbase(8) == 6);
+        EXPECT(a.sizeinbase(8) == 6U);
         EXPECT(a.get_str(8) == "303241");
     },
     CASE("String output hexadecimal - 16-bit")
     {
         mpz<uint16_t> a("0x186a1", 16);
-        EXPECT(a.sizeinbase(16) == 5);
+        EXPECT(a.sizeinbase(16) == 5U);
         EXPECT(a.get_str(16) == "186a1");
     },
     CASE("String output decimal - 16-bit")
     {
         mpz<uint16_t> a("0", 10);
-        EXPECT(a.sizeinbase(10) == 1);
+        EXPECT(a.sizeinbase(10) == 1U);
         EXPECT(a.get_str(10) == "0");
     },
     CASE("String output decimal - 16-bit")
     {
         mpz<uint16_t> a("-1", 10);
-        EXPECT(a.sizeinbase(10) == 1);
+        EXPECT(a.sizeinbase(10) == 1U);
         EXPECT(a.get_str(10) == "-1");
     },
     CASE("String output decimal - 16-bit")
     {
         mpz<uint16_t> a("0x186a1", 16);
-        EXPECT(a.sizeinbase(10) == 6);
+        EXPECT(a.sizeinbase(10) == 6U);
         EXPECT(a.get_str(10) == "100001");
     },
     CASE("String output decimal - 16-bit")
     {
         mpz<uint16_t> a("123456789", 10);
-        EXPECT(a.sizeinbase(10) == 9);
+        EXPECT(a.sizeinbase(10) == 9U);
         EXPECT(a.get_str(10) == "123456789");
     },
     CASE("String output decimal - 16-bit")
     {
         mpz<uint16_t> a("0x1ffffffffffffffffffffffffffffffff", 16);
-        EXPECT(a.sizeinbase(10) == 39);
+        EXPECT(a.sizeinbase(10) == 39U);
         EXPECT(a.get_str(10) == "680564733841876926926749214863536422911");
     },
     CASE("String output base 32 - 16-bit")
     {
         mpz<uint16_t> a("0x186a1", 16);
-        EXPECT(a.sizeinbase(32) == 8);
+        EXPECT(a.sizeinbase(32) == 8U);
         EXPECT(a.get_str(32) == "AGDKC===");
     },
     CASE("String output base 32 - 16-bit")
     {
         mpz<uint16_t> a("0xFFFFFF", 16);
-        EXPECT(a.sizeinbase(32) == 8);
+        EXPECT(a.sizeinbase(32) == 8U);
         EXPECT(a.get_str(32) == "77776===");
     },
     CASE("String output base 32 - 16-bit")
     {
         mpz<uint16_t> a("0x1FFFFFFFFFF", 16);
-        EXPECT(a.sizeinbase(32) == 16);
+        EXPECT(a.sizeinbase(32) == 16U);
         EXPECT(a.get_str(32) == "AH77777774======");
     },
     CASE("String output base 32 - 16-bit")
     {
         mpz<uint16_t> a("0x1ffffffffffffffffffffffffffffffff", 16);
-        EXPECT(a.sizeinbase(32) == 32);
+        EXPECT(a.sizeinbase(32) == 32U);
         EXPECT(a.get_str(32) == "AH7777777777777777777777777Q====");
     },
     CASE("String output base 32 - 16-bit")
     {
         mpz<uint16_t> a("0x0", 16);
-        EXPECT(a.sizeinbase(32) == 8);
+        EXPECT(a.sizeinbase(32) == 8U);
         EXPECT(a.get_str(32) == "AA======");
     },
     CASE("String output base 32 - 16-bit")
     {
         mpz<uint16_t> a("0x1", 16);
-        EXPECT(a.sizeinbase(32) == 8);
+        EXPECT(a.sizeinbase(32) == 8U);
         EXPECT(a.get_str(32) == "AE======");
     },
     CASE("String output base 32 - 16-bit")
     {
         mpz<uint16_t> a("-1", 10);
-        EXPECT(a.sizeinbase(32) == 8);
+        EXPECT(a.sizeinbase(32) == 8U);
         EXPECT(a.get_str(32) == "-AE======");
     },
     CASE("String output base 64 - 16-bit")
     {
         mpz<uint16_t> a("0x0", 16);
-        EXPECT(a.sizeinbase(64) == 4);
+        EXPECT(a.sizeinbase(64) == 4U);
         EXPECT(a.get_str(64) == "AA==");
     },
     CASE("String output base 64 - 16-bit")
     {
         mpz<uint16_t> a("0x1", 16);
-        EXPECT(a.sizeinbase(64) == 4);
+        EXPECT(a.sizeinbase(64) == 4U);
         EXPECT(a.get_str(64) == "AQ==");
     },
     CASE("String output base 32 - 16-bit")
     {
         mpz<uint16_t> a("0x186a1", 16);
-        EXPECT(a.sizeinbase(64) == 4);
+        EXPECT(a.sizeinbase(64) == 4U);
         EXPECT(a.get_str(64) == "AYah");
     },
     CASE("String output base 32 - 16-bit")
     {
         mpz<uint16_t> a("0xFFFFFF", 16);
-        EXPECT(a.sizeinbase(64) == 4);
+        EXPECT(a.sizeinbase(64) == 4U);
         EXPECT(a.get_str(64) == "////");
     },
     CASE("String output base 32 - 16-bit")
     {
         mpz<uint16_t> a("0x1FFFFFFFFFF", 16);
-        EXPECT(a.sizeinbase(64) == 8);
+        EXPECT(a.sizeinbase(64) == 8U);
         EXPECT(a.get_str(64) == "Af//////");
     },
     CASE("String output base 32 - 16-bit")
     {
         mpz<uint16_t> a("0x1ffffffffffffffffffffffffffffffff", 16);
-        EXPECT(a.sizeinbase(64) == 24);
+        EXPECT(a.sizeinbase(64) == 24U);
         EXPECT(a.get_str(64) == "Af////////////////////8=");
     },
     CASE("AND zero - 16-bit")
@@ -301,7 +301,7 @@ const lest::test specification[] =
         mpz<uint16_t> a(vala, 9);
         mpz<uint16_t> b(valb, 7);
         mpz<uint16_t> c = a & b;
-        EXPECT(c.sizeinbase(2) == 56);
+        EXPECT(c.sizeinbase(2) == 56U);
         EXPECT(c[3] == 0x0081);
         EXPECT(c[2] == 0x0081);
         EXPECT(c[1] == 0xFF00);
@@ -329,7 +329,7 @@ const lest::test specification[] =
         mpz<uint16_t> a(vala, 9);
         mpz<uint16_t> b(valb, 7);
         a &= b;
-        EXPECT(a.sizeinbase(2) == 56);
+        EXPECT(a.sizeinbase(2) == 56U);
         EXPECT(a[3] == 0x0081);
         EXPECT(a[2] == 0x0081);
         EXPECT(a[1] == 0xFF00);
@@ -361,7 +361,7 @@ const lest::test specification[] =
         mpz<uint16_t> a(vala, 9);
         mpz<uint16_t> b(valb, 7);
         mpz<uint16_t> c = a | b;
-        EXPECT(c.sizeinbase(2) == 65);
+        EXPECT(c.sizeinbase(2) == 65U);
         EXPECT(c[4] == 0x0001);
         EXPECT(c[3] == 0x00C3);
         EXPECT(c[2] == 0x00C3);
@@ -390,7 +390,7 @@ const lest::test specification[] =
         mpz<uint16_t> a(vala, 9);
         mpz<uint16_t> b(valb, 7);
         a |= b;
-        EXPECT(a.sizeinbase(2) == 65);
+        EXPECT(a.sizeinbase(2) == 65U);
         EXPECT(a[4] == 0x0001);
         EXPECT(a[3] == 0x00C3);
         EXPECT(a[2] == 0x00C3);
@@ -423,7 +423,7 @@ const lest::test specification[] =
         mpz<uint16_t> a(vala, 9);
         mpz<uint16_t> b(valb, 7);
         mpz<uint16_t> c = a ^ b;
-        EXPECT(c.sizeinbase(2) == 65);
+        EXPECT(c.sizeinbase(2) == 65U);
         EXPECT(c[4] == 0x0001);
         EXPECT(c[3] == 0x0042);
         EXPECT(c[2] == 0x0042);
@@ -452,7 +452,7 @@ const lest::test specification[] =
         mpz<uint16_t> a(vala, 9);
         mpz<uint16_t> b(valb, 7);
         a ^= b;
-        EXPECT(a.sizeinbase(2) == 65);
+        EXPECT(a.sizeinbase(2) == 65U);
         EXPECT(a[4] == 0x0001);
         EXPECT(a[3] == 0x0042);
         EXPECT(a[2] == 0x0042);

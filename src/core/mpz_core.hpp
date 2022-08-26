@@ -389,7 +389,7 @@ public:
         std::fill(out, out + n + 1, 0);
 
         // Simultaneously multiply and reduce
-        for (auto i=0; i < n; i++) {
+        for (size_t i=0; i < n; i++) {
             D in1_masked = (i >= in1_used)? 0 : in1[i];
             T h, ui;
             number<T>::umul(&h, &ui, static_cast<T>(in1_masked), in2[0]);
@@ -403,7 +403,7 @@ public:
             T k1 = z1 >> std::numeric_limits<T>::digits;
             T k2 = z2 >> std::numeric_limits<T>::digits;
 
-            for (S j = 1; j < n; j++) {
+            for (size_t j = 1; j < n; j++) {
                 D in2_masked = (j >= in2_used)? 0 : in2[j];
                 z1 = in2_masked * in1_masked + out[j] + k1;
                 z2 = static_cast<D>(m[j]) * uid + (z1 & LIMB_MASK) + k2;
@@ -439,7 +439,7 @@ public:
         std::fill(out, out + n + 1, 0);
 
         // Simultaneously multiply and reduce
-        for (auto i=0; i < n; i++) {
+        for (size_t i=0; i < n; i++) {
             D in1_masked = (i >= in_used)? 0 : in[i];
             T h, ui;
             number<T>::umul(&h, &ui, static_cast<T>(in1_masked), in[0]);
@@ -453,7 +453,7 @@ public:
             T k1 = z1 >> std::numeric_limits<T>::digits;
             T k2 = z2 >> std::numeric_limits<T>::digits;
 
-            for (S j = 1; j < n; j++) {
+            for (size_t j = 1; j < n; j++) {
                 D in2_masked = (j >= in_used)? 0 : in[j];
                 z1 = in2_masked * in1_masked + out[j] + k1;
                 z2 = static_cast<D>(m[j]) * uid + (z1 & LIMB_MASK) + k2;

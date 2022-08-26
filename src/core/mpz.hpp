@@ -658,7 +658,7 @@ public:
             return;
         }
 
-        size_t in_used = in1.get_limbsize();
+        int in_used = in1.get_limbsize();
         if (0 == in_used || (bits >= (in_used * std::numeric_limits<T>::digits))) {
             m_limbs.resize(0);
             m_sign = false;
@@ -796,8 +796,7 @@ public:
             }
 
             bool is_composite = true;
-            size_t j;
-            for (j=1; j < a; j++) {
+            for (int j=1; j < a; j++) {
                 z.square_mod(cfg);
                 if (z == T(1)) {
                     return MILLER_RABIN_COMPOSITE_NOT_POWER_OF_PRIME;
@@ -1405,7 +1404,7 @@ public:
         m = T(s);
 
         while (t.cmp_ui(1) != 0) {
-            int i = 1;
+            size_t i = 1;
             x.set(t).square_mod(cfg);
             while (x.cmp_ui(1) != 0 && i < m) {
                 x.square_mod(cfg);
@@ -1702,7 +1701,7 @@ public:
             T* r2 = rp.get_limbs().data();
             T* xp, *yp, *odd_inv_2exp;
             size_t t;
-            int bcnt;
+            size_t bcnt;
 
             if (bn < ncnt) {
                 phantom_vector<T> newbp(ncnt);

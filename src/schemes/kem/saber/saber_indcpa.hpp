@@ -83,7 +83,7 @@ private:
     static void bs2polp(uint16_t* _RESTRICT_ out, const uint8_t* _RESTRICT_ in);
 
     void gen_matrix_shake128(uint16_t* _RESTRICT_ A, const uint8_t* seed, size_t l, size_t k);
-    static uint64_t load_littleendian(const uint8_t *x, int bytes);
+    static uint64_t load_littleendian(const uint8_t *x, size_t bytes);
     static void cbd_6(const uint8_t* _RESTRICT_ buf, uint16_t* _RESTRICT_ s);
     static void cbd_8(const uint8_t* _RESTRICT_ buf, uint16_t* _RESTRICT_ s);
     static void cbd_10(const uint8_t* _RESTRICT_ buf, uint16_t* _RESTRICT_ s);
