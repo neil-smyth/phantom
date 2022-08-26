@@ -30,7 +30,6 @@ const lest::test specification[] =
         phantom_vector<uint8_t> tweak(7);
         phantom_vector<uint8_t> badtweak(8);
 
-        aes_fpe_ff3_1<int> uut;
         std::unique_ptr<fpe_ctx> ctx;
         ctx = aes_fpe_ff3_1<uint16_t>::create_ctx(user_key, aes_keylen_e::AES_128, badtweak);
         EXPECT(nullptr == ctx.get());

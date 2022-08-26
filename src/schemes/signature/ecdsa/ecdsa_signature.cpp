@@ -247,8 +247,6 @@ bool ecdsa_signature::sign(const std::unique_ptr<user_ctx>& ctx,
 {
     ctx_ecdsa& myctx = dynamic_cast<ctx_ecdsa&>(*ctx.get());
 
-    size_t n = myctx.get_order_G_bits();
-
     switch (myctx.get_wordsize())
     {
         case 16:

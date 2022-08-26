@@ -404,7 +404,7 @@ public:
             T sub_idx  = (is_zero? 0 : subtract? bit & 0xff : 0) + sub_offset;
 
             // Determine the point to be added
-            intptr_t mask, p_a, p_b;
+            intptr_t mask, p_b;
             mask = -intptr_t(subtract);
             p_b  = intptr_t(m_point_pre[pre_idx].get()) ^
                    ((intptr_t(m_point_pre[pre_idx].get()) ^ intptr_t(m_point_pre[sub_idx].get())) & mask);

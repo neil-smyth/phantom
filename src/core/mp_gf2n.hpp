@@ -367,7 +367,6 @@ public:
     {
         mpz<T> temp;
         temp.set_words(m_poly);
-        bool dummy;
         return limbstring<T>::get_str(temp, base, uppercase);
     }
 

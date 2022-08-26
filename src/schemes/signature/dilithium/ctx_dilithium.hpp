@@ -41,7 +41,6 @@ public:
                                    m_dilithium->get_params()->R, m_dilithium->get_params()->R2)),
         m_reduction(m_reduce)
     {
-        uint32_t q     = m_dilithium->get_params()->q;
         uint32_t g     = m_dilithium->get_params()->g;
         uint32_t inv_g = m_dilithium->get_params()->inv_g;
         size_t   n     = m_dilithium->get_params()->n;

@@ -48,7 +48,7 @@ const lest::test specification[] =
         phantom_vector<uint8_t> m;
         retflag = ecdh.key_exchange_init(ctx, m);
         EXPECT(true == retflag);
-        EXPECT(48 == m.size());
+        EXPECT(48U == m.size());
     },
     CASE("secp192r1 affine ECDH final bad message length - 64-bit")
     {
@@ -78,7 +78,7 @@ const lest::test specification[] =
         phantom_vector<uint8_t> m;
         retflag = ecdh.key_exchange_init(ctx, m);
         EXPECT(true == retflag);
-        EXPECT(48 == m.size());
+        EXPECT(48U == m.size());
 
         m.resize(47);
 
@@ -96,12 +96,12 @@ const lest::test specification[] =
         phantom_vector<uint8_t> m;
         retflag = ecdh.key_exchange_init(ctx, m);
         EXPECT(true == retflag);
-        EXPECT(48 == m.size());
+        EXPECT(48U == m.size());
 
         phantom_vector<uint8_t> shared_key;
         retflag = ecdh.key_exchange_final(ctx, m, shared_key);
         EXPECT(true == retflag);
-        EXPECT(24 == shared_key.size());
+        EXPECT(24U == shared_key.size());
     },
     CASE("secp224r1 affine ECDH get non-existant private key - 64-bit")
     {
@@ -132,7 +132,7 @@ const lest::test specification[] =
         phantom_vector<uint8_t> m;
         retflag = ecdh.key_exchange_init(ctx, m);
         EXPECT(true == retflag);
-        EXPECT(56 == m.size());
+        EXPECT(56U == m.size());
     },
     CASE("secp224r1 affine ECDH final bad message length - 64-bit")
     {
@@ -162,7 +162,7 @@ const lest::test specification[] =
         phantom_vector<uint8_t> m;
         retflag = ecdh.key_exchange_init(ctx, m);
         EXPECT(true == retflag);
-        EXPECT(56 == m.size());
+        EXPECT(56U == m.size());
 
         m.resize(55);
 
@@ -180,12 +180,12 @@ const lest::test specification[] =
         phantom_vector<uint8_t> m;
         retflag = ecdh.key_exchange_init(ctx, m);
         EXPECT(true == retflag);
-        EXPECT(56 == m.size());
+        EXPECT(56U == m.size());
 
         phantom_vector<uint8_t> shared_key;
         retflag = ecdh.key_exchange_final(ctx, m, shared_key);
         EXPECT(true == retflag);
-        EXPECT(28 == shared_key.size());
+        EXPECT(28U == shared_key.size());
     },
 #endif
     CASE("secp192r1 affine ECDH get non-existant private key - 32-bit")
@@ -217,7 +217,7 @@ const lest::test specification[] =
         phantom_vector<uint8_t> m;
         retflag = ecdh.key_exchange_init(ctx, m);
         EXPECT(true == retflag);
-        EXPECT(48 == m.size());
+        EXPECT(48U == m.size());
     },
     CASE("secp192r1 affine ECDH final bad message length - 32-bit")
     {
@@ -247,7 +247,7 @@ const lest::test specification[] =
         phantom_vector<uint8_t> m;
         retflag = ecdh.key_exchange_init(ctx, m);
         EXPECT(true == retflag);
-        EXPECT(48 == m.size());
+        EXPECT(48U == m.size());
 
         m.resize(47);
 
@@ -265,12 +265,12 @@ const lest::test specification[] =
         phantom_vector<uint8_t> m;
         retflag = ecdh.key_exchange_init(ctx, m);
         EXPECT(true == retflag);
-        EXPECT(48 == m.size());
+        EXPECT(48U == m.size());
 
         phantom_vector<uint8_t> shared_key;
         retflag = ecdh.key_exchange_final(ctx, m, shared_key);
         EXPECT(true == retflag);
-        EXPECT(24 == shared_key.size());
+        EXPECT(24U == shared_key.size());
     },
     CASE("secp224r1 affine ECDH get non-existant private key - 32-bit")
     {
@@ -301,7 +301,7 @@ const lest::test specification[] =
         phantom_vector<uint8_t> m;
         retflag = ecdh.key_exchange_init(ctx, m);
         EXPECT(true == retflag);
-        EXPECT(56 == m.size());
+        EXPECT(56U == m.size());
     },
     CASE("secp224r1 affine ECDH final bad message length - 32-bit")
     {
@@ -331,7 +331,7 @@ const lest::test specification[] =
         phantom_vector<uint8_t> m;
         retflag = ecdh.key_exchange_init(ctx, m);
         EXPECT(true == retflag);
-        EXPECT(56 == m.size());
+        EXPECT(56U == m.size());
 
         m.resize(55);
 
@@ -349,12 +349,12 @@ const lest::test specification[] =
         phantom_vector<uint8_t> m;
         retflag = ecdh.key_exchange_init(ctx, m);
         EXPECT(true == retflag);
-        EXPECT(56 == m.size());
+        EXPECT(56U == m.size());
 
         phantom_vector<uint8_t> shared_key;
         retflag = ecdh.key_exchange_final(ctx, m, shared_key);
         EXPECT(true == retflag);
-        EXPECT(28 == shared_key.size());
+        EXPECT(28U == shared_key.size());
     }
 };
 

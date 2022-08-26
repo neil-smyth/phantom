@@ -472,7 +472,6 @@ void saber_indcpa::dec(const phantom_vector<uint8_t>& sk, const phantom_vector<u
     size_t   eq       = m_params[m_set].eq;
     size_t   ep       = m_params[m_set].ep;
     size_t   et       = m_params[m_set].et;
-    size_t   mu       = m_params[m_set].mu;
     size_t   h2       = m_params[m_set].h2;
 
     phantom_vector<uint16_t> storage(SABER_N * (2 + 2*l));

@@ -41,13 +41,12 @@ const lest::test specification[] =
             0x3c, 0x81, 0x9d, 0x9a, 0x9b, 0xed, 0x08, 0x76, 0x15, 0x03, 0x0b, 0x65
         };
         uint8_t pt[0]  = {};
-        uint8_t ct[70]  = {};
         uint8_t tag[16] = {
             0x25, 0x03, 0x27, 0xc6, 0x74, 0xaa, 0xf4, 0x77, 0xae, 0xf2, 0x67, 0x57, 0x48, 0xcf, 0x69, 0x71
         };
         uint8_t result_ct[0], result_pt[0], pt_tag[16], ct_tag[16];
         auto aesenc = std::unique_ptr<symmetric_key_ctx>(symmetric_key_cipher::make(SYMKEY_AES_128_GCM));
-        auto retval = symmetric_key_cipher::set_key(aesenc.get(), key, 16);
+        symmetric_key_cipher::set_key(aesenc.get(), key, 16);
         symmetric_key_cipher::encrypt_start(aesenc.get(), ctr, 12, nullptr, 0);
         symmetric_key_cipher::encrypt_update(aesenc.get(), result_ct, pt, 0);
         symmetric_key_cipher::encrypt_finish(aesenc.get(), ct_tag, 16);
@@ -72,13 +71,12 @@ const lest::test specification[] =
             0x79, 0x4e, 0xc5, 0x88, 0x17, 0x6c, 0x70, 0x3d, 0x3d, 0x2a, 0x7a, 0x07
         };
         uint8_t pt[0]  = {};
-        uint8_t ct[0]  = {};
         uint8_t tag[16] = {
             0xb6, 0xe6, 0xf1, 0x97, 0x16, 0x8f, 0x50, 0x49, 0xae, 0xda, 0x32, 0xda, 0xfb, 0xda, 0xeb
         };
         uint8_t result_ct[0], result_pt[0], pt_tag[16], ct_tag[16];
         auto aesenc = std::unique_ptr<symmetric_key_ctx>(symmetric_key_cipher::make(SYMKEY_AES_128_GCM));
-        auto retval = symmetric_key_cipher::set_key(aesenc.get(), key, 16);
+        symmetric_key_cipher::set_key(aesenc.get(), key, 16);
         symmetric_key_cipher::encrypt_start(aesenc.get(), ctr, 12, nullptr, 0);
         symmetric_key_cipher::encrypt_update(aesenc.get(), result_ct, pt, 0);
         symmetric_key_cipher::encrypt_finish(aesenc.get(), ct_tag, 15);
@@ -103,7 +101,6 @@ const lest::test specification[] =
             0x5b, 0x05, 0x75, 0x5f, 0x98, 0x4d, 0x2b, 0x90, 0xf9, 0x4b, 0x80, 0x27
         };
         uint8_t pt[0]  = {};
-        uint8_t ct[0]  = {};
         uint8_t tag[16] = {
             0xc7, 0x5b, 0x78, 0x32, 0xb2, 0xa2, 0xd9, 0xbd, 0x82, 0x74, 0x12, 0xb6, 0xef, 0x57, 0x69, 0xdb
         };
@@ -113,7 +110,7 @@ const lest::test specification[] =
         };
         uint8_t result_ct[0], result_pt[0], pt_tag[16], ct_tag[16];
         auto aesenc = std::unique_ptr<symmetric_key_ctx>(symmetric_key_cipher::make(SYMKEY_AES_128_GCM));
-        auto retval = symmetric_key_cipher::set_key(aesenc.get(), key, 16);
+        symmetric_key_cipher::set_key(aesenc.get(), key, 16);
         symmetric_key_cipher::encrypt_start(aesenc.get(), ctr, 12, aad, 20);
         symmetric_key_cipher::encrypt_update(aesenc.get(), result_ct, pt, 0);
         symmetric_key_cipher::encrypt_finish(aesenc.get(), ct_tag, 16);
@@ -146,10 +143,9 @@ const lest::test specification[] =
         uint8_t tag[12] = {
             0xcb, 0xa0, 0x6b, 0xb4, 0xf6, 0xe0, 0x97, 0x19, 0x92, 0x50, 0xb0, 0xd1
         };
-        uint8_t aad[0] = {};
         uint8_t result_ct[16], result_pt[16], pt_tag[16], ct_tag[16];
         auto aesenc = std::unique_ptr<symmetric_key_ctx>(symmetric_key_cipher::make(SYMKEY_AES_128_GCM));
-        auto retval = symmetric_key_cipher::set_key(aesenc.get(), key, 16);
+        symmetric_key_cipher::set_key(aesenc.get(), key, 16);
         symmetric_key_cipher::encrypt_start(aesenc.get(), ctr, 12, nullptr, 0);
         symmetric_key_cipher::encrypt_update(aesenc.get(), result_ct, pt, 16);
         symmetric_key_cipher::encrypt_finish(aesenc.get(), ct_tag, 12);
@@ -198,7 +194,7 @@ const lest::test specification[] =
         };
         uint8_t result_ct[13], result_pt[13], pt_tag[4], ct_tag[4];
         auto aesenc = std::unique_ptr<symmetric_key_ctx>(symmetric_key_cipher::make(SYMKEY_AES_128_GCM));
-        auto retval = symmetric_key_cipher::set_key(aesenc.get(), key, 16);
+        symmetric_key_cipher::set_key(aesenc.get(), key, 16);
         symmetric_key_cipher::encrypt_start(aesenc.get(), ctr, 1, aad, 90);
         symmetric_key_cipher::encrypt_update(aesenc.get(), result_ct, pt, 13);
         symmetric_key_cipher::encrypt_finish(aesenc.get(), ct_tag, 4);

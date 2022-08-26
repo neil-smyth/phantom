@@ -324,12 +324,6 @@ std::string limbstring<T>::get_str(const mpz<T>& number, size_t base, bool upper
 
     auto n_used = bit_manipulation::clz(number[used-1]);
     if (64 == base) {
-        size_t bitsize = 6;
-        uint8_t mask = (1 << bitsize) - 1;
-
-        // Calculate the number of digits rounded up
-        size_t str_len = (used * std::numeric_limits<T>::digits + bitsize - 1 - n_used) / bitsize;
-
         size_t k = 0;
         std::vector<uint8_t> block;
         base64_gen_blocks(block, number.get_limbs().data(), number.sizeinbase(2));
@@ -345,12 +339,6 @@ std::string limbstring<T>::get_str(const mpz<T>& number, size_t base, bool upper
         }
     }
     else if (32 == base) {
-        size_t bitsize = 5;
-        uint8_t mask = (1 << bitsize) - 1;
-
-        // Calculate the number of digits rounded up
-        size_t str_len = (used * std::numeric_limits<T>::digits + bitsize - 1 - n_used) / bitsize;
-
         size_t k = 0;
         std::vector<uint8_t> block;
         base32_gen_blocks(block, number.get_limbs().data(), number.sizeinbase(2));
@@ -415,7 +403,6 @@ std::string limbstring<T>::get_str(const mpz<T>& number, size_t base, bool upper
             str[0] = ascii[0];
         }
         else {
-            size_t shift = 0;
             for (size_t j=0, k=str_len, shift=0; k-->0;) {
                 uint8_t c = number[j] >> shift;
                 shift += bitsize;

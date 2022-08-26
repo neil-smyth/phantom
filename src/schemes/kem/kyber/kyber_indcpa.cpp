@@ -82,7 +82,6 @@ void kyber_indcpa::init()
         throw std::invalid_argument("Parameter set is out of range");
     }
 
-    uint16_t q     = m_params[m_set].q;
     uint16_t g     = m_params[m_set].g;
     uint16_t inv_g = m_params[m_set].inv_g;
     size_t   n     = m_params[m_set].n;

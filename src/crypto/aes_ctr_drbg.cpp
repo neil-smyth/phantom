@@ -67,8 +67,6 @@ void aes_ctr_drbg::reset()
 
 void aes_ctr_drbg::internal_update()
 {
-    size_t seedlen = 4 + 32;
-    size_t num_blocks = 3;
     uint8_t bytes[48];
     union u {
         uint8_t b[4];

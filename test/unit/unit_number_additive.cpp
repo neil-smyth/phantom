@@ -95,8 +95,8 @@ const lest::test specification[] =
         uint32_t b[2] = { 0x00000000, 0x00000000 };
         uint32_t s[2];
         number<uint32_t>::uadd(&s[1], &s[0], a[1], a[0], b[1], b[0]);
-        EXPECT(s[1] == 0x00000000);
-        EXPECT(s[0] == 0x00000000);
+        EXPECT(s[1] == 0x00000000UL);
+        EXPECT(s[0] == 0x00000000UL);
     },
     CASE("addition - 32-bit")
     {
@@ -104,8 +104,8 @@ const lest::test specification[] =
         uint32_t b[2] = { 0xffffffff, 0x00000000 };
         uint32_t s[2];
         number<uint32_t>::uadd(&s[1], &s[0], a[1], a[0], b[1], b[0]);
-        EXPECT(s[1] == 0x00000001);
-        EXPECT(s[0] == 0x00000000);
+        EXPECT(s[1] == 0x00000001UL);
+        EXPECT(s[0] == 0x00000000UL);
     },
     CASE("addition - 32-bit")
     {
@@ -113,8 +113,8 @@ const lest::test specification[] =
         uint32_t b[2] = { 0xffffffff, 0x00000000 };
         uint32_t s[2];
         number<uint32_t>::uadd(&s[1], &s[0], a[1], a[0], b[1], b[0]);
-        EXPECT(s[1] == 0xffffffff);
-        EXPECT(s[0] == 0x00000001);
+        EXPECT(s[1] == 0xffffffffUL);
+        EXPECT(s[0] == 0x00000001UL);
     },
     CASE("addition - 32-bit")
     {
@@ -122,8 +122,8 @@ const lest::test specification[] =
         uint32_t b[2] = { 0x00000001, 0x00000000 };
         uint32_t s[2];
         number<uint32_t>::uadd(&s[1], &s[0], a[1], a[0], b[1], b[0]);
-        EXPECT(s[1] == 0x00000000);
-        EXPECT(s[0] == 0x00000000);
+        EXPECT(s[1] == 0x00000000UL);
+        EXPECT(s[0] == 0x00000000UL);
     },
     CASE("addition - 64-bit")
     {
@@ -131,8 +131,8 @@ const lest::test specification[] =
         uint64_t b[2] = { 0x0000000000000000, 0x0000000000000000 };
         uint64_t s[2];
         number<uint64_t>::uadd(&s[1], &s[0], a[1], a[0], b[1], b[0]);
-        EXPECT(s[1] == 0x0000000000000000);
-        EXPECT(s[0] == 0x0000000000000000);
+        EXPECT(s[1] == 0x0000000000000000ULL);
+        EXPECT(s[0] == 0x0000000000000000ULL);
     },
     CASE("addition - 64-bit")
     {
@@ -140,8 +140,8 @@ const lest::test specification[] =
         uint64_t b[2] = { 0xffffffffffffffff, 0x0000000000000000 };
         uint64_t s[2];
         number<uint64_t>::uadd(&s[1], &s[0], a[1], a[0], b[1], b[0]);
-        EXPECT(s[1] == 0x0000000000000001);
-        EXPECT(s[0] == 0x0000000000000000);
+        EXPECT(s[1] == 0x0000000000000001ULL);
+        EXPECT(s[0] == 0x0000000000000000ULL);
     },
     CASE("addition - 64-bit")
     {
@@ -149,8 +149,8 @@ const lest::test specification[] =
         uint64_t b[2] = { 0xffffffffffffffff, 0x0000000000000000 };
         uint64_t s[2];
         number<uint64_t>::uadd(&s[1], &s[0], a[1], a[0], b[1], b[0]);
-        EXPECT(s[1] == 0xffffffffffffffff);
-        EXPECT(s[0] == 0x0000000000000001);
+        EXPECT(s[1] == 0xffffffffffffffffULL);
+        EXPECT(s[0] == 0x0000000000000001ULL);
     },
     CASE("addition - 64-bit")
     {
@@ -158,8 +158,8 @@ const lest::test specification[] =
         uint64_t b[2] = { 0x0000000000000001, 0x0000000000000000 };
         uint64_t s[2];
         number<uint64_t>::uadd(&s[1], &s[0], a[1], a[0], b[1], b[0]);
-        EXPECT(s[1] == 0x0000000000000000);
-        EXPECT(s[0] == 0x0000000000000000);
+        EXPECT(s[1] == 0x0000000000000000ULL);
+        EXPECT(s[0] == 0x0000000000000000ULL);
     },
     CASE("subtraction - 8-bit")
     {
@@ -239,8 +239,8 @@ const lest::test specification[] =
         uint32_t b[2] = { 0x00000000, 0x00000000 };
         uint32_t s[2];
         number<uint32_t>::usub(&s[1], &s[0], a[1], a[0], b[1], b[0]);
-        EXPECT(s[1] == 0x00000000);
-        EXPECT(s[0] == 0x00000000);
+        EXPECT(s[1] == 0x00000000UL);
+        EXPECT(s[0] == 0x00000000UL);
     },
     CASE("subtraction - 32-bit")
     {
@@ -248,8 +248,8 @@ const lest::test specification[] =
         uint32_t b[2] = { 0xffffffff, 0x00000000 };
         uint32_t s[2];
         number<uint32_t>::usub(&s[1], &s[0], a[1], a[0], b[1], b[0]);
-        EXPECT(s[1] == 0xffffffff);
-        EXPECT(s[0] == 0x00000002);
+        EXPECT(s[1] == 0xffffffffUL);
+        EXPECT(s[0] == 0x00000002UL);
     },
     CASE("subtraction - 32-bit")
     {
@@ -257,8 +257,8 @@ const lest::test specification[] =
         uint32_t b[2] = { 0xffffffff, 0x00000000 };
         uint32_t s[2];
         number<uint32_t>::usub(&s[1], &s[0], a[1], a[0], b[1], b[0]);
-        EXPECT(s[1] == 0xfffffffd);
-        EXPECT(s[0] == 0x00000003);
+        EXPECT(s[1] == 0xfffffffdUL);
+        EXPECT(s[0] == 0x00000003UL);
     },
     CASE("subtraction - 32-bit")
     {
@@ -266,8 +266,8 @@ const lest::test specification[] =
         uint32_t b[2] = { 0x00000001, 0x00000000 };
         uint32_t s[2];
         number<uint32_t>::usub(&s[1], &s[0], a[1], a[0], b[1], b[0]);
-        EXPECT(s[1] == 0xffffffff);
-        EXPECT(s[0] == 0xfffffffe);
+        EXPECT(s[1] == 0xffffffffUL);
+        EXPECT(s[0] == 0xfffffffeUL);
     },
     CASE("subtraction - 64-bit")
     {
@@ -275,8 +275,8 @@ const lest::test specification[] =
         uint64_t b[2] = { 0x0000000000000000, 0x0000000000000000 };
         uint64_t s[2];
         number<uint64_t>::usub(&s[1], &s[0], a[1], a[0], b[1], b[0]);
-        EXPECT(s[1] == 0x0000000000000000);
-        EXPECT(s[0] == 0x0000000000000000);
+        EXPECT(s[1] == 0x0000000000000000ULL);
+        EXPECT(s[0] == 0x0000000000000000ULL);
     },
     CASE("subtraction - 64-bit")
     {
@@ -284,8 +284,8 @@ const lest::test specification[] =
         uint64_t b[2] = { 0xffffffffffffffff, 0x0000000000000000 };
         uint64_t s[2];
         number<uint64_t>::usub(&s[1], &s[0], a[1], a[0], b[1], b[0]);
-        EXPECT(s[1] == 0xffffffffffffffff);
-        EXPECT(s[0] == 0x0000000000000002);
+        EXPECT(s[1] == 0xffffffffffffffffULL);
+        EXPECT(s[0] == 0x0000000000000002ULL);
     },
     CASE("subtraction - 64-bit")
     {
@@ -293,8 +293,8 @@ const lest::test specification[] =
         uint64_t b[2] = { 0xffffffffffffffff, 0x0000000000000000 };
         uint64_t s[2];
         number<uint64_t>::usub(&s[1], &s[0], a[1], a[0], b[1], b[0]);
-        EXPECT(s[1] == 0xfffffffffffffffd);
-        EXPECT(s[0] == 0x0000000000000003);
+        EXPECT(s[1] == 0xfffffffffffffffdULL);
+        EXPECT(s[0] == 0x0000000000000003ULL);
     },
     CASE("subtraction - 64-bit")
     {
@@ -302,8 +302,8 @@ const lest::test specification[] =
         uint64_t b[2] = { 0x0000000000000001, 0x0000000000000000 };
         uint64_t s[2];
         number<uint64_t>::usub(&s[1], &s[0], a[1], a[0], b[1], b[0]);
-        EXPECT(s[1] == 0xffffffffffffffff);
-        EXPECT(s[0] == 0xfffffffffffffffe);
+        EXPECT(s[1] == 0xffffffffffffffffULL);
+        EXPECT(s[0] == 0xfffffffffffffffeULL);
     }
 };
 

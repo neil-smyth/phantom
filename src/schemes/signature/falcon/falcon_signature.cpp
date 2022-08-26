@@ -216,7 +216,6 @@ bool falcon_signature::set_public_key(std::unique_ptr<user_ctx>& ctx, const phan
     ctx_falcon& myctx = dynamic_cast<ctx_falcon&>(*ctx.get());
 
     size_t   n      = ctx_falcon::m_params[myctx.get_set()].n;
-    uint32_t q      = ctx_falcon::m_params[myctx.get_set()].q;
     size_t   q_bits = ctx_falcon::m_params[myctx.get_set()].q_bits;
     size_t   logn   = ctx_falcon::m_params[myctx.get_set()].n_bits;
 

@@ -93,8 +93,7 @@ public:
             return n1 ^ mpbase<T>::abs_sub_n(out, in1, in2, n);
         }
         else {
-            T cc = mpbase<T>::add_n(out, in1, in2, n);
-            assert(0 == cc);
+            mpbase<T>::add_n(out, in1, in2, n);
             return n1;
         }
     }

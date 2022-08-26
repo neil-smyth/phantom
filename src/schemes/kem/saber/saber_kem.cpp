@@ -56,9 +56,6 @@ bool saber_kem::keygen(std::unique_ptr<user_ctx>& ctx)
 
     ctx_saber& myctx = dynamic_cast<ctx_saber&>(*ctx.get());
 
-    size_t   l        = saber_indcpa::m_params[myctx.get_set()].l;
-    size_t   ep       = saber_indcpa::m_params[myctx.get_set()].ep;
-
     // Generate a key pair for the underlying Saber IND-CPA PKE
     myctx.pke()->keygen(myctx.pk(), myctx.sk());
 
@@ -168,10 +165,6 @@ bool saber_kem::encapsulate(std::unique_ptr<user_ctx>& ctx, const phantom_vector
 
     ctx_saber& myctx = dynamic_cast<ctx_saber&>(*ctx.get());
 
-    size_t   l        = saber_indcpa::m_params[myctx.get_set()].l;
-    size_t   eq       = saber_indcpa::m_params[myctx.get_set()].eq;
-    size_t   ep       = saber_indcpa::m_params[myctx.get_set()].ep;
-
     phantom_vector<uint8_t> kr(64);
     phantom_vector<uint8_t> buf(64);
 
@@ -221,13 +214,8 @@ bool saber_kem::decapsulate(std::unique_ptr<user_ctx>& ctx,
 
     ctx_saber& myctx = dynamic_cast<ctx_saber&>(*ctx.get());
 
-    size_t   l        = saber_indcpa::m_params[myctx.get_set()].l;
-    size_t   eq       = saber_indcpa::m_params[myctx.get_set()].eq;
-    size_t   ep       = saber_indcpa::m_params[myctx.get_set()].ep;
-
     phantom_vector<uint8_t> buf(64);
     phantom_vector<uint8_t> kr(64);
-
     phantom_vector<uint8_t> ct(c.begin(), c.end());
 
     // Use the private key to decrypt the ciphertext and obtain the key basis
@@ -269,8 +257,6 @@ bool saber_kem::decapsulate(std::unique_ptr<user_ctx>& ctx,
 
 size_t saber_kem::get_msg_len(const std::unique_ptr<user_ctx>& ctx) const
 {
-    ctx_saber& myctx = dynamic_cast<ctx_saber&>(*ctx.get());
-
     return SABRE_MSG_LEN;
 }
 

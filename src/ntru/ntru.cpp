@@ -277,8 +277,7 @@ void ntru::poly_sub_scaled(uint32_t *_RESTRICT_ F, size_t Flen, size_t Fstride,
     // which is efficient in space (no extra buffer needed) but slow at
     // high degree.
 
-    size_t n   = 1 << logn;
-    size_t hn  = n >> 1;
+    size_t   n   = 1 << logn;
     uint32_t sch = core::bit_manipulation::fast_div31(sc);   // sc / 31
     uint32_t scl = sc - (31 * sch);  // sc % 31
 

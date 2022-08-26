@@ -222,7 +222,7 @@ static void interpolate_recombine_5(T *c, T *v2, T *vm1, size_t n, size_t s, siz
     CARRY_ASSERT(mpbase<T>::rshift(vm1, vm1, kk1, 1));
 
     // t1 = v1 = v1 - v0
-    vinf[0] -= mpbase<T>::sub_n(v1, v1, c, twon);
+    vinf[0] -= mpbase<T>::sub_n(v1, v1, v0, twon);
 
     // t2 = v2 = (v2 - v1) / 2 = ((v2-vm1)/3-t1)/2 = (v2-vm1-3*t1)/6
     mpbase<T>::sub_n(v2, v2, v1, kk1);

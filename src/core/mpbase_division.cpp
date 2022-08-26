@@ -2173,7 +2173,6 @@ int mpbase<T>::divisible_p(const T *a_limbs, size_t an, const T *d_limbs, size_t
     T alow, dlow, dmask;
     T *q_limbs, *r_limbs, *tp;
     size_t  i;
-    T di;
     unsigned twos;
 
     assert(an >= 0);

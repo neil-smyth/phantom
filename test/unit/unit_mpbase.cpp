@@ -21,7 +21,6 @@ const lest::test specification[] =
     CASE("modular multiplicative inverse - 16-bit")
     {
         mpz<uint16_t> m("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFF", 16);
-        size_t n = 12;
 
         uint16_t* pm = m.get_limbs().data();
 

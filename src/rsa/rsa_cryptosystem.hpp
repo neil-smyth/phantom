@@ -226,8 +226,6 @@ public:
      */
     virtual bool keygen(ctx_rsa_tmpl<T>& ctx)
     {
-        auto enc = ctx.pke();
-
         if (ctx.e().is_zero()) {
             ctx.e() = core::mpz<T>("65537", 10);
         }

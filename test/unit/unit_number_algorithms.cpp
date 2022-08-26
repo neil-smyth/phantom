@@ -45,25 +45,25 @@ const lest::test specification[] =
     {
         uint32_t q;
         q = number<uint32_t>::ugcd(uint32_t(0x00000001), uint32_t(0x00000001));
-        EXPECT(q == 0x00000001);
+        EXPECT(q == 0x00000001UL);
         q = number<uint32_t>::ugcd(uint32_t(0x00000004), uint32_t(0x00000008));
-        EXPECT(q == 0x00000004);
+        EXPECT(q == 0x00000004UL);
         q = number<uint32_t>::ugcd(uint32_t(0x10000000), uint32_t(0x04000000));
-        EXPECT(q == 0x04000000);
+        EXPECT(q == 0x04000000UL);
         q = number<uint32_t>::ugcd(uint32_t(0x80000000), uint32_t(0xc0000000));
-        EXPECT(q == 0x40000000);
+        EXPECT(q == 0x40000000UL);
     },
     CASE("Euclidean algorithm - 64-bit")
     {
         uint64_t q;
         q = number<uint64_t>::ugcd(uint64_t(0x0000000000000001), uint64_t(0x0000000000000001));
-        EXPECT(q == 0x0000000000000001);
+        EXPECT(q == 0x0000000000000001ULL);
         q = number<uint64_t>::ugcd(uint64_t(0x0000000000000004), uint64_t(0x0000000000000008));
-        EXPECT(q == 0x0000000000000004);
+        EXPECT(q == 0x0000000000000004ULL);
         q = number<uint64_t>::ugcd(uint64_t(0x1000000000000000), uint64_t(0x0400000000000000));
-        EXPECT(q == 0x0400000000000000);
+        EXPECT(q == 0x0400000000000000ULL);
         q = number<uint64_t>::ugcd(uint64_t(0x8000000000000000), uint64_t(0xc000000000000000));
-        EXPECT(q == 0x4000000000000000);
+        EXPECT(q == 0x4000000000000000ULL);
     },
     CASE("Extended Euclidean algorithm - 8-bit")
     {
@@ -101,32 +101,32 @@ const lest::test specification[] =
     {
         uint32_t q, x, y;
         q = number<uint32_t>::uxgcd(uint32_t(0x00000001), uint32_t(0x00000001), &x, &y);
-        EXPECT(q == 0x00000001);
+        EXPECT(q == 0x00000001UL);
         EXPECT(uint32_t(uint32_t(0x00000001) * x + uint32_t(0x00000001) * y) == q);
         q = number<uint32_t>::uxgcd(uint32_t(0x00000004), uint32_t(0x00000008), &x, &y);
-        EXPECT(q == 0x00000004);
+        EXPECT(q == 0x00000004UL);
         EXPECT(uint32_t(uint32_t(0x00000004) * x + uint32_t(0x00000008) * y) == q);
         q = number<uint32_t>::uxgcd(uint32_t(0x10000000), uint32_t(0x04000000), &x, &y);
-        EXPECT(q == 0x04000000);
+        EXPECT(q == 0x04000000UL);
         EXPECT(uint32_t(uint32_t(0x10000000) * x + uint32_t(0x04000000) * y) == q);
         q = number<uint32_t>::uxgcd(uint32_t(0x80000000), uint32_t(0xc0000000), &x, &y);
-        EXPECT(q == 0x40000000);
+        EXPECT(q == 0x40000000UL);
         EXPECT(uint32_t(uint32_t(0x80000000) * x + uint32_t(0xc0000000) * y) == q);
     },
     CASE("Extended Euclidean algorithm - 64-bit")
     {
         uint64_t q, x, y;
         q = number<uint64_t>::uxgcd(uint64_t(0x0000000000000001), uint64_t(0x0000000000000001), &x, &y);
-        EXPECT(q == 0x0000000000000001);
+        EXPECT(q == 0x0000000000000001ULL);
         EXPECT(uint64_t(uint64_t(0x0000000000000001) * x + uint64_t(0x0000000000000001) * y) == q);
         q = number<uint64_t>::uxgcd(uint64_t(0x0000000000000004), uint64_t(0x0000000000000008), &x, &y);
-        EXPECT(q == 0x0000000000000004);
+        EXPECT(q == 0x0000000000000004ULL);
         EXPECT(uint64_t(uint64_t(0x0000000000000004) * x + uint64_t(0x0000000000000008) * y) == q);
         q = number<uint64_t>::uxgcd(uint64_t(0x1000000000000000), uint64_t(0x0400000000000000), &x, &y);
-        EXPECT(q == 0x0400000000000000);
+        EXPECT(q == 0x0400000000000000ULL);
         EXPECT(uint64_t(uint64_t(0x1000000000000000) * x + uint64_t(0x0400000000000000) * y) == q);
         q = number<uint64_t>::uxgcd(uint64_t(0x8000000000000000), uint64_t(0xc000000000000000), &x, &y);
-        EXPECT(q == 0x4000000000000000);
+        EXPECT(q == 0x4000000000000000ULL);
         EXPECT(uint64_t(uint64_t(0x8000000000000000) * x + uint64_t(0xc000000000000000) * y) == q);
     },
     CASE("Binary Extended GCD algorithm - 8-bit")
@@ -163,7 +163,7 @@ const lest::test specification[] =
         EXPECT(errcode == -2);
         errcode = number<uint32_t>::ubinxgcd(uint32_t(0x10000000), uint32_t(0x00000005), &u, &v);
         EXPECT(errcode == 0);
-        EXPECT(uint32_t(2 * uint32_t(0x10000000) * u - uint32_t(0x00000005) * v) == 1);
+        EXPECT(uint32_t(2 * uint32_t(0x10000000) * u - uint32_t(0x00000005) * v) == 1U);
     },
     CASE("Binary Extended GCD algorithm - 64-bit")
     {
@@ -175,7 +175,7 @@ const lest::test specification[] =
         EXPECT(errcode == -2);
         errcode = number<uint64_t>::ubinxgcd(uint64_t(0x1000000000000000), uint64_t(0x0000000000000005), &u, &v);
         EXPECT(errcode == 0);
-        EXPECT(uint64_t(2 * uint64_t(0x1000000000000000) * u - uint64_t(0x0000000000000005) * v) == 1);
+        EXPECT(uint64_t(2 * uint64_t(0x1000000000000000) * u - uint64_t(0x0000000000000005) * v) == 1U);
     },
     CASE("Binary Extended GCD algorithm - 8-bit")
     {
@@ -201,21 +201,21 @@ const lest::test specification[] =
     {
         uint32_t inv;
         inv = number<uint32_t>::umod_mul_inverse(uint32_t(0x00000001), uint32_t(0x00000001));
-        EXPECT(uint32_t(uint32_t(0x00000001) * uint32_t(0x00000001) / inv) == 1);
+        EXPECT(uint32_t(uint32_t(0x00000001) * uint32_t(0x00000001) / inv) == 1U);
         inv = number<uint32_t>::umod_mul_inverse(uint32_t(0x80000001), uint32_t(0x80000001));
-        EXPECT(uint32_t(uint32_t(0x80000001) * uint32_t(0x80000001) / inv) == 1);
+        EXPECT(uint32_t(uint32_t(0x80000001) * uint32_t(0x80000001) / inv) == 1U);
         inv = number<uint32_t>::umod_mul_inverse(uint32_t(0xffffffff), uint32_t(0xffffffff));
-        EXPECT(uint32_t(uint32_t(0xffffffff) * uint32_t(0xffffffff) / inv) == 1);
+        EXPECT(uint32_t(uint32_t(0xffffffff) * uint32_t(0xffffffff) / inv) == 1U);
     },
     CASE("Binary Extended GCD algorithm - 64-bit")
     {
         uint64_t inv;
         inv = number<uint64_t>::umod_mul_inverse(uint64_t(0x0000000000000001), uint64_t(0x0000000000000001));
-        EXPECT(uint64_t(uint64_t(0x0000000000000001) * uint64_t(0x0000000000000001) / inv) == 1);
+        EXPECT(uint64_t(uint64_t(0x0000000000000001) * uint64_t(0x0000000000000001) / inv) == 1U);
         inv = number<uint64_t>::umod_mul_inverse(uint64_t(0x8000000000000001), uint64_t(0x8000000000000001));
-        EXPECT(uint64_t(uint64_t(0x8000000000000001) * uint64_t(0x8000000000000001) / inv) == 1);
+        EXPECT(uint64_t(uint64_t(0x8000000000000001) * uint64_t(0x8000000000000001) / inv) == 1U);
         inv = number<uint64_t>::umod_mul_inverse(uint64_t(0xffffffffffffffff), uint64_t(0xffffffffffffffff));
-        EXPECT(uint64_t(uint64_t(0xffffffffffffffff) * uint64_t(0xffffffffffffffff) / inv) == 1);
+        EXPECT(uint64_t(uint64_t(0xffffffffffffffff) * uint64_t(0xffffffffffffffff) / inv) == 1U);
     },
     CASE("invx = (B^2-1)/x-B - 8-bit")
     {
@@ -275,17 +275,17 @@ const lest::test specification[] =
     {
         uint32_t inv;
         inv = number<uint32_t>::uninv_minus1(uint32_t(0x00000001));
-        EXPECT(uint32_t((-inv * uint32_t(0x00000001)) & 0x7fffffff) == 1);
+        EXPECT(uint32_t((-inv * uint32_t(0x00000001)) & 0x7fffffff) == 1U);
         inv = number<uint32_t>::uninv_minus1(uint32_t(0xffffffff));
-        EXPECT(uint32_t((-inv * uint32_t(0xffffffff)) & 0x7fffffff) == 1);
+        EXPECT(uint32_t((-inv * uint32_t(0xffffffff)) & 0x7fffffff) == 1U);
     },
     CASE("negative inverse, -1/q mod 2^63 - 64-bit")
     {
         uint64_t inv;
         inv = number<uint64_t>::uninv_minus1(uint64_t(0x0000000000000001));
-        EXPECT(uint64_t((-inv * uint64_t(0x0000000000000001)) & 0x7fffffffffffffff) == 1);
+        EXPECT(uint64_t((-inv * uint64_t(0x0000000000000001)) & 0x7fffffffffffffff) == 1U);
         inv = number<uint64_t>::uninv_minus1(uint64_t(0xffffffffffffffff));
-        EXPECT(uint64_t((-inv * uint64_t(0xffffffffffffffff)) & 0x7fffffffffffffff) == 1);
+        EXPECT(uint64_t((-inv * uint64_t(0xffffffffffffffff)) & 0x7fffffffffffffff) == 1U);
     }
 };
 

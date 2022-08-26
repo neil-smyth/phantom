@@ -29,7 +29,6 @@ const lest::test specification[] =
         phantom_vector<uint8_t> user_key = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
         phantom_vector<uint8_t> tweak(16);
 
-        aes_fpe_ff1<int> uut;
         std::unique_ptr<fpe_ctx> ctx;
         ctx = aes_fpe_ff1<uint16_t>::create_ctx(user_key, static_cast<aes_keylen_e>(0xffff), tweak);
         EXPECT(nullptr == ctx.get());

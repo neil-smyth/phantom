@@ -62,7 +62,6 @@ public:
 
         uint32_t q     = m_params[m_set].q;
         uint32_t g     = m_params[m_set].g;
-        uint32_t inv_g = m_params[m_set].inv_g;
         size_t   n     = m_params[m_set].n;
         ntt_dlp_ibe* ntt32 = new ntt_dlp_ibe(m_reduction, g, n);
         if (!ntt32) {

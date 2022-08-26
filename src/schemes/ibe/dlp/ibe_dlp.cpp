@@ -174,7 +174,6 @@ bool ibe_dlp::set_public_key(std::unique_ptr<user_ctx>& ctx, const phantom_vecto
     ctx_ibe_dlp& myctx = dynamic_cast<ctx_ibe_dlp&>(*ctx.get());
 
     size_t   n      = ctx_ibe_dlp::m_params[myctx.get_set()].n;
-    uint32_t q      = ctx_ibe_dlp::m_params[myctx.get_set()].q;
     size_t   q_bits = ctx_ibe_dlp::m_params[myctx.get_set()].q_bits;
     size_t   logn   = ctx_ibe_dlp::m_params[myctx.get_set()].logn;
 
@@ -375,8 +374,6 @@ bool ibe_dlp::extract(std::unique_ptr<user_ctx>& ctx, const phantom_vector<uint8
 
 void ibe_dlp::k_function(crypto::xof_sha3 *xof, uint8_t *k, size_t n)
 {
-    uint32_t mask = (1 << n) - 1;
-
     xof->init(16);
     xof->absorb(k, n);
     xof->final();
@@ -580,16 +577,12 @@ bool ibe_dlp::encrypt(std::unique_ptr<user_ctx>& ctx, const phantom_vector<uint8
     uint32_t l      = ctx_ibe_dlp::m_params[myctx.get_set()].l;
     size_t   flen   = from.size();
 
-    // Assign values to commonly used variables
-    uint32_t q2     = q >> 1;
-    uint32_t q4     = q >> 2;
 
     if (flen != (n >> 3)) {
         return false;
     }
 
     // Obtain pointers to the public key (NTT domain version)
-    const int32_t*  h       = myctx.h().data();
     const uint32_t* h_ntt   = myctx.h_ntt().data();
 
     // Obtain pointers to temporary storage variables
@@ -713,7 +706,6 @@ bool ibe_dlp::decrypt(std::unique_ptr<user_ctx>& ctx, const phantom_vector<uint8
     uint32_t q_bits = ctx_ibe_dlp::m_params[myctx.get_set()].q_bits;
     size_t   n      = ctx_ibe_dlp::m_params[myctx.get_set()].n;
     size_t   logn   = ctx_ibe_dlp::m_params[myctx.get_set()].logn;
-    uint32_t scale  = ctx_ibe_dlp::m_params[myctx.get_set()].scale;
     uint32_t l      = ctx_ibe_dlp::m_params[myctx.get_set()].l;
     size_t   flen   = n >> 3;
 
@@ -721,7 +713,6 @@ bool ibe_dlp::decrypt(std::unique_ptr<user_ctx>& ctx, const phantom_vector<uint8
     int32_t* u = reinterpret_cast<int32_t*>(aligned_malloc(sizeof(int32_t) * 2 * n));
     int32_t* v = u + n;
     uint8_t* k = reinterpret_cast<uint8_t*>(aligned_malloc(sizeof(uint8_t) * 2 * n));
-    uint8_t* c = k + n;
 
     // Decompress the ciphertext (u,v,c)
     packing::unpacker unpack(from);

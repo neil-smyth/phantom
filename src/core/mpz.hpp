@@ -1373,7 +1373,7 @@ public:
     static bool tonelli_shanks(const mod_config<T>& cfg, mpz<T>& r, const mpz<T>& n)
     {
         mpz<T> q, z, c, t, n_inv, tmp, pso, x, b, g;
-        size_t i, s, m;
+        size_t s, m;
 
         q.set(cfg.mod);
         q = q - T(1);
@@ -2013,7 +2013,6 @@ public:
     {
         size_t n_used = n.get_limbsize();
         size_t d_used = d.get_limbsize();
-        size_t r_used;
 
         // Check for divide by zero
         if (0 == d_used) {
@@ -2022,7 +2021,6 @@ public:
 
         // Check for a single precision divisor that is a power of 2
         if (1 == d_used && !(d.m_limbs[0] & (d.m_limbs[0] - 1))) {
-            T retval = 0;
             T ctz    = bit_manipulation::ctz(d.m_limbs[0]);
             div_r_2exp(r, n, ctz, mode);
             return r.get_limbsize() > 0;
@@ -2062,7 +2060,6 @@ public:
             mpz<T> temp_r = n;
             T* n_limbs = temp_r.m_limbs.data();
             const T* d_limbs = d.m_limbs.data();
-            size_t q_used  = n_used - d_used + 1;
 
             // Obtain the quotient
             mpbase<T>::div_qr(nullptr, n_limbs, n_used, d_limbs, d_used);
@@ -2109,7 +2106,6 @@ public:
     {
         size_t n_used = n.get_limbsize();
         size_t d_used = d.get_limbsize();
-        size_t r_used;
 
         // Check for divide by zero
         if (0 == d_used) {
@@ -2268,14 +2264,13 @@ public:
         }
 
         // Allocate memory for the quotient if necessary
-        size_t q_used  = n_used;
-        T*     q_limbs = nullptr;
+        size_t q_used    = n_used;
+        T*     q_limbs   = nullptr;
 
         // Obtain the result of q / d
         const T* n_limbs = n.m_limbs.data();
-        T  r_lsw   = mpbase<T>::div_qr_1(q_limbs, n_limbs, q_used, d);
-        size_t r_used = r_lsw > 0;
-        bool   r_sign = n.m_sign;
+        T        r_lsw   = mpbase<T>::div_qr_1(q_limbs, n_limbs, q_used, d);
+        bool     r_sign  = n.m_sign;
 
         // If q/d is non-zero then apply rounding
         if (r_lsw > 0) {
@@ -2310,8 +2305,6 @@ public:
         // Obtain the result of q / d
         T* n_limbs = const_cast<T*>(n.m_limbs.data());
         T  r_lsw   = mpbase<T>::div_qr_1(q_limbs, n_limbs, q_used, d);
-        size_t r_used = r_lsw > 0;
-        bool   r_sign = n.m_sign;
 
         // If q/d is non-zero then apply rounding
         if (r_lsw > 0) {
