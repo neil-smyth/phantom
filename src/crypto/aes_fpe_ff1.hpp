@@ -86,7 +86,7 @@ public:
         T v = inlen - u;
         phantom_vector<T> outA(in.begin(), in.begin() + u);
         phantom_vector<T> outB(in.begin() + u, in.end());
-        T *A = outA.data(), *B = outB.data();
+        T *B = outB.data();
         pow_uv(qpow_u, qpow_v, radix, u, v);
 
         int ceil_vlog2, b, d, tweaklen, pad, Qlen;
@@ -135,7 +135,6 @@ public:
 
             // Swap A and B
             outA.swap(outB);
-            A = outA.data();
             B = outB.data();
 
             // anum = (anum + y) mod qpow_uv
@@ -169,7 +168,7 @@ public:
         T v = inlen - u;
         phantom_vector<T> outA(in.begin(), in.begin() + u);
         phantom_vector<T> outB(in.begin() + u, in.end());
-        T *A = outA.data(), *B = outB.data();
+        T *A = outA.data();
         pow_uv(qpow_u, qpow_v, radix, u, v);
 
         int ceil_vlog2, b, d, tweaklen, pad, Qlen;
@@ -217,7 +216,6 @@ public:
             // Swap A and B
             outA.swap(outB);
             A = outA.data();
-            B = outB.data();
 
             // bnum = (bnum - y) mod qpow_uv
             core::mpz<T> q, r, n;

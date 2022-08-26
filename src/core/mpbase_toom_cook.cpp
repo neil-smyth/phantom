@@ -10,6 +10,23 @@
 #include "core/mpbase.hpp"
 
 
+
+#if NDEBUG
+#define CARRY_ASSERT(x) \
+    do                  \
+    {                   \
+        (x);            \
+    } while (0)
+#else
+#define CARRY_ASSERT(x) \
+    do                  \
+    {                   \
+        T cc = (x);     \
+        assert(cc);     \
+    } while (0)
+#endif
+
+
 namespace phantom {
 namespace core {
 
@@ -165,15 +182,15 @@ static T divexact_by_3(T * out, const T * in, size_t n)
 template<typename T>
 static void interpolate_recombine_5(T *c, T *v2, T *vm1, size_t n, size_t s, size_t t, bool sign, T vinf0)
 {
-    T cc, cy, saved;
+    T cy, saved;
     size_t twon = n + n;
     size_t twos = s + t;
     size_t kk1  = twon + 1;
-    T     *v0   = c;
-    T     *c1   = c   + n;
-    T     *v1   = c1  + n;
-    T     *c3   = v1  + n;
-    T     *vinf = c3  + n;
+    T *v0   = c;
+    T *c1   = c + n;
+    T *v1   = c1 + n;
+    T *c3   = v1 + n;
+    T *vinf = c3 + n;
 
     //   v0                 {c,      2n}
     //   v1                 {c+2n,   2n+1}
@@ -184,43 +201,35 @@ static void interpolate_recombine_5(T *c, T *v2, T *vm1, size_t n, size_t s, siz
 
     // v2 = v2 - vm1, a carry bit will NOT be returned
     if (sign) {
-        cc = mpbase<T>::add_n(v2, v2, vm1, kk1);
+        CARRY_ASSERT(mpbase<T>::add_n(v2, v2, vm1, kk1));
     }
     else {
-        cc = mpbase<T>::sub_n(v2, v2, vm1, kk1);
+        CARRY_ASSERT(mpbase<T>::sub_n(v2, v2, vm1, kk1));
     }
-    assert(0 == cc);
 
     // v2 = v2 / 3
-    cc = divexact_by_3<T>(v2, v2, kk1);
-    assert(0 == cc);
+    CARRY_ASSERT(divexact_by_3<T>(v2, v2, kk1));
 
     // vm1 = v1 - vm1, a carry bit will NOT be returned
     if (sign) {
-        cc = mpbase<T>::add_n(vm1, v1, vm1, kk1);
-        assert(0 == cc);
+        CARRY_ASSERT(mpbase<T>::add_n(vm1, v1, vm1, kk1));
     }
     else {
-        cc = mpbase<T>::sub_n(vm1, v1, vm1, kk1);
-        assert(0 == cc);
+        CARRY_ASSERT(mpbase<T>::sub_n(vm1, v1, vm1, kk1));
     }
 
     // tm1 = vm1 = vm1 / 2
-    cc = mpbase<T>::rshift(vm1, vm1, kk1, 1);
-    assert(0 == cc);
+    CARRY_ASSERT(mpbase<T>::rshift(vm1, vm1, kk1, 1));
 
     // t1 = v1 = v1 - v0
     vinf[0] -= mpbase<T>::sub_n(v1, v1, c, twon);
 
     // t2 = v2 = (v2 - v1) / 2 = ((v2-vm1)/3-t1)/2 = (v2-vm1-3*t1)/6
     mpbase<T>::sub_n(v2, v2, v1, kk1);
-    assert(0 == cc);
     mpbase<T>::rshift(v2, v2, kk1, 1);
-    assert(0 == cc);
 
     // v1 = t1-tm1 = v1 - vm1
     mpbase<T>::sub_n(v1, v1, vm1, kk1);
-    assert(0 == cc);
 
     // vm1 is recombined with c1, the carry is propagated into c3 - it is no longer used
     // so its array of n limbs is now free
@@ -243,7 +252,6 @@ static void interpolate_recombine_5(T *c, T *v2, T *vm1, size_t n, size_t s, siz
     }
     else {
         mpbase<T>::add_n(vinf, vinf, v2 + n, twos);
-        assert(0 == cc);
     }
 
     // Subtract vinf from v1, which also subtracts the high half of v2
@@ -491,7 +499,7 @@ template<typename T>
 void mpbase<T>::mul_toom32(T *out, const T *in1, size_t n1, const T *in2, size_t n2, T *scratch)
 {
     bool vm1_neg;
-    T cy, cc;
+    T cy;
     S hi;
 
     // Required, to ensure that s + t >= n
@@ -524,8 +532,7 @@ void mpbase<T>::mul_toom32(T *out, const T *in1, size_t n1, const T *in2, size_t
     // Compute in11 = in1_0 + in1_1 + in1_2, am1 = in1_0 - in1_1 + in1_2
     T in11_hi = mpbase<T>::add(in11, in1_0, n, in1_2, s);
     if (in11_hi == 0 && mpbase<T>::cmp(in11, in1_1, n) < 0) {
-        cc = mpbase<T>::sub_n(am1, in1_1, in11, n);
-        assert(0 == cc);
+        CARRY_ASSERT(mpbase<T>::sub_n(am1, in1_1, in11, n));
         hi = 0;
         vm1_neg = true;
     }
@@ -541,27 +548,23 @@ void mpbase<T>::mul_toom32(T *out, const T *in1, size_t n1, const T *in2, size_t
         in21_hi = mpbase<T>::add_n(in21, in2_0, in2_1, n);
 
         if (mpbase<T>::cmp(in2_0, in2_1, n) < 0) {
-            cc = mpbase<T>::sub_n(bm1, in2_1, in2_0, n);
-            assert(0 == cc);
+            CARRY_ASSERT(mpbase<T>::sub_n(bm1, in2_1, in2_0, n));
             vm1_neg = !vm1_neg;
         }
         else {
-            cc = mpbase<T>::sub_n(bm1, in2_0, in2_1, n);
-            assert(0 == cc);
+            CARRY_ASSERT(mpbase<T>::sub_n(bm1, in2_0, in2_1, n));
         }
     }
     else {
         in21_hi = mpbase<T>::add(in21, in2_0, n, in2_1, t);
 
         if (mpbase<T>::is_zero(in2_0 + t, n - t) && mpbase<T>::cmp(in2_0, in2_1, t) < 0) {
-            cc = mpbase<T>::sub_n(bm1, in2_1, in2_0, t);
-            assert(0 == cc);
+            CARRY_ASSERT(mpbase<T>::sub_n(bm1, in2_1, in2_0, t));
             mpbase<T>::zero(bm1 + t, n - t);
             vm1_neg = !vm1_neg;
         }
         else {
-            cc = mpbase<T>::sub(bm1, in2_0, n, in2_1, t);
-            assert(0 == cc);
+            CARRY_ASSERT(mpbase<T>::sub(bm1, in2_0, n, in2_1, t));
         }
     }
 
@@ -591,13 +594,11 @@ void mpbase<T>::mul_toom32(T *out, const T *in1, size_t n1, const T *in2, size_t
     // v1 <-- (v1 + vm1) / 2 = x0 + x2
     if (vm1_neg) {
         mpbase<T>::sub_n(v1, v1, vm1, 2*n+1);
-        cc = mpbase<T>::rshift(v1, v1, 2 * n + 1, 1);
-        assert(0 == cc);
+        CARRY_ASSERT(mpbase<T>::rshift(v1, v1, 2 * n + 1, 1));
     }
     else {
         mpbase<T>::add_n(v1, v1, vm1, 2*n+1);
-        cc = mpbase<T>::rshift(v1, v1, 2 * n + 1, 1);
-        assert(0 == cc);
+        CARRY_ASSERT(mpbase<T>::rshift(v1, v1, 2 * n + 1, 1));
     }
 
     // y = (x0 + x2) * B + (x0 + x2) - vm1, 3*n + 1 limbs

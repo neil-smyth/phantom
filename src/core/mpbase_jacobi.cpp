@@ -111,6 +111,7 @@ public:
     static size_t mul1_inverse_vector(const hgcd_matrix<T> *M,
         T* r_limbs, const T* a_limbs, T* b_limbs, size_t n)
     {
+#ifndef NDEBUG
         T h0, h1;
 
         // Compute (r;b) = (u11 a - u01 b; -u10 a + u00 b) as
@@ -126,6 +127,7 @@ public:
         h0 = mpbase<T>::mul_1(b_limbs, b_limbs, n, M->u[0][0]);
         h1 = mpbase<T>::submul_1(b_limbs, a_limbs, n, M->u[1][0]);
         assert(h0 == h1);
+#endif
 
         n -= (r_limbs[n-1] | b_limbs[n-1]) == 0;
         return n;

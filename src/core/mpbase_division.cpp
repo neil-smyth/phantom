@@ -2358,8 +2358,6 @@ size_t mpbase<T>::mulmod_bnm1_size(size_t rn, size_t an, size_t bn)
 template<typename T>
 size_t mpbase<T>::mulmod_bnm1_next_size(size_t n)
 {
-    size_t nh;
-
     if (BELOW_THRESHOLD(n,      MULMOD_BNM1_THRESHOLD)) {
         return n;
     }
@@ -2370,9 +2368,7 @@ size_t mpbase<T>::mulmod_bnm1_next_size(size_t n)
         return (n + (4-1)) & (-4);
     }
 
-    nh = (n + 1) >> 1;
-
-    return (n + (8-1)) & (-8);
+    return (n + 7) & 0x7;
 }
 
 /**
