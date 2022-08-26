@@ -120,7 +120,7 @@ public:
 
     /// Swap two operands using no additional variables
     template<typename T>
-    static void swap(T x, T y)  // NOLINT
+    static void swap(T &x, T &y)  // NOLINT
     {
         x ^= y;
         y ^= x;

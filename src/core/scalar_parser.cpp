@@ -48,19 +48,19 @@ scalar_parser::scalar_parser(scalar_coding_e coding, const phantom_vector<uint8_
     }
 
     // Recoding of the secret value to non-adjacent form
-    if (scalar_coding_e::ECC_NAF_2 <= coding && scalar_coding_e::ECC_NAF_7 >= coding) {
+    if (scalar_coding_e::SCALAR_NAF_2 <= coding && scalar_coding_e::SCALAR_NAF_7 >= coding) {
         m_recoded = phantom_vector<uint8_t>();
         m_max     = naf(m_recoded, e, static_cast<size_t>(coding) ^ SCALAR_CODING_NAF_BIT);
     }
-    else if (scalar_coding_e::ECC_PRE_2 <= coding && scalar_coding_e::ECC_PRE_8 >= coding) {
+    else if (scalar_coding_e::SCALAR_PRE_2 <= coding && scalar_coding_e::SCALAR_PRE_8 >= coding) {
         m_recoded = phantom_vector<uint8_t>();
         m_max     = window(m_recoded, secret, static_cast<size_t>(coding) ^ SCALAR_CODING_PRE_BIT);
     }
-    else if (scalar_coding_e::ECC_BINARY_DUAL == coding) {
+    else if (scalar_coding_e::SCALAR_BINARY_DUAL == coding) {
         m_recoded = phantom_vector<uint8_t>();
         m_max     = binary_dual(m_recoded, secret);
     }
-    else if (scalar_coding_e::ECC_BINARY == coding || scalar_coding_e::ECC_MONT_LADDER == coding) {
+    else if (scalar_coding_e::SCALAR_BINARY == coding || scalar_coding_e::SCALAR_MONT_LADDER == coding) {
         m_max     = 8*(n - 1) + 8 - bit_manipulation::clz(secret[n - 1]);
         m_recoded = phantom_vector<uint8_t>(secret.begin(), secret.begin() + n);
     }
@@ -72,10 +72,10 @@ scalar_parser::scalar_parser(scalar_coding_e coding, const phantom_vector<uint8_
     m_shift   = ((max_scale * m_max & 7) - 1) & (7 ^ is_naf);
     m_coding  = coding;
 
-    if (scalar_coding_e::ECC_BINARY == coding || scalar_coding_e::ECC_MONT_LADDER == coding ||
-        (scalar_coding_e::ECC_NAF_2 <= coding && scalar_coding_e::ECC_NAF_7 >= coding) ||
-        (scalar_coding_e::ECC_BINARY_DUAL == coding) ||
-        (scalar_coding_e::ECC_PRE_2 <= coding && scalar_coding_e::ECC_PRE_8 >= coding)) {
+    if (scalar_coding_e::SCALAR_BINARY == coding || scalar_coding_e::SCALAR_MONT_LADDER == coding ||
+        (scalar_coding_e::SCALAR_NAF_2 <= coding && scalar_coding_e::SCALAR_NAF_7 >= coding) ||
+        (scalar_coding_e::SCALAR_BINARY_DUAL == coding) ||
+        (scalar_coding_e::SCALAR_PRE_2 <= coding && scalar_coding_e::SCALAR_PRE_8 >= coding)) {
         // Skim through the scalar value until the first bit/window to be pulled by the user will be non-zero
         while (m_max && m_index >= 0 && SCALAR_IS_LOW == peek()) {
             m_max--;
@@ -108,10 +108,6 @@ size_t scalar_parser::binary_dual(phantom_vector<uint8_t>& recoded, const phanto
     size_t num_codes = ((secret.size() + 1) >> 1) << 3;
 
     recoded = phantom_vector<uint8_t>(num_codes);
-
-    std::cerr << "!!! binary_dual secret = "
-              << mpz<uint8_t>(const_cast<uint8_t*>(secret.data()), secret.size()).get_str(16)
-              << std::endl;
 
     for (size_t i=0; i < secret.size() * 8 - num_codes; i++) {
         recoded[i] = (secret[(i>>3)] >> (i & 0x7)) & 1;
@@ -180,16 +176,16 @@ size_t scalar_parser::naf(phantom_vector<uint8_t>& recoded, const mpz<uint32_t>&
 uint16_t scalar_parser::peek() const
 {
     // Peek ahead at the bit(s) to be pulled depending upon the coding mode
-    if (scalar_coding_e::ECC_BINARY == m_coding || scalar_coding_e::ECC_MONT_LADDER == m_coding) {
+    if (scalar_coding_e::SCALAR_BINARY == m_coding || scalar_coding_e::SCALAR_MONT_LADDER == m_coding) {
         uint16_t word = m_secret1[m_index];
         uint16_t shift = m_shift;
         return (word >> shift) & 0x1;
     }
-    else if (scalar_coding_e::ECC_BINARY_DUAL == m_coding) {
+    else if (scalar_coding_e::SCALAR_BINARY_DUAL == m_coding) {
         uint16_t word = m_recoded[m_index];
         return (word == 0)? SCALAR_IS_LOW : word;
     }
-    else if (scalar_coding_e::ECC_PRE_2 <= m_coding && scalar_coding_e::ECC_PRE_8 >= m_coding) {
+    else if (scalar_coding_e::SCALAR_PRE_2 <= m_coding && scalar_coding_e::SCALAR_PRE_8 >= m_coding) {
         uint16_t word = m_recoded[m_index];
         return (word == 0)? SCALAR_IS_LOW : word;
     }
@@ -271,13 +267,13 @@ uint32_t scalar_parser::pull()
     uint16_t word, shift;
 
     // Obtain the bit depending upon the coding mode
-    if (scalar_coding_e::ECC_BINARY == m_coding || scalar_coding_e::ECC_MONT_LADDER == m_coding) {
+    if (scalar_coding_e::SCALAR_BINARY == m_coding || scalar_coding_e::SCALAR_MONT_LADDER == m_coding) {
         bit = pull_binary();
     }
-    else if (scalar_coding_e::ECC_BINARY_DUAL == m_coding) {
+    else if (scalar_coding_e::SCALAR_BINARY_DUAL == m_coding) {
         bit = pull_binary_dual();
     }
-    else if (scalar_coding_e::ECC_PRE_2 <= m_coding && scalar_coding_e::ECC_PRE_8 >= m_coding) {
+    else if (scalar_coding_e::SCALAR_PRE_2 <= m_coding && scalar_coding_e::SCALAR_PRE_8 >= m_coding) {
         bit = pull_window();
     }
     else {

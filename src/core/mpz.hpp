@@ -501,9 +501,7 @@ public:
         // Swap the limb vectors and the sign
         m_limbs.swap(const_cast<phantom_vector<T>&>(in.get_limbs()));
         bool in_sign = in.is_negative();
-        m_sign  ^= in_sign;
-        in_sign ^= m_sign;
-        m_sign  ^= in_sign;
+        bit_manipulation::swap<bool>(m_sign, in_sign);  // NOLINT
         in.set_sign(in_sign);
     }
 
@@ -1453,14 +1451,18 @@ outer_loop:
     }
 
     /// Calculate the square of an mpz object modulo p
-    mpz<T>& square_mod(const mod_config<T>& cfg)
+    mpz<T>& square_mod(const mod_config<T>& cfg, size_t w = 1)
     {
-        if (REDUCTION_MONTGOMERY == cfg.reduction) {
-            return this->square_mont(cfg);
-        }
-        else {
-            return this->square().reduce(cfg);
-        }
+        do {
+            if (REDUCTION_MONTGOMERY == cfg.reduction) {
+                this->square_mont(cfg);
+            }
+            else {
+                this->square().reduce(cfg);
+            }
+        } while (--w);
+
+        return *this;
     }
 
     // Montgomery squaring of the mpz object
@@ -1471,8 +1473,8 @@ outer_loop:
         }
 
         m_scratch.resize(cfg.k + 1);
-        int32_t used = mpz_core<T>::mul_mont(m_scratch.data(), this->m_limbs.data(), this->m_limbs.size(),
-            this->m_limbs.data(), this->m_limbs.size(), cfg.mod.get_limbs().data(), cfg.k, cfg.mont_inv);
+        int32_t used = mpz_core<T>::square_mont(m_scratch.data(), this->m_limbs.data(), this->m_limbs.size(),
+            cfg.mod.get_limbs().data(), cfg.k, cfg.mont_inv);
         this->m_limbs.swap(m_scratch);
 
         used = mpbase<T>::normalized_size(m_limbs.data(), m_limbs.size());

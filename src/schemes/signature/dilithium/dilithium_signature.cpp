@@ -51,7 +51,9 @@ dilithium_signature::~dilithium_signature()
 {
 }
 
-std::unique_ptr<user_ctx> dilithium_signature::create_ctx(security_strength_e bits, cpu_word_size_e size_hint) const
+std::unique_ptr<user_ctx> dilithium_signature::create_ctx(security_strength_e bits,
+                                                          cpu_word_size_e size_hint,
+                                                          bool masking) const
 {
     ctx_dilithium* ctx = new ctx_dilithium(dilithium_signature::bits_2_set(bits));
     if (ctx->get_set() > 3) {
@@ -60,7 +62,9 @@ std::unique_ptr<user_ctx> dilithium_signature::create_ctx(security_strength_e bi
     return std::unique_ptr<user_ctx>(ctx);
 }
 
-std::unique_ptr<user_ctx> dilithium_signature::create_ctx(size_t set, cpu_word_size_e size_hint) const
+std::unique_ptr<user_ctx> dilithium_signature::create_ctx(size_t set,
+                                                          cpu_word_size_e size_hint,
+                                                          bool masking) const
 {
     ctx_dilithium* ctx = new ctx_dilithium(set);
     if (ctx->get_set() > 3) {

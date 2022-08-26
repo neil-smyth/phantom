@@ -30,7 +30,9 @@ kyber_pke::~kyber_pke()
 {
 }
 
-std::unique_ptr<user_ctx> kyber_pke::create_ctx(security_strength_e bits, cpu_word_size_e size_hint) const
+std::unique_ptr<user_ctx> kyber_pke::create_ctx(security_strength_e bits,
+                                                cpu_word_size_e size_hint,
+                                                bool masking) const
 {
     ctx_kyber_pke* ctx = new ctx_kyber_pke(kyber_indcpa::bits_2_set(bits));
     if (ctx->get_set() > 2) {
@@ -39,7 +41,9 @@ std::unique_ptr<user_ctx> kyber_pke::create_ctx(security_strength_e bits, cpu_wo
     return std::unique_ptr<user_ctx>(ctx);
 }
 
-std::unique_ptr<user_ctx> kyber_pke::create_ctx(size_t set, cpu_word_size_e size_hint) const
+std::unique_ptr<user_ctx> kyber_pke::create_ctx(size_t set,
+                                                cpu_word_size_e size_hint,
+                                                bool masking) const
 {
     ctx_kyber_pke* ctx = new ctx_kyber_pke(set);
     if (ctx->get_set() > 2) {

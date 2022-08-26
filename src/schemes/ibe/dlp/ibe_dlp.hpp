@@ -35,10 +35,15 @@ public:
     virtual ~ibe_dlp();
 
     /// Create a context for the pkc instance based on the required security strength
-    std::unique_ptr<user_ctx> create_ctx(security_strength_e strength, cpu_word_size_e size_hint) const override;
+    std::unique_ptr<user_ctx> create_ctx(security_strength_e bits,
+                                         cpu_word_size_e size_hint,
+                                         bool masking = true) const override;
 
     /// Create a context for the pkc instance based on the parameter set
-    std::unique_ptr<user_ctx> create_ctx(size_t set, cpu_word_size_e size_hint) const override;
+    std::unique_ptr<user_ctx> create_ctx(size_t set,
+                                         cpu_word_size_e size_hint,
+                                         bool masking = true) const override;
+
 
     /// Key manipulation methods
     /// @{

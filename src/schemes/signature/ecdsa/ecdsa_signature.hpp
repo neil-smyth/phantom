@@ -35,10 +35,15 @@ public:
     virtual ~ecdsa_signature();
 
     /// Create a context for the pkc instance based on the required security strength
-    std::unique_ptr<user_ctx> create_ctx(security_strength_e strength, cpu_word_size_e size_hint) const override;
+    std::unique_ptr<user_ctx> create_ctx(security_strength_e bits,
+                                         cpu_word_size_e size_hint,
+                                         bool masking = true) const override;
 
     /// Create a context for the pkc instance based on the parameter set
-    std::unique_ptr<user_ctx> create_ctx(size_t set, cpu_word_size_e size_hint) const override;
+    std::unique_ptr<user_ctx> create_ctx(size_t set,
+                                         cpu_word_size_e size_hint,
+                                         bool masking = true) const override;
+
 
     /// Key manipulation methods
     /// @{
@@ -206,11 +211,9 @@ restart:
         k.set_bytes(k_bytes);
         k.reduce(myctx.get_n_mod());
         k.get_bytes(k_bytes);
-        std::cerr << "!!! k = " << k.get_str(16) << std::endl;
 
         // 3. Calculate the curve point (x1, y1) = k*G
         if (elliptic::POINT_OK != myctx.scalar_point_mul(k_bytes)) {
-            std::cerr << "!!! scalar_point_mul() failed" << std::endl;
             goto restart;
         }
         const elliptic::point<T>& result_point = myctx.get_result_point();
@@ -231,7 +234,6 @@ restart:
         }
         mpz_r.reduce(myctx.get_n_mod());
         if (mpz_r.is_zero()) {
-            std::cerr << "!!! r is zero" << std::endl;
             goto restart;
         }
 
@@ -240,13 +242,11 @@ restart:
         z.set_bytes(ehash);
         dA.set_bytes(myctx.sk());
         if (!core::mpz<T>::invert(mpz_s, k, order_n)) {
-            std::cerr << "!!! inversion failed" << std::endl;
             goto restart;
         }
 
         mpz_s.mul_mod(dA.mul_mod(mpz_r, myctx.get_n_mod()).add_mod(z, myctx.get_n_mod()), myctx.get_n_mod());
         if (mpz_s.is_zero()) {
-            std::cerr << "!!! s is zero" << std::endl;
             goto restart;
         }
 
@@ -358,9 +358,6 @@ restart:
             x.set_words(x1.get_limbs());
         }
         x.reduce(myctx.get_n_mod());
-
-        std::cerr << "!!! x = " << x.get_str(16) << std::endl;
-        std::cerr << "!!! r = " << r.get_str(16) << std::endl;
 
         if (x != r) {
             return false;

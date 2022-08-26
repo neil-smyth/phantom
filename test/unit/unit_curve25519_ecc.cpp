@@ -77,7 +77,7 @@ const lest::test specification[] =
         mpz<uint32_t> y1;
         ecc_config<uint32_t> cfg = setup_32_curve25519(reduction_e::REDUCTION_BARRETT);
 
-        ecc<uint32_t> ec(cfg, field_e::MONTGOMERY_PRIME_FIELD, type_e::POINT_COORD_AFFINE, scalar_coding_e::ECC_BINARY);
+        ecc<uint32_t> ec(cfg, field_e::MONTGOMERY_PRIME_FIELD, type_e::POINT_COORD_AFFINE, scalar_coding_e::SCALAR_BINARY);
         retcode_e rc;
 
         auto secret = phantom_vector<uint8_t>();
@@ -100,7 +100,7 @@ const lest::test specification[] =
         mpz<uint32_t> y1;
         ecc_config<uint32_t> cfg = setup_32_curve25519(reduction_e::REDUCTION_BARRETT);
 
-        ecc<uint32_t> ec(cfg, field_e::MONTGOMERY_PRIME_FIELD, type_e::POINT_COORD_AFFINE, scalar_coding_e::ECC_BINARY);
+        ecc<uint32_t> ec(cfg, field_e::MONTGOMERY_PRIME_FIELD, type_e::POINT_COORD_AFFINE, scalar_coding_e::SCALAR_BINARY);
         retcode_e rc;
 
         mpz<uint8_t> k("0", 10);
@@ -124,7 +124,7 @@ const lest::test specification[] =
         mpz<uint32_t> y1("6666666666666666666666666666666666666666666666666666666666666658", 16);
         ecc_config<uint32_t> cfg = setup_32_curve25519(reduction_e::REDUCTION_BARRETT);
 
-        ecc<uint32_t> ec(cfg, field_e::MONTGOMERY_PRIME_FIELD, type_e::POINT_COORD_AFFINE, scalar_coding_e::ECC_BINARY);
+        ecc<uint32_t> ec(cfg, field_e::MONTGOMERY_PRIME_FIELD, type_e::POINT_COORD_AFFINE, scalar_coding_e::SCALAR_BINARY);
 
         mpz<uint8_t> k("1", 10);
         auto secret = phantom_vector<uint8_t>(k.get_limbs().begin(), k.get_limbs().end());
@@ -150,7 +150,7 @@ const lest::test specification[] =
         ecc_config<uint32_t> cfg = setup_32_curve25519(reduction_e::REDUCTION_BARRETT);
 
         ecc<uint32_t> ec(cfg, field_e::MONTGOMERY_PRIME_FIELD,
-            type_e::POINT_COORD_AFFINE, scalar_coding_e::ECC_PRE_2, false);
+            type_e::POINT_COORD_AFFINE, scalar_coding_e::SCALAR_PRE_2, false);
 
         mpz<uint8_t> k("1", 10);
         auto secret = phantom_vector<uint8_t>(k.get_limbs().begin(), k.get_limbs().end());
@@ -179,7 +179,7 @@ const lest::test specification[] =
         ecc_config<uint32_t> cfg = setup_32_curve25519(reduction_e::REDUCTION_BARRETT);
 
         ecc<uint32_t> ec(cfg, field_e::MONTGOMERY_PRIME_FIELD,
-            type_e::POINT_COORD_PROJECTIVE, scalar_coding_e::ECC_MONT_LADDER);
+            type_e::POINT_COORD_PROJECTIVE, scalar_coding_e::SCALAR_MONT_LADDER);
 
         mpz<uint8_t> k("2", 10);
         auto secret = phantom_vector<uint8_t>(k.get_limbs().begin(), k.get_limbs().end());
@@ -207,7 +207,7 @@ const lest::test specification[] =
         ecc_config<uint32_t> cfg = setup_32_curve25519(reduction_e::REDUCTION_MONTGOMERY);
 
         ecc<uint32_t> ec(cfg, field_e::MONTGOMERY_PRIME_FIELD,
-            type_e::POINT_COORD_PROJECTIVE, scalar_coding_e::ECC_MONT_LADDER);
+            type_e::POINT_COORD_PROJECTIVE, scalar_coding_e::SCALAR_MONT_LADDER);
 
         mpz<uint8_t> k("10", 10);
         auto secret = phantom_vector<uint8_t>(k.get_limbs().begin(), k.get_limbs().end());
@@ -235,7 +235,7 @@ const lest::test specification[] =
         ecc_config<uint32_t> cfg = setup_32_curve25519(reduction_e::REDUCTION_BARRETT);
 
         ecc<uint32_t> ec(cfg, field_e::MONTGOMERY_PRIME_FIELD,
-            type_e::POINT_COORD_PROJECTIVE, scalar_coding_e::ECC_MONT_LADDER);
+            type_e::POINT_COORD_PROJECTIVE, scalar_coding_e::SCALAR_MONT_LADDER);
 
         mpz<uint8_t> k("6277101735386680763835789423176059013767194773182842284080", 10);
         auto secret = phantom_vector<uint8_t>(k.get_limbs().begin(), k.get_limbs().end());
@@ -263,7 +263,7 @@ const lest::test specification[] =
         ecc_config<uint32_t> cfg = setup_32_curve25519(reduction_e::REDUCTION_MONTGOMERY);
 
         ecc<uint32_t> ec(cfg, field_e::MONTGOMERY_PRIME_FIELD,
-            type_e::POINT_COORD_PROJECTIVE, scalar_coding_e::ECC_MONT_LADDER);
+            type_e::POINT_COORD_PROJECTIVE, scalar_coding_e::SCALAR_MONT_LADDER);
 
         mpz<uint8_t> k("449A44BA44226A50185AFCC10A4C1462DD5E46824B15163B9D7C52F06BE346A0", 16);
         auto secret = phantom_vector<uint8_t>(k.get_limbs().begin(), k.get_limbs().end());

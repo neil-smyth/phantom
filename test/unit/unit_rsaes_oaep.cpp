@@ -100,6 +100,30 @@ const lest::test specification[] =
         EXPECT(json2["exp2"].get<std::string>() == exp2.get_str(16));
         EXPECT(json2["inv"].get<std::string>() == inv.get_str(16));
     },
+    CASE("RSA keygen - 16-bit")
+    {
+        rsaes_oaep_pke uut;
+        std::unique_ptr<user_ctx> ctx = uut.create_ctx(0, CPU_WORD_SIZE_16);
+
+        bool success = uut.keygen(ctx);
+        EXPECT(success == true);
+
+        phantom_vector<uint8_t> k;
+        success = uut.get_private_key(ctx, k);
+        EXPECT(success == true);
+
+        std::string jstr = std::string(k.begin(), k.end());
+        auto json = json::parse(jstr);
+
+        mpz<uint32_t> e(json["e"].get<std::string>().c_str(), 16);
+        mpz<uint32_t> d(json["d"].get<std::string>().c_str(), 16);
+        mpz<uint32_t> p(json["p"].get<std::string>().c_str(), 16);
+        mpz<uint32_t> q(json["q"].get<std::string>().c_str(), 16);
+        mpz<uint32_t> theta, g, inv, dummy;
+        theta = (p-uint32_t(1))*(q-uint32_t(1));
+        g = theta.gcd(d * e);
+        EXPECT(g.get_str(16) == "1");
+    },
     CASE("RSA keygen - 32-bit")
     {
         rsaes_oaep_pke uut;
@@ -124,11 +148,77 @@ const lest::test specification[] =
         g = theta.gcd(d * e);
         EXPECT(g.get_str(16) == "1");
     },
+    CASE("RSA encryption & decryption (512-bit) - 32-bit")
+    {
+        rsaes_oaep_pke uut_masked, uut_unmasked;
+        std::unique_ptr<user_ctx> ctx_masked   = uut_masked.create_ctx(0, CPU_WORD_SIZE_32, true);
+        std::unique_ptr<user_ctx> ctx_unmasked = uut_unmasked.create_ctx(0, CPU_WORD_SIZE_32, false);
+        bool success = uut_masked.keygen(ctx_masked);
+        EXPECT(success == true);
+
+        bool result;
+        phantom_vector<uint8_t> k, k2;
+        result = uut_masked.get_private_key(ctx_masked, k);
+        EXPECT(true == result);
+        result = uut_unmasked.set_private_key(ctx_unmasked, k);
+        EXPECT(true == result);
+        result = uut_unmasked.get_private_key(ctx_masked, k2);
+        EXPECT(true == result);
+
+        std::string jstr = std::string(k.begin(), k.end());
+        auto json = json::parse(jstr);
+        std::string jstr2 = std::string(k2.begin(), k2.end());
+        auto json2 = json::parse(jstr2);
+
+        mpz<uint32_t> n(json["n"].get<std::string>().c_str(), 16);
+        mpz<uint32_t> e(json["e"].get<std::string>().c_str(), 16);
+        mpz<uint32_t> d(json["d"].get<std::string>().c_str(), 16);
+        mpz<uint32_t> p(json["p"].get<std::string>().c_str(), 16);
+        mpz<uint32_t> q(json["q"].get<std::string>().c_str(), 16);
+        mpz<uint32_t> inv(json["inv"].get<std::string>().c_str(), 16);
+        mpz<uint32_t> n2(json2["n"].get<std::string>().c_str(), 16);
+        mpz<uint32_t> e2(json2["e"].get<std::string>().c_str(), 16);
+        mpz<uint32_t> d2(json2["d"].get<std::string>().c_str(), 16);
+        mpz<uint32_t> p2(json2["p"].get<std::string>().c_str(), 16);
+        mpz<uint32_t> q2(json2["q"].get<std::string>().c_str(), 16);
+        mpz<uint32_t> inv2(json2["inv"].get<std::string>().c_str(), 16);
+        EXPECT(n.get_str(16) == n2.get_str(16));
+        EXPECT(e.get_str(16) == e2.get_str(16));
+        EXPECT(d.get_str(16) == d2.get_str(16));
+        EXPECT(p.get_str(16) == p2.get_str(16));
+        EXPECT(q.get_str(16) == q2.get_str(16));
+        EXPECT(inv.get_str(16) == inv2.get_str(16));
+
+
+        phantom_vector<uint8_t> pt(6), ct, rt;
+        for (size_t i=0; i < 6; i++) {
+            pt[i] = 5 - i;
+        }
+        bool code = uut_masked.encrypt(ctx_masked, pt, ct);
+        EXPECT(code == true);
+
+        std::cout << "ct = ";
+        for (size_t i=0; i < ct.size(); i++) {
+            std::cout << std::hex <<std::setw(2) << std::setfill('0') << static_cast<int>(ct[i]);
+        }
+        std::cout << std::dec << std::endl;
+
+        code = uut_unmasked.decrypt(ctx_unmasked, ct, rt);
+        EXPECT(code == true);
+
+        std::cout << "rt = ";
+        EXPECT(rt.size() == pt.size());
+        for (size_t i=0; i < pt.size(); i++) {
+            EXPECT(rt[i] == pt[i]);
+            std::cout << std::hex <<std::setw(2) << std::setfill('0') << static_cast<int>(rt[i]);
+        }
+        std::cout << std::dec << std::endl;
+    },
 #if defined(IS_64BIT)
     CASE("RSA encryption & decryption (512-bit) - 64-bit")
     {
         rsaes_oaep_pke uut;
-        std::unique_ptr<user_ctx> ctx = uut.create_ctx(0, CPU_WORD_SIZE_64);
+        std::unique_ptr<user_ctx> ctx = uut.create_ctx(0, CPU_WORD_SIZE_64, false);
         bool success = uut.keygen(ctx);
         EXPECT(success == true);
 
@@ -159,7 +249,7 @@ const lest::test specification[] =
     CASE("RSA encryption & decryption (1024-bit) - 64-bit")
     {
         rsaes_oaep_pke uut;
-        std::unique_ptr<user_ctx> ctx = uut.create_ctx(1, CPU_WORD_SIZE_64);
+        std::unique_ptr<user_ctx> ctx = uut.create_ctx(1, CPU_WORD_SIZE_64, true);
         bool success = uut.keygen(ctx);
         EXPECT(success == true);
 

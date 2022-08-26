@@ -258,7 +258,7 @@ const lest::test specification[] =
         a.negate();
         EXPECT(a == int16_t(-255));
     },
-    CASE("Addition with modular barrett reduction - 16-bit")
+    CASE("Addition with modular Montgomery reduction - 16-bit")
     {
         mpz<uint16_t> m("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFF", 16);
         mpz<uint16_t> a(uint16_t(0xFFFF));
@@ -292,7 +292,7 @@ const lest::test specification[] =
         EXPECT(a[0] == 0x0000);
         EXPECT(a.is_negative() == false);
     },
-    CASE("Subtraction with modular barrett reduction - 16-bit")
+    CASE("Subtraction with modular Montgomery reduction - 16-bit")
     {
         mpz<uint16_t> m("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFF", 16);
         mpz<uint16_t> a("0", 16);
@@ -325,7 +325,7 @@ const lest::test specification[] =
         EXPECT(a.get_str(16, true) == "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFE");
         EXPECT(a.is_negative() == false);
     },
-    CASE("Addition with modular barrett reduction - 16-bit")
+    CASE("Addition with modular Montgomery reduction - 16-bit")
     {
         mpz<uint16_t> m("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFF", 16);
         mpz<uint16_t> a("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFE", 16);

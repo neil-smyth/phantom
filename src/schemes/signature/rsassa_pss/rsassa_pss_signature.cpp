@@ -71,15 +71,17 @@ rsassa_pss_signature::~rsassa_pss_signature()
 {
 }
 
-std::unique_ptr<user_ctx> rsassa_pss_signature::create_ctx(security_strength_e bits, cpu_word_size_e size_hint) const
+std::unique_ptr<user_ctx> rsassa_pss_signature::create_ctx(security_strength_e bits,
+                                                           cpu_word_size_e size_hint,
+                                                           bool masking) const
 {
     user_ctx* ctx;
     switch (size_hint)
     {
-        case CPU_WORD_SIZE_16: ctx = new phantom::rsa::ctx_rsa_tmpl<uint16_t>(bits_2_set(bits)); break;
-        case CPU_WORD_SIZE_32: ctx = new phantom::rsa::ctx_rsa_tmpl<uint32_t>(bits_2_set(bits)); break;
+        case CPU_WORD_SIZE_16: ctx = new phantom::rsa::ctx_rsa_tmpl<uint16_t>(bits_2_set(bits), masking); break;
+        case CPU_WORD_SIZE_32: ctx = new phantom::rsa::ctx_rsa_tmpl<uint32_t>(bits_2_set(bits), masking); break;
 #if defined(IS_64BIT)
-        case CPU_WORD_SIZE_64: ctx = new phantom::rsa::ctx_rsa_tmpl<uint64_t>(bits_2_set(bits)); break;
+        case CPU_WORD_SIZE_64: ctx = new phantom::rsa::ctx_rsa_tmpl<uint64_t>(bits_2_set(bits), masking); break;
 #endif
         default: throw std::invalid_argument("size_hint set is out of range");
     }
@@ -91,15 +93,17 @@ std::unique_ptr<user_ctx> rsassa_pss_signature::create_ctx(security_strength_e b
     return std::unique_ptr<user_ctx>(ctx);
 }
 
-std::unique_ptr<user_ctx> rsassa_pss_signature::create_ctx(size_t set, cpu_word_size_e size_hint) const
+std::unique_ptr<user_ctx> rsassa_pss_signature::create_ctx(size_t set,
+                                                           cpu_word_size_e size_hint,
+                                                           bool masking) const
 {
     user_ctx* ctx;
     switch (size_hint)
     {
-        case CPU_WORD_SIZE_16: ctx = new phantom::rsa::ctx_rsa_tmpl<uint16_t>(set); break;
-        case CPU_WORD_SIZE_32: ctx = new phantom::rsa::ctx_rsa_tmpl<uint32_t>(set); break;
+        case CPU_WORD_SIZE_16: ctx = new phantom::rsa::ctx_rsa_tmpl<uint16_t>(set, masking); break;
+        case CPU_WORD_SIZE_32: ctx = new phantom::rsa::ctx_rsa_tmpl<uint32_t>(set, masking); break;
 #if defined(IS_64BIT)
-        case CPU_WORD_SIZE_64: ctx = new phantom::rsa::ctx_rsa_tmpl<uint64_t>(set); break;
+        case CPU_WORD_SIZE_64: ctx = new phantom::rsa::ctx_rsa_tmpl<uint64_t>(set, masking); break;
 #endif
         default: throw std::invalid_argument("size_hint set is out of range");
     }

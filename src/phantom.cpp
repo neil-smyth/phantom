@@ -183,14 +183,18 @@ pkc::~pkc()
 {
 }
 
-std::unique_ptr<user_ctx> pkc::create_ctx(security_strength_e strength, cpu_word_size_e size_hint) const
+std::unique_ptr<user_ctx> pkc::create_ctx(security_strength_e strength,
+                                          cpu_word_size_e size_hint,
+                                          bool masking) const
 {
-    return m_scheme->create_ctx(strength, size_hint);
+    return m_scheme->create_ctx(strength, size_hint, masking);
 }
 
-std::unique_ptr<user_ctx> pkc::create_ctx(size_t set, cpu_word_size_e size_hint) const
+std::unique_ptr<user_ctx> pkc::create_ctx(size_t set,
+                                          cpu_word_size_e size_hint,
+                                          bool masking) const
 {
-    return m_scheme->create_ctx(set, size_hint);
+    return m_scheme->create_ctx(set, size_hint, masking);
 }
 
 bool pkc::keygen(std::unique_ptr<user_ctx>& ctx)

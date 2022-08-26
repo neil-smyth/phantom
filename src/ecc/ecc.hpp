@@ -58,18 +58,18 @@ class ecc
 
         switch (m_coding_type)
         {
-            case core::scalar_coding_e::ECC_BINARY_DUAL:
+            case core::scalar_coding_e::SCALAR_BINARY_DUAL:
             {
                 m_point_pre[1] = std::unique_ptr<point<T>>(new P<T>(m_config));
                 m_point_pre[2] = std::unique_ptr<point<T>>(new P<T>(m_config));
             } break;
 
-            case core::scalar_coding_e::ECC_NAF_2:
-            case core::scalar_coding_e::ECC_NAF_3:
-            case core::scalar_coding_e::ECC_NAF_4:
-            case core::scalar_coding_e::ECC_NAF_5:
-            case core::scalar_coding_e::ECC_NAF_6:
-            case core::scalar_coding_e::ECC_NAF_7:
+            case core::scalar_coding_e::SCALAR_NAF_2:
+            case core::scalar_coding_e::SCALAR_NAF_3:
+            case core::scalar_coding_e::SCALAR_NAF_4:
+            case core::scalar_coding_e::SCALAR_NAF_5:
+            case core::scalar_coding_e::SCALAR_NAF_6:
+            case core::scalar_coding_e::SCALAR_NAF_7:
             {
                 size_t w = (1 << ((static_cast<size_t>(m_coding_type) ^ SCALAR_CODING_NAF_BIT) - 1)) - 1;
 
@@ -78,13 +78,13 @@ class ecc
                 }
             } break;
 
-            case core::scalar_coding_e::ECC_PRE_2:
-            case core::scalar_coding_e::ECC_PRE_3:
-            case core::scalar_coding_e::ECC_PRE_4:
-            case core::scalar_coding_e::ECC_PRE_5:
-            case core::scalar_coding_e::ECC_PRE_6:
-            case core::scalar_coding_e::ECC_PRE_7:
-            case core::scalar_coding_e::ECC_PRE_8:
+            case core::scalar_coding_e::SCALAR_PRE_2:
+            case core::scalar_coding_e::SCALAR_PRE_3:
+            case core::scalar_coding_e::SCALAR_PRE_4:
+            case core::scalar_coding_e::SCALAR_PRE_5:
+            case core::scalar_coding_e::SCALAR_PRE_6:
+            case core::scalar_coding_e::SCALAR_PRE_7:
+            case core::scalar_coding_e::SCALAR_PRE_8:
             {
                 size_t w = (1 << (static_cast<size_t>(m_coding_type) ^ SCALAR_CODING_PRE_BIT));
 
@@ -113,13 +113,13 @@ public:
      * @param cfg AN ecc_config object defining how ECC is configured
      * @param field The type of field to be used (default: WEIERSTRASS_PRIME_FIELD)
      * @param coord_type The coordinate system to be used (default: POINT_COORD_AFFINE)
-     * @param coding The scalar coding method to be used (default: ECC_BINARY)
+     * @param coding The scalar coding method to be used (default: SCALAR_BINARY)
      * @param masking A flag to indicate if double-and-add masking is required (default: true)
      */
     ecc(const ecc_config<T>& cfg,
         field_e field = WEIERSTRASS_PRIME_FIELD,
         type_e coord_type = POINT_COORD_AFFINE,
-        core::scalar_coding_e coding = core::scalar_coding_e::ECC_BINARY,
+        core::scalar_coding_e coding = core::scalar_coding_e::SCALAR_BINARY,
         bool masking = true) :
         m_config(cfg),
         m_field(field),
@@ -249,7 +249,7 @@ public:
 
         switch (m_coding_type)
         {
-            case core::scalar_coding_e::ECC_BINARY_DUAL:
+            case core::scalar_coding_e::SCALAR_BINARY_DUAL:
             {
                 m_point_pre[2]->copy(*m_point_pre[0].get());
                 if (POINT_OK != m_point_pre[2]->addition(m_config, *m_point_pre[1].get())) {
@@ -257,12 +257,12 @@ public:
                 }
             } break;
 
-            case core::scalar_coding_e::ECC_NAF_2:
-            case core::scalar_coding_e::ECC_NAF_3:
-            case core::scalar_coding_e::ECC_NAF_4:
-            case core::scalar_coding_e::ECC_NAF_5:
-            case core::scalar_coding_e::ECC_NAF_6:
-            case core::scalar_coding_e::ECC_NAF_7:
+            case core::scalar_coding_e::SCALAR_NAF_2:
+            case core::scalar_coding_e::SCALAR_NAF_3:
+            case core::scalar_coding_e::SCALAR_NAF_4:
+            case core::scalar_coding_e::SCALAR_NAF_5:
+            case core::scalar_coding_e::SCALAR_NAF_6:
+            case core::scalar_coding_e::SCALAR_NAF_7:
             {
                 size_t w = static_cast<size_t>(m_coding_type) ^ SCALAR_CODING_NAF_BIT;
                 size_t r = (1 << (w - 1)) - 1;
@@ -282,13 +282,13 @@ public:
                 // Converting to mixed is too expensive
             } break;
 
-            case core::scalar_coding_e::ECC_PRE_2:
-            case core::scalar_coding_e::ECC_PRE_3:
-            case core::scalar_coding_e::ECC_PRE_4:
-            case core::scalar_coding_e::ECC_PRE_5:
-            case core::scalar_coding_e::ECC_PRE_6:
-            case core::scalar_coding_e::ECC_PRE_7:
-            case core::scalar_coding_e::ECC_PRE_8:
+            case core::scalar_coding_e::SCALAR_PRE_2:
+            case core::scalar_coding_e::SCALAR_PRE_3:
+            case core::scalar_coding_e::SCALAR_PRE_4:
+            case core::scalar_coding_e::SCALAR_PRE_5:
+            case core::scalar_coding_e::SCALAR_PRE_6:
+            case core::scalar_coding_e::SCALAR_PRE_7:
+            case core::scalar_coding_e::SCALAR_PRE_8:
             {
                 size_t w = static_cast<size_t>(m_coding_type) ^ SCALAR_CODING_PRE_BIT;
                 size_t r = 1 << w;
@@ -332,7 +332,6 @@ public:
         core::scalar_parser bitgen(m_coding_type, secret);
         size_t num_bits = bitgen.num_symbols();
         if (0 == num_bits) {
-            std::cerr << "!!! SECRET_IS_ZERO" << std::endl;
             return SECRET_IS_ZERO;
         }
 
@@ -340,31 +339,28 @@ public:
         num_bits--;
         uint32_t bit = bitgen.pull();
         if (SCALAR_IS_LOW == bit) {
-            std::cerr << "!!! RECODING_ERROR" << std::endl;
             return RECODING_ERROR;
         }
 
         size_t sub_offset = 0;
-        if (core::scalar_coding_e::ECC_NAF_2 <= m_coding_type && core::scalar_coding_e::ECC_NAF_7 >= m_coding_type) {
+        if (core::scalar_coding_e::SCALAR_NAF_2 <= m_coding_type &&
+            core::scalar_coding_e::SCALAR_NAF_7 >= m_coding_type) {
             sub_offset = (1 << ((static_cast<size_t>(m_coding_type) & 0x3f) - 1)) - 2;
         }
 
         retcode_e retcode;
-        if (core::ECC_MONT_LADDER == m_coding_type) {
+        if (core::SCALAR_MONT_LADDER == m_coding_type) {
             if (POINT_OK != (retcode = montgomery_ladder(bitgen, num_bits, w, bit, sub_offset))) {
-                std::cerr << "!!! montgomery_ladder() failed" << std::endl;
                 return retcode;
             }
         }
         else if (m_masking) {
             if (POINT_OK != (retcode = double_and_add(bitgen, num_bits, w, bit, sub_offset))) {
-                std::cerr << "!!! double_and_add() failed" << std::endl;
                 return retcode;
             }
         }
         else {
             if (POINT_OK != (retcode = double_and_add_unmasked(bitgen, num_bits, w, bit, sub_offset))) {
-                std::cerr << "!!! double_and_add_unmasked() failed" << std::endl;
                 return retcode;
             }
         }

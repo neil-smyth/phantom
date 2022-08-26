@@ -1089,7 +1089,7 @@ public:
         else {
             if (an > bn) {
                 swap_ptrs<T>(a_limbs, b_limbs);
-                bit_manipulation::swap<T>(an, bn);
+                bit_manipulation::swap<size_t>(an, bn);
                 swapped ^= 1;
             }
         }
@@ -1139,7 +1139,7 @@ public:
 
             if (an > bn) {
                 swap_ptrs<T>(a_limbs, b_limbs);
-                bit_manipulation::swap<T>(an, bn);
+                bit_manipulation::swap<size_t>(an, bn);
                 swapped ^= 1;
             }
         }

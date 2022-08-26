@@ -54,10 +54,10 @@ template<class T>
 class ctx_rsa_tmpl : public ctx_rsa
 {
 public:
-    explicit ctx_rsa_tmpl(size_t set) : m_scheme(PKC_PKE_RSAES_OAEP), m_set(set)
+    ctx_rsa_tmpl(size_t set, bool masking) : m_scheme(PKC_PKE_RSAES_OAEP), m_set(set)
     {
         m_rsa_pke = std::unique_ptr<phantom::rsa::rsa_cryptosystem<T>>(
-            new phantom::rsa::rsa_cryptosystem<T>());
+            new phantom::rsa::rsa_cryptosystem<T>(core::scalar_coding_e::SCALAR_BINARY, masking));
 
         if (!set_hash(static_cast<crypto::hash_alg_e>((set >> 8) & 0x1f))) {
             throw std::runtime_error("Hash is unknown");

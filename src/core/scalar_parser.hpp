@@ -38,22 +38,22 @@ namespace core {
 
 /// An enumerated type describing the coding of scalar numbers
 enum scalar_coding_e {
-    ECC_BINARY           = 0,
-    ECC_MONT_LADDER      = 1,
-    ECC_PRE_2            = SCALAR_CODING_PRE_BIT + 2,
-    ECC_PRE_3            = SCALAR_CODING_PRE_BIT + 3,
-    ECC_PRE_4            = SCALAR_CODING_PRE_BIT + 4,
-    ECC_PRE_5            = SCALAR_CODING_PRE_BIT + 5,
-    ECC_PRE_6            = SCALAR_CODING_PRE_BIT + 6,
-    ECC_PRE_7            = SCALAR_CODING_PRE_BIT + 7,
-    ECC_PRE_8            = SCALAR_CODING_PRE_BIT + 8,
-    ECC_NAF_2            = SCALAR_CODING_NAF_BIT + 2,
-    ECC_NAF_3            = SCALAR_CODING_NAF_BIT + 3,
-    ECC_NAF_4            = SCALAR_CODING_NAF_BIT + 4,
-    ECC_NAF_5            = SCALAR_CODING_NAF_BIT + 5,
-    ECC_NAF_6            = SCALAR_CODING_NAF_BIT + 6,
-    ECC_NAF_7            = SCALAR_CODING_NAF_BIT + 7,
-    ECC_BINARY_DUAL      = SCALAR_CODING_BINARY_DUAL + 2,
+    SCALAR_BINARY           = 0,
+    SCALAR_MONT_LADDER      = 1,
+    SCALAR_PRE_2            = SCALAR_CODING_PRE_BIT + 2,
+    SCALAR_PRE_3            = SCALAR_CODING_PRE_BIT + 3,
+    SCALAR_PRE_4            = SCALAR_CODING_PRE_BIT + 4,
+    SCALAR_PRE_5            = SCALAR_CODING_PRE_BIT + 5,
+    SCALAR_PRE_6            = SCALAR_CODING_PRE_BIT + 6,
+    SCALAR_PRE_7            = SCALAR_CODING_PRE_BIT + 7,
+    SCALAR_PRE_8            = SCALAR_CODING_PRE_BIT + 8,
+    SCALAR_NAF_2            = SCALAR_CODING_NAF_BIT + 2,
+    SCALAR_NAF_3            = SCALAR_CODING_NAF_BIT + 3,
+    SCALAR_NAF_4            = SCALAR_CODING_NAF_BIT + 4,
+    SCALAR_NAF_5            = SCALAR_CODING_NAF_BIT + 5,
+    SCALAR_NAF_6            = SCALAR_CODING_NAF_BIT + 6,
+    SCALAR_NAF_7            = SCALAR_CODING_NAF_BIT + 7,
+    SCALAR_BINARY_DUAL      = SCALAR_CODING_BINARY_DUAL + 2,
 };
 
 /** 
