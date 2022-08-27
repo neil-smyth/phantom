@@ -181,7 +181,7 @@ uint64_t csprng::get_u64()
 
 float csprng::get_float()
 {
-    return static_cast<float>(get_u32() / UINT32_MAX);
+    return static_cast<float>(get_u32()) / static_cast<float>(UINT32_MAX);
 }
 
 double csprng::get_double()
