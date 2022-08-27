@@ -17,6 +17,7 @@
 
 #include "core/reduction.hpp"
 #include "core/bit_manipulation.hpp"
+#include "./phantom_types.hpp"
 
 
 namespace phantom {

@@ -46,9 +46,10 @@ const lest::test specification[] =
         auto prng = csprng::make(0, &test_cb);
         EXPECT(nullptr != prng);
         auto sss = shamirs_secret_sharing(std::shared_ptr<csprng>(prng));
-        phantom_vector<uint8_t> shares[3];
+        phantom_vector<phantom_vector<uint8_t>> shares(3);
         uint8_t key[shamirs_secret_sharing::key_bytes] = {0};
-        int32_t retval = sss.create(nullptr, key, 3, 2);
+        phantom_vector<phantom_vector<uint8_t>> shares_empty;
+        int32_t retval = sss.create(shares_empty, key, 3, 2);
         EXPECT(EXIT_FAILURE == retval);
 
         retval = sss.create(shares, nullptr, 3, 2);
@@ -62,7 +63,7 @@ const lest::test specification[] =
         auto prng = csprng::make(0, &test_cb);
         EXPECT(nullptr != prng);
         auto sss = shamirs_secret_sharing(std::shared_ptr<csprng>(prng));
-        phantom_vector<uint8_t> shares[3];
+        phantom_vector<phantom_vector<uint8_t>> shares(3);
         uint8_t key[shamirs_secret_sharing::key_bytes] = {0};
         uint8_t keyout[shamirs_secret_sharing::key_bytes] = {0};
         int32_t retval = sss.create(shares, key, 3, 2);

@@ -39,8 +39,8 @@ public:
         return KEY_SHARING_SHAMIRS;
     }
 
-    virtual int32_t create(phantom_vector<uint8_t> *out, const uint8_t* key, size_t n, size_t k);
-    virtual int32_t combine(uint8_t* key, const phantom_vector<uint8_t> *shares, size_t k);
+    virtual int32_t create(phantom_vector<phantom_vector<uint8_t>> &out, const uint8_t* key, size_t n, size_t k);
+    virtual int32_t combine(uint8_t* key, const phantom_vector<phantom_vector<uint8_t>> &shares, size_t k);
 
 private:
     static void bitslice(uint32_t r[key_words], const uint8_t x[key_bytes]);

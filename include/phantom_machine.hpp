@@ -94,7 +94,7 @@ public:
 
     static const bool bits_per_word()
     {
-#if defined (__x86_64)
+#if defined (__x86_64) || defined(_WIN64)
         return 64;
 #else
         return 32;
@@ -103,7 +103,7 @@ public:
 
     static const bool log2_bits_per_word()
     {
-#if defined (__x86_64)
+#if defined (__x86_64) || defined(_WIN64)
         return 6;
 #else
         return 5;

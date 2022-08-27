@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
         uint8_t key[shamirs_secret_sharing::key_bytes], keyout[shamirs_secret_sharing::key_bytes];
         prng->get_mem(key, shamirs_secret_sharing::key_bytes);
 
-        phantom_vector<uint8_t> shares[n];
+        phantom_vector<phantom_vector<uint8_t>> shares(n);
 
         for (size_t k=1; k <= n; k++) {
             std::cout << "n = " << n << ", k = " << k << std::endl;

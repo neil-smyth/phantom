@@ -20,6 +20,14 @@
 #include <vector>
 #include "./phantom_machine.hpp"
 
+// Define bswap_32 and bswap_64
+#if defined(__GNU__)  // GCC or Clang
+#include <byteswap.h>
+#endif
+#if defined(_MSC_VER)  // MSVC
+#define bswap_32   _byteswap_ulong
+#define bswap_64   _byteswap_uint64
+#endif
 
 /// Default byte alignment of memory
 #define DEFAULT_MEM_ALIGNMENT   16
@@ -29,7 +37,11 @@
 #if defined(__GNUG__)    // GCC or Clang
 #define _RESTRICT_    __restrict__
 #else
+#if defined(_MSC_VER)    // MSVC
+#define _RESTRICT_    __restrict
+#else
 #error "Error! restrict keyword is undefined"
+#endif
 #endif
 
 namespace phantom {
@@ -78,8 +90,12 @@ static size_t align_on_type(size_t n)
  */
 static inline void* aligned_malloc(size_t n, size_t alignment = DEFAULT_MEM_ALIGNMENT)
 {
+#if defined(__GNUG__)    // GCC or Clang
     // Obtain aligned memory by over-allocation
     void* p = aligned_alloc(alignment, n + alignment);
+#elif defined(_MSC_VER)    // MSVC
+    void* p = _aligned_malloc(n + alignment, alignment);
+#endif
     if (nullptr == p) {
         return nullptr;
     }
@@ -121,7 +137,11 @@ static inline void aligned_free(void* p, size_t alignment = DEFAULT_MEM_ALIGNMEN
 #endif
 
     // Release the memory resources
+#if defined(__GNUG__)    // GCC or Clang
     std::free(p_offset);
+#elif defined(_MSC_VER)    // MSVC
+    _aligned_free(p_offset);
+#endif
 }
 
 /**

@@ -10,13 +10,14 @@
 #include "packing/stream.hpp"
 
 #include <algorithm>
+#include <stdexcept>
 
 
 namespace phantom {
 namespace packing {
 
 
-#if defined(__linux__) || defined(_WIN32)
+#if defined(__linux__)
 #include <arpa/inet.h>
 #else
 

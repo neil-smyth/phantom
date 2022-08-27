@@ -145,7 +145,7 @@ double ntru_master_tree::gram_schmidt_norm(const int32_t* f, const int32_t* g, u
         b_N1 += f_fft[i] * f_fft[i] + g_fft[i] * g_fft[i];
     }
 
-    if (b_N1 >= thresh || isnanl(b_N1)) {
+    if (b_N1 >= thresh || std::isnan(b_N1)) {
         return 2 * thresh;
     }
 

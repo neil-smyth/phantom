@@ -11,6 +11,7 @@
 #include <memory>
 #include "./lest.hpp"
 #include "./phantom.hpp"
+#include "./config.hpp"
 
 namespace phantom {
 
@@ -19,20 +20,20 @@ const lest::test specification[] =
     CASE("Get version")
     {
         std::string version = build_info::version();
-        //EXPECT(version == (PHANTOM_BUILD_VERSION));
+        EXPECT(version == PHANTOM_BUILD_VERSION);
         std::cout << "version: " << version << std::endl;
     },
     CASE("Get build date")
     {
-        std::string version = build_info::build_date();
-        //EXPECT(version == (PHANTOM_BUILD_VERSION));
-        std::cout << "build date: " << version << std::endl;
+        std::string datetime = build_info::build_date();
+        //EXPECT(datetime == (PHANTOM_BUILD_VERSION));
+        std::cout << "build date: " << datetime << std::endl;
     },
     CASE("Get compiler")
     {
-        std::string version = build_info::compiler();
-        //EXPECT(version == (PHANTOM_BUILD_VERSION));
-        std::cout << "compiler: " << version << std::endl;
+        std::string compiler = build_info::compiler();
+        //EXPECT(compiler == (PHANTOM_BUILD_VERSION));
+        std::cout << "compiler: " << compiler << std::endl;
     },
 };
 

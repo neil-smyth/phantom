@@ -432,12 +432,14 @@ bool dilithium_signature::sign(const std::unique_ptr<user_ctx>& ctx,
     size_t   d            = myctx.get_dilithium()->get_params()->d;
 
     uint32_t kappa        = 0;
-    alignas(DEFAULT_MEM_ALIGNMENT) uint8_t mu[48];
-    alignas(DEFAULT_MEM_ALIGNMENT) uint8_t w1_bytes[k*n];
-    alignas(DEFAULT_MEM_ALIGNMENT) uint8_t r1[k*n];
 
-    phantom_vector<uint32_t> storage((3 + 2*l + 6*k) * n);
-    int32_t*  c        = reinterpret_cast<int32_t*>(storage.data());
+    phantom_vector<uint8_t> storage_u8(48 + k * n);
+    uint8_t*  mu          = storage_u8.data();
+    uint8_t*  w1_bytes    = mu + 48;
+    uint8_t*  r1          = w1_bytes + k * n;
+
+    phantom_vector<uint32_t> storage_u32((3 + 2*l + 6*k) * n);
+    int32_t*  c        = reinterpret_cast<int32_t*>(storage_u32.data());
     int32_t*  y        = c + n;
     int32_t*  t0       = y + l*n;
     int32_t*  t1       = t0 + k*n;
@@ -580,9 +582,9 @@ restart:
         myctx.get_dilithium()->get_xof()->absorb(myctx.rho(), 32);
         myctx.get_dilithium()->get_xof()->final();
 
-        alignas(DEFAULT_MEM_ALIGNMENT) int32_t temp[2*n];
-
-        create_rand_product(myctx, q, q_bits, w, z, n_bits, k, l, reinterpret_cast<uint32_t*>(temp));
+        phantom_vector<int32_t> temp(2 *n);
+        
+        create_rand_product(myctx, q, q_bits, w, z, n_bits, k, l, reinterpret_cast<uint32_t*>(temp.data()));
 
         for (size_t i=0; i < k; i++) {
             myctx.get_ntt()->mul(ntt_temp, myctx.ntt_t1().data() + i*n, ntt_c);
@@ -602,7 +604,7 @@ restart:
 
         // Calculate H(mu, w1) such that a sparse polynomial with 60
         // coefficients have the values 1 or -1
-        myctx.get_dilithium()->h_function(temp, mu, w1_bytes, n, k);
+        myctx.get_dilithium()->h_function(temp.data(), mu, w1_bytes, n, k);
         LOG_DEBUG_ARRAY("H(mu, w')", temp, n);
     }
 
@@ -654,11 +656,12 @@ bool dilithium_signature::verify(const std::unique_ptr<user_ctx>& ctx,
     size_t   k            = myctx.get_dilithium()->get_params()->k;
     size_t   d            = myctx.get_dilithium()->get_params()->d;
 
-    alignas(DEFAULT_MEM_ALIGNMENT) uint8_t mu[48];
-    alignas(DEFAULT_MEM_ALIGNMENT) uint8_t w1_bytes[k*n];
+    phantom_vector<uint8_t> storage_u8(48 + k * n);
+    uint8_t*  mu          = storage_u8.data();
+    uint8_t*  w1_bytes    = mu + 48;
 
-    phantom_vector<uint32_t> storage((5 + l + 3*k) * n);
-    uint32_t* ntt_c    = reinterpret_cast<uint32_t*>(storage.data());
+    phantom_vector<uint32_t> storage_u32((5 + l + 3*k) * n);
+    uint32_t* ntt_c    = reinterpret_cast<uint32_t*>(storage_u32.data());
     uint32_t* ntt_temp = ntt_c + n;
     int32_t*  z        = reinterpret_cast<int32_t*>(ntt_temp + n);
     int32_t*  h        = z + l*n;

@@ -12,6 +12,11 @@
 #include "./phantom_memory.hpp"
 
 
+#if defined(_MSC_VER)
+#include <BaseTsd.h>
+typedef SSIZE_T ssize_t;
+#endif
+
 namespace phantom {
 
 
@@ -107,7 +112,7 @@ enum cpu_word_size_e {
 };
 
 /// The native machine word size
-#if defined (__x86_64)
+#if defined (__x86_64) || defined(_WIN64)
 #define IS_64BIT
 #define NATIVE_CPU_WORD_SIZE    cpu_word_size_e::CPU_WORD_SIZE_64
 #else

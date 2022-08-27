@@ -8,7 +8,6 @@
  *****************************************************************************/
 
 #include "crypto/hash_sha2.hpp"
-#include <byteswap.h>
 #include <algorithm>
 #include <climits>
 #include "./phantom_memory.hpp"

@@ -25,12 +25,16 @@ template class number<uint64_t>;
 // Compute a double-word product from single word multiplicands (64-bit)
 void number_impl::umul_internal(uint64_t * _RESTRICT_ hi, uint64_t * _RESTRICT_ lo, uint64_t u, uint64_t v)
 {
-#if defined (__x86_64)
+#if defined (__x86_64) || defined(__GNUG__)
     // x86-64 assembler for 64-bit multiplication
-    __asm__ ("mulq %3"
+    __asm__("mulq %3"
                 : "=a" (*lo), "=d" (*hi)
                 : "%a" (u), "rm" (v)
                 : "cc");
+#else
+#if defined (_M_AMD64) || defined(_MSC_VER)
+    // x86-64 MSVC intrinsic for 64-bit multiplication
+    *lo = _umul128(u, v, hi);
 #else
 #if defined(__SIZEOF_INT128__)
     // The compiler has defined 128-bit integer types so they are used
@@ -65,12 +69,13 @@ void number_impl::umul_internal(uint64_t * _RESTRICT_ hi, uint64_t * _RESTRICT_ 
 #endif
 #endif
 #endif
+#endif
 }
 
 // Compute a double-word product from single word multiplicands (32-bit)
 void number_impl::umul_internal(uint32_t * _RESTRICT_ hi, uint32_t * _RESTRICT_ lo, uint32_t u, uint32_t v)
 {
-#if defined(__x86_64) || defined(_IA64) || defined(__aarch64__)
+#if defined(__x86_64) || defined(_IA64) || defined(__aarch64__) || defined(_WIN64)
     uint64_t p = static_cast<uint64_t>(u) * static_cast<uint64_t>(v);
     *hi = p >> 32;
     *lo = p & 0xffffffff;
@@ -95,7 +100,7 @@ void number_impl::umul_internal(uint8_t * _RESTRICT_ hi, uint8_t * _RESTRICT_ lo
     *lo = t & 0xff;
 }
 
-#if !defined(__x86_64) && !defined(_IA64) && !defined(__aarch64__)
+#if !defined(__x86_64) && !defined(_IA64) && !defined(__aarch64__) && defined(_WIN64)
 /// A helper method for multiplication of 32-bit multiplicands on a non-64-bit platform
 void number_impl::umul32(uint32_t * _RESTRICT_ hi, uint32_t * _RESTRICT_ lo, uint32_t u, uint32_t v)
 {

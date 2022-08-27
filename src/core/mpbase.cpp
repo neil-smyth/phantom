@@ -10,6 +10,7 @@
 #include "core/mpbase.hpp"
 
 #include <algorithm>
+#include <functional>
 #include <limits>
 
 
@@ -279,10 +280,13 @@ void mpbase<T>::incr_u(const T* p, T incr)
 {
     T v;
     T* ptr = const_cast<T*>(p);
+#if defined(__GNUG__)    // GCC or Clang
     if (__builtin_constant_p(incr) && incr == 1) {
         while (++(*ptr++) == 0) {}        // Increment array 'p' with carry propagation
     }
-    else {
+    else
+#endif
+    {
         v = *ptr + incr;                  // Add 'incr'
         *ptr = v;                         // Set the array value leats significant word
         if (v < incr) {                   // Check if we need to propagate a carry bit
@@ -301,10 +305,13 @@ void mpbase<T>::decr_u(const T* p, T decr)
 {
     T v;
     T* ptr = const_cast<T*>(p);
+#if defined(__GNUG__)    // GCC or Clang
     if (__builtin_constant_p(decr) && decr == 1) {
         while (++(*ptr--) == 0) {}        // Decrement array 'p' with carry propagation
     }
-    else {
+    else
+#endif
+    {
         v = *ptr;
         *ptr = v - decr;                  // Subtract 'decr'
         if (v < decr) {                   // Check if we need to propagate a carry bit

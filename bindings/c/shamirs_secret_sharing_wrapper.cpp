@@ -116,7 +116,7 @@ extern "C" {
 
         size_t n = p_sss->ctx.n;
         size_t k = p_sss->ctx.k;
-        phantom::phantom_vector<uint8_t> user_shares[n];
+        phantom::phantom_vector<phantom::phantom_vector<uint8_t>> user_shares(n);
         p_sss->obj->create(user_shares, keyBytes.data(), n, k);
 
         p_sss->ctx.shards = phantom::phantom_vector<std::string>(n);
@@ -137,7 +137,7 @@ extern "C" {
             return nullptr;
         }
 
-        phantom::phantom_vector<uint8_t> quorum_shares[k];
+        phantom::phantom_vector<phantom::phantom_vector<uint8_t>> quorum_shares(k);
         for (size_t i=0; i < k; i++) {
             std::string share = base64_decode(p_sss->ctx.shards[i]);
             quorum_shares[i] = phantom::phantom_vector<uint8_t>(share.c_str(), share.c_str() + share.size());
