@@ -2270,14 +2270,12 @@ public:
         // Obtain the result of q / d
         const T* n_limbs = n.m_limbs.data();
         T        r_lsw   = mpbase<T>::div_qr_1(q_limbs, n_limbs, q_used, d);
-        bool     r_sign  = n.m_sign;
 
         // If q/d is non-zero then apply rounding
         if (r_lsw > 0) {
             if ((mp_round_e::MP_ROUND_FLOOR == mode && n.m_sign) ||
                 (mp_round_e::MP_ROUND_CEIL  == mode && !n.m_sign)) {
                 r_lsw   = d - r_lsw;
-                r_sign ^= true;
             }
         }
 
