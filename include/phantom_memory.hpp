@@ -21,7 +21,7 @@
 #include "./phantom_machine.hpp"
 
 // Define bswap_32 and bswap_64
-#if defined(__GNU__)  // GCC or Clang
+#if defined(__GNUG__)  // GCC or Clang
 #include <byteswap.h>
 #endif
 #if defined(_MSC_VER)  // MSVC

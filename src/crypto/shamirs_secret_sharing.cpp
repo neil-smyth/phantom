@@ -108,8 +108,8 @@ int32_t shamirs_secret_sharing::combine(uint8_t key[key_bytes],
 
     // Use Lagrange basis polynomials to calculate the secret coefficient
     for (size_t i=0; i < k; i++) {
-        memset(num, 0, sizeof(num));
-        memset(denom, 0, sizeof(denom));
+        memset(num, 0, sizeof(uint32_t) * key_words);
+        memset(denom, 0, sizeof(uint32_t) * key_words);
         num[0] = ~0;
         denom[0] = ~0;
         for (size_t j=0; j < k; j++) {

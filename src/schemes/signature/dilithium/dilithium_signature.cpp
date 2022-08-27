@@ -433,7 +433,7 @@ bool dilithium_signature::sign(const std::unique_ptr<user_ctx>& ctx,
 
     uint32_t kappa        = 0;
 
-    phantom_vector<uint8_t> storage_u8(48 + k * n);
+    phantom_vector<uint8_t> storage_u8(48 + 2 * k * n);
     uint8_t*  mu          = storage_u8.data();
     uint8_t*  w1_bytes    = mu + 48;
     uint8_t*  r1          = w1_bytes + k * n;

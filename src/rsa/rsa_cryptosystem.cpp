@@ -7,8 +7,6 @@
  * 'LICENSE', which is part of this source code package.                     *
  *****************************************************************************/
 
-#pragma once
-
 #include "rsa/rsa_cryptosystem.hpp"
 #include <limits>
 #include <memory>
@@ -607,8 +605,6 @@ rsacode_e rsa_cryptosystem<T>::montgomery_ladder(core::mpz<T>& r, const core::mp
     }
 
     // Set the initial value according to the encoding - it is guaranteed to be positive non-zero
-    //r.set(*m_base_pre[(bit - 1) & ((1 << (static_cast<size_t>(m_coding_type) & 0x3f)) - 1)].get());
-
     if (core::REDUCTION_MONTGOMERY == cfg.reduction) {
         r = cfg.mont_R2;
     }
@@ -740,8 +736,8 @@ bool rsa_cryptosystem<T>::check_pminusq_diff(const core::mpz<T>& p, const core::
  * @return false Failure
  */
 template<typename T>
-bool rsa_cryptosystem<T>::gen_probable_prime(core::mpz<T>& prime, core::mpz<T>& xpout, core::mpz<T>& p1, core::mpz<T>& p2,
-    const core::mpz<T>& e, size_t nbits)
+bool rsa_cryptosystem<T>::gen_probable_prime(core::mpz<T>& prime, core::mpz<T>& xpout,
+    core::mpz<T>& p1, core::mpz<T>& p2, const core::mpz<T>& e, size_t nbits)
 {
     const size_t min_bitlen = nbits >=4096 ? 201 :
                                 nbits >=3072 ? 171 :
@@ -908,9 +904,10 @@ bool rsa_cryptosystem<T>::derive_prime(core::mpz<T>& prime_factor, core::mpz<T>&
  * @return std::shared_ptr<csprng> CSPRNG
  */
 template<typename T>
-std::shared_ptr<csprng> rsa_cryptosystem<T>::get_prng();
-
-
+std::shared_ptr<csprng> rsa_cryptosystem<T>::get_prng()
+{
+    return m_prng;
+}
 
 // Forward declaration of common type declarations
 /// @{
