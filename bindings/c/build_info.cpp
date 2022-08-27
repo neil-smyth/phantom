@@ -34,7 +34,6 @@ const char* build_compiler()
     return strncpy(new char[phantom::build_info::compiler().length()],  // flawfinder: ignore
                    phantom::build_info::compiler().c_str(),
                    phantom::build_info::compiler().length());
-    return phantom::build_info::compiler().c_str();
 }
 
 }
