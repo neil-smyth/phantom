@@ -20,14 +20,15 @@
 
 
 namespace phantom {
-
 namespace core {
 
 template<typename T>
 class mpz;
 
 }  // namespace core
+}  // namespace phantom
 
+namespace phantom {
 namespace rsa {
 
 
@@ -331,6 +332,7 @@ extern template class rsa_cryptosystem<uint32_t>;
 #if defined(IS_64BIT)
 extern template class rsa_cryptosystem<uint64_t>;
 #endif
+
 
 }  // namespace rsa
 }  // namespace phantom

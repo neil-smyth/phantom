@@ -583,7 +583,6 @@ restart:
         myctx.get_dilithium()->get_xof()->final();
 
         phantom_vector<int32_t> temp(2 *n);
-        
         create_rand_product(myctx, q, q_bits, w, z, n_bits, k, l, reinterpret_cast<uint32_t*>(temp.data()));
 
         for (size_t i=0; i < k; i++) {

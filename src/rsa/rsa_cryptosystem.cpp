@@ -8,19 +8,12 @@
  *****************************************************************************/
 
 #include "rsa/rsa_cryptosystem.hpp"
-#include <limits>
-#include <memory>
-#include <string>
 
 #include <iostream>
 #include <sstream>
 
-#include "crypto/csprng.hpp"
 #include "crypto/random_seed.hpp"
-#include "core/scalar_parser.hpp"
 #include "core/mpz.hpp"
-#include "rsa/ctx_rsa.hpp"
-#include "./phantom.hpp"
 #include <nlohmann/json.hpp>
 
 
@@ -31,7 +24,6 @@ namespace phantom {
 namespace rsa {
 
 
-/// Class constructor
 template<typename T>
 rsa_cryptosystem<T>::rsa_cryptosystem(core::scalar_coding_e coding, bool masking)
     : m_e_2_16("10000", 16),
@@ -43,17 +35,11 @@ rsa_cryptosystem<T>::rsa_cryptosystem(core::scalar_coding_e coding, bool masking
     m_prng = std::shared_ptr<csprng>(csprng::make(0x10000000, random_seed::seed_cb));
 }
 
-/// Class destructor
 template<typename T>
 rsa_cryptosystem<T>::~rsa_cryptosystem()
 {
 }
 
-/**
- * @brief Memory allocation for base values used with exponent recoding
- * 
- * @param cfg Modulus configuration and information for reduction
- */
 template<typename T>
 void rsa_cryptosystem<T>::precomputation_alloc(const core::mod_config<T>& cfg)
 {
@@ -100,13 +86,6 @@ void rsa_cryptosystem<T>::precomputation_alloc(const core::mod_config<T>& cfg)
     }
 }
 
-/**
- * @brief Precomputation of values needed for suqre-and-multiply with exponent recoding
- * 
- * @param b Base value
- * @param cfg Modulus configuration and information for reduction
- * @return bool True on success, flaseon failure
- */
 template<typename T>
 bool rsa_cryptosystem<T>::precomputation(const core::mpz<T>& b, const core::mod_config<T>& cfg)
 {
@@ -174,13 +153,6 @@ bool rsa_cryptosystem<T>::precomputation(const core::mpz<T>& b, const core::mod_
     return true;
 }
 
-/**
- * @brief Key generation for the given context
- * 
- * @param ctx RSA context
- * @return true Success
- * @return false Failure
- */
 template<typename T>
 bool rsa_cryptosystem<T>::keygen(ctx_rsa_tmpl<T>& ctx)
 {
@@ -236,16 +208,6 @@ bool rsa_cryptosystem<T>::keygen(ctx_rsa_tmpl<T>& ctx)
     return true;
 }
 
-/**
- * @brief Set the public key and initialize reduction
- * 
- * The public key is stored internally as JSON n and e parameters.
- * 
- * @param ctx RSA context
- * @param k Public key
- * @return true Success
- * @return false Failure
- */
 template<typename T>
 bool rsa_cryptosystem<T>::set_public_key(ctx_rsa_tmpl<T>& ctx, const phantom_vector<uint8_t>& k)
 {
@@ -260,14 +222,6 @@ bool rsa_cryptosystem<T>::set_public_key(ctx_rsa_tmpl<T>& ctx, const phantom_vec
     return true;
 }
 
-/**
- * @brief Get the public key
- * 
- * @param ctx RSA context
- * @param k Key encoded
- * @return true Success
- * @return false Failure
- */
 template<typename T>
 bool rsa_cryptosystem<T>::get_public_key(ctx_rsa_tmpl<T>& ctx, phantom_vector<uint8_t>& k)
 {
@@ -281,16 +235,6 @@ bool rsa_cryptosystem<T>::get_public_key(ctx_rsa_tmpl<T>& ctx, phantom_vector<ui
     return true;
 }
 
-/**
- * @brief Set the private key (and public key) and initialize reduction
- * 
- * The private and public key are stored internally as JSON n, e, d, p, q, exp1, exp2and inv parameters.
- * 
- * @param ctx RSA context
- * @param k Private key
- * @return true Success
- * @return false Failure
- */
 template<typename T>
 bool rsa_cryptosystem<T>::set_private_key(ctx_rsa_tmpl<T>& ctx, const phantom_vector<uint8_t>& k)
 {
@@ -338,16 +282,6 @@ bool rsa_cryptosystem<T>::get_private_key(ctx_rsa_tmpl<T>& ctx, phantom_vector<u
     return true;
 }
 
-/**
- * @brief Key generation as per SP800 56B
- * 
- * @param[out] p RSA secret prime p
- * @param[out] q RSA secret prime q with p < q
- * @param[in] e RSA public exponent e
- * @param nbits 
- * @return true Success
- * @return false Failure
- */
 template<typename T>
 bool rsa_cryptosystem<T>::keygen_sp800_56b(core::mpz<T>& p, core::mpz<T>& q, const core::mpz<T>& e, size_t nbits)
 {
@@ -380,18 +314,6 @@ bool rsa_cryptosystem<T>::keygen_sp800_56b(core::mpz<T>& p, core::mpz<T>& q, con
     return true;
 }
 
-/**
- * @brief Mask generation function MGF1 from PKCS #1
- * 
- * @param[in] h Pointer to a suitable hash function
- * @param[out] mask The generated mask byte array
- * @param hblocklen The blocklength used by the hash function
- * @param hlen Hash length
- * @param[in] seed Seed bytes
- * @param masklen Mask length to be produced
- * @return true Success
- * @return false Failure
- */
 template<typename T>
 bool rsa_cryptosystem<T>::mgf1(crypto::hash* h, phantom_vector<uint8_t>& mask, size_t hblocklen, size_t hlen,
     const phantom_vector<uint8_t>& seed, size_t masklen)
@@ -424,25 +346,12 @@ bool rsa_cryptosystem<T>::mgf1(crypto::hash* h, phantom_vector<uint8_t>& mask, s
     return true;
 }
 
-/**
- * @brief Octet Stream to Integer Primitive from PKCS #11
- * 
- * @param i Integer represented as a multiple precision integer
- * @param os Octet stream represented as a byte vector
- */
 template<typename T>
 void rsa_cryptosystem<T>::os2ip(core::mpz<T>& i, const phantom_vector<uint8_t>& os)
 {
     i.set_bytes(os, true);
 }
 
-/**
- * @brief Integer to Octet Stream Primitive from PKCS #1
- * 
- * @param os Octet stream represented as a byte vector
- * @param i Integer represented as a multiple precision integer
- * @param k Maximum byte length of the octet stream (i.e. the modulus length in bytes)
- */
 template<typename T>
 void rsa_cryptosystem<T>::i2osp(phantom_vector<uint8_t>& os, const core::mpz<T>& i, size_t k)
 {
@@ -452,15 +361,6 @@ void rsa_cryptosystem<T>::i2osp(phantom_vector<uint8_t>& os, const core::mpz<T>&
     }
 }
 
-/**
- * @brief Low-level RSA exponentiation, r = b^e mod n
- * 
- * @param r Result
- * @param b Base
- * @param e Exponent
- * @param cfg Modulus configuration
- * @return rsacode_e Enumerated return code, RSA_OK indicates success
- */
 template<typename T>
 rsacode_e rsa_cryptosystem<T>::exponentiation(core::mpz<T>& r, core::mpz<T>& b, const core::mpz<T>& e,
     const core::mod_config<T>& cfg)
@@ -497,10 +397,12 @@ rsacode_e rsa_cryptosystem<T>::exponentiation(core::mpz<T>& r, core::mpz<T>& b, 
 
     // Square-and-multiply
     rsacode_e rsacode;
-    /*if (core::SCALAR_MONT_LADDER == m_coding_type) {
+    /*
+    if (core::SCALAR_MONT_LADDER == m_coding_type) {
         rsacode = montgomery_ladder(r, b, bitgen, num_bits, w, sub_offset, cfg);
     }
-    else */{
+    else */
+    {
         rsacode = square_and_multiply(r, b, bitgen, num_bits, w, sub_offset, cfg);
     }
 
@@ -512,18 +414,6 @@ rsacode_e rsa_cryptosystem<T>::exponentiation(core::mpz<T>& r, core::mpz<T>& b, 
     return rsacode;
 }
 
-/**
- * @brief Unmasked square-and-multiply exponentiation
- * 
- * @param r Result
- * @param b Base
- * @param bitgen A reference to the scalar_parser object used to encode the exponent
- * @param num_bits The number of bits in the encoded scalar
- * @param w The window size
- * @param sub_offset An offset to negative pre-computed points
- * @param cfg Modulus configuration
- * @return rsacode_e Enumerated return code, RSA_OK indicates success
- */
 template<typename T>
 rsacode_e rsa_cryptosystem<T>::square_and_multiply(core::mpz<T>& r, const core::mpz<T>& b, core::scalar_parser& bitgen,
     size_t num_bits, size_t w, size_t sub_offset, const core::mod_config<T>& cfg)
@@ -564,12 +454,6 @@ rsacode_e rsa_cryptosystem<T>::square_and_multiply(core::mpz<T>& r, const core::
     return RSA_OK;
 }
 
-/**
- * @brief Constant-time swap of two pointers
- * @param swap Flag indicating if swap should occur
- * @param s Pointer to swap
- * @param r Pointer to swap
- */
 template<typename T>
 void rsa_cryptosystem<T>::cswap(bool swap, intptr_t& s, intptr_t& r)
 {
@@ -578,18 +462,6 @@ void rsa_cryptosystem<T>::cswap(bool swap, intptr_t& s, intptr_t& r)
     r ^= dummy;
 }
 
-/**
- * @brief Montgomer ladder exponentiation
- * 
- * @param r Result
- * @param b Base
- * @param bitgen A reference to the scalar_parser object used to encode the exponent
- * @param num_bits The number of bits in the encoded scalar
- * @param w Unused
- * @param sub_offset Unused
- * @param cfg Modulus configuration
- * @return rsacode_e Enumerated return code, RSA_OK indicates success
- */
 template<typename T>
 rsacode_e rsa_cryptosystem<T>::montgomery_ladder(core::mpz<T>& r, const core::mpz<T>& b, core::scalar_parser& bitgen,
     size_t num_bits, size_t w, size_t sub_offset, const core::mod_config<T>& cfg)
@@ -643,15 +515,6 @@ rsacode_e rsa_cryptosystem<T>::montgomery_ladder(core::mpz<T>& r, const core::mp
     return RSA_OK;
 }
 
-/**
- * @brief RSA public exponentiation, c = m^e mod n
- * 
- * @param ctx RSA context
- * @param m Message
- * @param c Ciphertext
- * @return true Success
- * @return false Failure
- */
 template<typename T>
 bool rsa_cryptosystem<T>::rsa_public_exponentiation(ctx_rsa_tmpl<T>& ctx, core::mpz<T> m, core::mpz<T>& c)
 {
@@ -660,15 +523,6 @@ bool rsa_cryptosystem<T>::rsa_public_exponentiation(ctx_rsa_tmpl<T>& ctx, core::
     return RSA_OK == code;
 }
 
-/**
- * @brief RSA private exponentiation, m = c^d mod n
- * 
- * @param ctx RSA context
- * @param c Ciphertext
- * @param m Message
- * @return true Success
- * @return false Failure
- */
 template<typename T>
 bool rsa_cryptosystem<T>::rsa_private_exponentiation(ctx_rsa_tmpl<T>& ctx, core::mpz<T> c, core::mpz<T>& m)
 {
@@ -697,15 +551,6 @@ bool rsa_cryptosystem<T>::rsa_private_exponentiation(ctx_rsa_tmpl<T>& ctx, core:
     return true;
 }
 
-/**
- * @brief Verify that p - q is not too close
- * 
- * @param p RSA secret prime p
- * @param q RSA secret prime q with p < q
- * @param nbits Length of the modulus n in bits
- * @return true Success
- * @return false Failure
- */
 template<typename T>
 bool rsa_cryptosystem<T>::check_pminusq_diff(const core::mpz<T>& p, const core::mpz<T>& q, int nbits)
 {
@@ -723,18 +568,6 @@ bool rsa_cryptosystem<T>::check_pminusq_diff(const core::mpz<T>& p, const core::
     return diff.sizeinbase(2) > bitlen;
 }
 
-/**
- * @brief Generate a probable prime
- * 
- * @param[out] prime Prime number
- * @param[out] xpout Random number used in prime generation
- * @param[out] p1 Auxiliary prime 1
- * @param[out] p2 Auxiliary prime 2
- * @param e Auxiliary prime 2
- * @param nbits Length of the modulus n in bits
- * @return true Success
- * @return false Failure
- */
 template<typename T>
 bool rsa_cryptosystem<T>::gen_probable_prime(core::mpz<T>& prime, core::mpz<T>& xpout,
     core::mpz<T>& p1, core::mpz<T>& p2, const core::mpz<T>& e, size_t nbits)
@@ -779,12 +612,6 @@ bool rsa_cryptosystem<T>::gen_probable_prime(core::mpz<T>& prime, core::mpz<T>& 
     return derive_prime(prime, xpout, p1, p2, e, nbits);
 }
 
-/**
- * @brief Find an auxiliary probable prime from an array of random bits
- * 
- * @param[out] p1 Auxiliary prime
- * @param xp1 Random byte array
- */
 template<typename T>
 void rsa_cryptosystem<T>::find_aux_prob_prime(core::mpz<T>& p1, const core::mpz<T>& xp1)
 {
@@ -798,12 +625,6 @@ void rsa_cryptosystem<T>::find_aux_prob_prime(core::mpz<T>& p1, const core::mpz<
     }
 }
 
-/**
- * @brief Find an auxiliary probable prime from an array of random bits
- * 
- * @param[out] p1 Auxiliary prime
- * @param xp1 Random byte array
- */
 template<typename T>
 bool rsa_cryptosystem<T>::derive_prime(core::mpz<T>& prime_factor, core::mpz<T>& rand_out,
     const core::mpz<T>& aux_prime_1, const core::mpz<T>& aux_prime_2, const core::mpz<T>& e, size_t nbits)
@@ -898,26 +719,20 @@ bool rsa_cryptosystem<T>::derive_prime(core::mpz<T>& prime_factor, core::mpz<T>&
     }
 }
 
-/**
- * @brief Get the (Cryptographically Secure) PRNG
- * 
- * @return std::shared_ptr<csprng> CSPRNG
- */
 template<typename T>
 std::shared_ptr<csprng> rsa_cryptosystem<T>::get_prng()
 {
     return m_prng;
 }
 
-// Forward declaration of common type declarations
-/// @{
+
+// Forward declaration of common sizes
 template class rsa_cryptosystem<uint8_t>;
 template class rsa_cryptosystem<uint16_t>;
 template class rsa_cryptosystem<uint32_t>;
 #if defined(IS_64BIT)
 template class rsa_cryptosystem<uint64_t>;
 #endif
-/// @}
 
 }  // namespace rsa
 }  // namespace phantom
