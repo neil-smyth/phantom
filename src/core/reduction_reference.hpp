@@ -33,8 +33,6 @@ class reduction_reference : public reduction<T>
                     std::is_same<T, uint64_t>::value,
             "number instantiated with unsupported type");
 
-    using U = next_size_t<T>;
-
 public:
     explicit reduction_reference(int32_t q)
     {

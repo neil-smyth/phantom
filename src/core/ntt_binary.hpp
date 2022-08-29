@@ -26,13 +26,11 @@ namespace core {
 template<class R, typename T>
 class ntt_binary : public ntt_base<T>
 {
-    using U = next_size_t<T>;
-
     static_assert(std::is_same<T, uint8_t>::value  ||
-                    std::is_same<T, uint16_t>::value ||
-                    std::is_same<T, uint32_t>::value ||
-                    std::is_same<T, uint64_t>::value,
-            "number instantiated with unsupported type");
+                  std::is_same<T, uint16_t>::value ||
+                  std::is_same<T, uint32_t>::value ||
+                  std::is_same<T, uint64_t>::value,
+                  "number instantiated with unsupported type");
 
 private:
     const reduction<R, T>& m_reduce;  ///< Reduction object (passed by reference)
@@ -94,7 +92,6 @@ public:
     void fwd(T *a, size_t logn, size_t stride = 1) override
     {
         const T* p = m_fwd.data();
-        const T  q = m_reduce.get_q();
         const size_t n = 1 << logn;
 
         if (0 == logn) {
@@ -111,16 +108,9 @@ public:
                 T* _RESTRICT_ a1 = a + j2 * stride;
                 for (size_t j = 0; j < ht * stride; j += stride) {
                     const T u = a0[j];
-                    if (std::is_same<T, U>::value) {
-                        const T v = a1[j] * s;
-                        a0[j] = u + v;
-                        a1[j] = u + 2 * q - v;
-                    }
-                    else {
-                        const T v = m_reduce.mul(a1[j], s);
-                        a0[j] = m_reduce.add(u, v);
-                        a1[j] = m_reduce.sub(u, v);
-                    }
+                    const T v = m_reduce.mul(a1[j], s);
+                    a0[j] = m_reduce.add(u, v);
+                    a1[j] = m_reduce.sub(u, v);
                 }
             }
             t = ht;
@@ -131,7 +121,6 @@ public:
     void inv(T *a, size_t logn, size_t stride = 1) override
     {
         const T* p = m_inv.data();
-        const T q = m_reduce.get_q();
         const size_t n = 1 << logn;
 
         if (0 == logn) {
@@ -152,16 +141,9 @@ public:
                 for (size_t j = 0; j < t * stride; j += stride) {
                     const T u = a0[j];
                     const T v = a1[j];
-                    if (std::is_same<T, U>::value) {
-                        const T w = u + n * q - v;
-                        a0[j] = u + v;
-                        a1[j] = w * s;
-                    }
-                    else {
-                        const T w = m_reduce.sub(u, v);
-                        a0[j] = m_reduce.add(u, v);
-                        a1[j] = m_reduce.mul(w, s);
-                    }
+                    const T w = m_reduce.sub(u, v);
+                    a0[j] = m_reduce.add(u, v);
+                    a1[j] = m_reduce.mul(w, s);
                 }
             }
             t = dt;

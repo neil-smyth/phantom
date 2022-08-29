@@ -90,7 +90,6 @@ class mpz_core
                   "number instantiated with unsupported type");
 
     using S = signed_type_t<T>;
-    using D = next_size_t<T>;
     using H = half_size<T>;
 
     struct mpz_base_coding {
@@ -377,6 +376,15 @@ public:
         return in_used;
     }
 
+    /// Add a double-word number to two single-word numers
+    static void uadd_mont(T * const s1, T * const s0, T a1, T a0, T b, T c)
+    {
+        *s0 = a0 + b;
+        *s1 = a1 + const_time<T>::cmp_lessthan(*s0, b);
+        *s0 = *s0 + c;
+        *s1 = *s1 + const_time<T>::cmp_lessthan(*s0, c);
+    }
+
     // Montgomery multiplication
     static int32_t mul_mont(T* out, const T* in1, size_t in1_used, const T* in2, size_t in2_used,
         const T* m, size_t n, T m_inv)
@@ -390,31 +398,33 @@ public:
 
         // Simultaneously multiply and reduce
         for (size_t i=0; i < n; i++) {
-            D in1_masked = (i >= in1_used)? 0 : in1[i];
+            const T in1_masked = (i >= in1_used)? 0 : in1[i];
             T h, ui;
-            number<T>::umul(&h, &ui, static_cast<T>(in1_masked), in2[0]);
-            number<T>::umul(&h, &ui, out[0] + ui, m_inv);
+            number<T>::umul(&h, &ui, in1_masked, in2[0]);
+            number<T>::uadd(&h, &ui, h, ui, 0, out[0]);
+            number<T>::umul(&h, &ui, ui, m_inv);
 
-            ui    = (out[0] + in1_masked * in2[0]) * m_inv;
-            D uid = ui;
+            T z1[2], z2[2];
+            T k1, k2;
+            number<T>::umul(&z1[1], &z1[0], in1_masked, in2[0]);
+            number<T>::uadd(&k1, &z1[0], z1[1], z1[0], 0, out[0]);
 
-            D z1 = static_cast<D>(in2[0]) * in1_masked + out[0];
-            D z2 = static_cast<D>(m[0]) * uid + (z1 & LIMB_MASK);
-            T k1 = z1 >> std::numeric_limits<T>::digits;
-            T k2 = z2 >> std::numeric_limits<T>::digits;
+            number<T>::umul(&z2[1], &z2[0], m[0], ui);
+            number<T>::uadd(&k2, &z2[0], z2[1], z2[0], 0, z1[0]);
 
             for (size_t j = 1; j < n; j++) {
-                D in2_masked = (j >= in2_used)? 0 : in2[j];
-                z1 = in2_masked * in1_masked + out[j] + k1;
-                z2 = static_cast<D>(m[j]) * uid + (z1 & LIMB_MASK) + k2;
-                k1 = z1 >> std::numeric_limits<T>::digits;
-                k2 = z2 >> std::numeric_limits<T>::digits;
-                out[j-1] = z2;
+                const T in2_masked = (j >= in2_used)? 0 : in2[j];
+
+                number<T>::umul(&z1[1], &z1[0], in1_masked, in2_masked);
+                uadd_mont(&k1, &z1[0], z1[1], z1[0], out[j], k1);
+
+                number<T>::umul(&z2[1], &z2[0], m[j], ui);
+                uadd_mont(&k2, &z2[0], z2[1], z2[0], z1[0], k2);
+
+                out[j-1] = z2[0];
             }
 
-            D tmp = static_cast<D>(out[n]) + k1 + k2;
-            out[n-1] = tmp;
-            out[n]   = tmp >> std::numeric_limits<T>::digits;
+            uadd_mont(&out[n], &out[n-1], 0, out[n], k2, k1);
         }
 
         // Reduce the output if it is equal or larger than the modulus
@@ -440,31 +450,33 @@ public:
 
         // Simultaneously multiply and reduce
         for (size_t i=0; i < n; i++) {
-            D in1_masked = (i >= in_used)? 0 : in[i];
+            const T in1_masked = (i >= in_used)? 0 : in[i];
             T h, ui;
-            number<T>::umul(&h, &ui, static_cast<T>(in1_masked), in[0]);
-            number<T>::umul(&h, &ui, out[0] + ui, m_inv);
+            number<T>::umul(&h, &ui, in1_masked, in[0]);
+            number<T>::uadd(&h, &ui, h, ui, 0, out[0]);
+            number<T>::umul(&h, &ui, ui, m_inv);
 
-            ui    = (out[0] + in1_masked * in[0]) * m_inv;
-            D uid = ui;
+            T z1[2], z2[2];
+            T k1, k2;
+            number<T>::umul(&z1[1], &z1[0], in1_masked, in[0]);
+            number<T>::uadd(&k1, &z1[0], z1[1], z1[0], 0, out[0]);
 
-            D z1 = static_cast<D>(in[0]) * in1_masked + out[0];
-            D z2 = static_cast<D>(m[0]) * uid + (z1 & LIMB_MASK);
-            T k1 = z1 >> std::numeric_limits<T>::digits;
-            T k2 = z2 >> std::numeric_limits<T>::digits;
+            number<T>::umul(&z2[1], &z2[0], m[0], ui);
+            number<T>::uadd(&k2, &z2[0], z2[1], z2[0], 0, z1[0]);
 
             for (size_t j = 1; j < n; j++) {
-                D in2_masked = (j >= in_used)? 0 : in[j];
-                z1 = in2_masked * in1_masked + out[j] + k1;
-                z2 = static_cast<D>(m[j]) * uid + (z1 & LIMB_MASK) + k2;
-                k1 = z1 >> std::numeric_limits<T>::digits;
-                k2 = z2 >> std::numeric_limits<T>::digits;
-                out[j-1] = z2;
+                const T in2_masked = (j >= in_used)? 0 : in[j];
+
+                number<T>::umul(&z1[1], &z1[0], in1_masked, in2_masked);
+                uadd_mont(&k1, &z1[0], z1[1], z1[0], out[j], k1);
+
+                number<T>::umul(&z2[1], &z2[0], m[j], ui);
+                uadd_mont(&k2, &z2[0], z2[1], z2[0], z1[0], k2);
+
+                out[j-1] = z2[0];
             }
 
-            D tmp = static_cast<D>(out[n]) + k1 + k2;
-            out[n-1] = tmp;
-            out[n]   = tmp >> std::numeric_limits<T>::digits;
+            uadd_mont(&out[n], &out[n-1], 0, out[n], k2, k1);
         }
 
         // Reduce the output if it is equal or larger than the modulus
