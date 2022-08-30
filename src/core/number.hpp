@@ -39,7 +39,7 @@ public:
 
     static void umul_internal(uint8_t * _RESTRICT_ hi, uint8_t * _RESTRICT_ lo, uint8_t u, uint8_t v);
 
-#if !defined(__x86_64) || defined(_M_AMD64)
+#if !defined(__x86_64) && !defined(_IA64) && !defined(__aarch64__) && !defined(_WIN64)
     static void umul32(uint32_t * _RESTRICT_ hi, uint32_t * _RESTRICT_ lo, uint32_t u, uint32_t v);
 #endif
 

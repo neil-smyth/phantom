@@ -17,14 +17,12 @@
 #include "core/reduction.hpp"
 #include "core/number.hpp"
 #include "core/bit_manipulation.hpp"
+#include "./phantom_types.hpp"
 
 
 namespace phantom {
 namespace core {
 
-#if defined(__SIZEOF_INT128__)
-using uint128_t = unsigned __int128;
-#endif
 
 /**
  * @brief A Montgomery class derived from the reducer base class

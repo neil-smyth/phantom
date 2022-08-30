@@ -280,7 +280,7 @@ public:
         if (mpbase<T>::add_1(out, in1, in1_used, in2)) {
             out[in1_used++] = 1;
         }
-        return in1_used;
+        return static_cast<int32_t>(in1_used);
     }
 
     /// Subtract the two mpz integers as absolute values
@@ -322,8 +322,8 @@ public:
         }
         else {
             mpbase<T>::sub_1(out, in1, in1_used, in2);
-            int32_t nsize = mpbase<T>::normalized_size(out, in1_used);
-            return nsize;
+            size_t nsize = mpbase<T>::normalized_size(out, in1_used);
+            return static_cast<int32_t>(nsize);
         }
     }
 
@@ -499,9 +499,9 @@ public:
         }
 
         // Reduce the output size if the MSW are zero
-        int32_t used = mpbase<T>::normalized_size(out, n);
+        size_t used = mpbase<T>::normalized_size(out, n);
 
-        return used;
+        return static_cast<int32_t>(used);
     }
 };
 

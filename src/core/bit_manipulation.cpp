@@ -157,7 +157,7 @@ uint64_t bit_manipulation::ctz(uint64_t x)
     return c;
 #else
 #if defined(_M_AMD64) && defined(_MSC_VER)
-    uint64_t c = 0;
+    unsigned long c = 0;  // NOLINT
 
     if (_BitScanForward64(&c, x)) {
         return c;

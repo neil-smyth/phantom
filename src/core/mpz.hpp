@@ -928,11 +928,11 @@ public:
     /// Subtract an mpz integer and an unsigned integer as absolute values
     int32_t abs_sub(const mpz& in1, T in2)
     {
-        int32_t used = in1.get_limbsize();
+        size_t used = in1.get_limbsize();
         m_limbs.resize((used < 1)? 1 : used);
         used = mpz_core<T>::abs_sub(m_limbs.data(), in1.get_limbs().data(), used, in2);
         m_limbs.resize((used < 0)? -used : used);
-        return used;
+        return static_cast<int32_t>(used);
     }
 
     /// Add an unsigned integer to an mpz object
