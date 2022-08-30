@@ -16,8 +16,9 @@
 #include "./phantom.hpp"
 #include "core/small_primes.hpp"
 #include "crypto/csprng.hpp"
-#include "core/reduction_montgomery.hpp"
+#include "core/number.hpp"
 #include "core/ntt_binary.hpp"
+#include "core/reduction_montgomery.hpp"
 #include "sampling/gaussian_cdf.hpp"
 
 
@@ -37,8 +38,6 @@ template<typename U>
 class ntru_number
 {
 public:
-    using V = core::next_size_t<U>;
-
     static_assert(std::is_same<U, uint8_t>::value  ||
                   std::is_same<U, uint16_t>::value ||
                   std::is_same<U, uint32_t>::value ||
@@ -96,10 +95,11 @@ public:
     {
         U cc = 0;
         for (size_t i = 0; i < len; i++) {
-            V z;
-            z    = static_cast<V>(m[i]) * static_cast<V>(x) + cc;
-            m[i] = static_cast<U>(z) & ((U(1) << (std::numeric_limits<U>::digits - 1)) - 1);
-            cc   = static_cast<U>(z >> (std::numeric_limits<U>::digits - 1));
+            U z[2];
+            phantom::core::number<U>::umul(&z[1], &z[0], m[i], x);
+            phantom::core::number<U>::uadd(&z[1], &z[0], z[1], z[0], 0, cc);
+            m[i] = z[0] & ((U(1) << (std::numeric_limits<U>::digits - 1)) - 1);
+            cc   = (z[1] << 1)| (z[0] >> (std::numeric_limits<U>::digits - 1));
         }
         return cc;
     }
@@ -109,11 +109,13 @@ public:
     static void add_mul_small(U* x, const U* y, size_t len, const U s)
     {
         U cc = 0;
-        for (size_t u = 0; u < len; u++) {
-            V z  = static_cast<V>(y[u]) * static_cast<V>(s) +
-                    static_cast<V>(x[u]) + static_cast<V>(cc);
-            x[u] = static_cast<U>(z) & ((U(1) << (std::numeric_limits<U>::digits - 1)) - 1);
-            cc   = static_cast<U>(z >> (std::numeric_limits<U>::digits - 1));
+        for (size_t i = 0; i < len; i++) {
+            U z[2];
+            phantom::core::number<U>::umul(&z[1], &z[0], y[i], s);
+            phantom::core::number<U>::uadd(&z[1], &z[0], z[1], z[0], 0, cc);
+            phantom::core::number<U>::uadd(&z[1], &z[0], z[1], z[0], 0, x[i]);
+            x[i] = z[0] & ((U(1) << (std::numeric_limits<U>::digits - 1)) - 1);
+            cc   = (z[1] << 1)| (z[0] >> (std::numeric_limits<U>::digits - 1));
         }
         x[len] = cc;
     }
