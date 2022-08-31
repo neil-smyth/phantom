@@ -36,9 +36,9 @@ scalar_parser::scalar_parser(scalar_coding_e coding, const phantom_vector<uint8_
     uint8_t mask = (0 == (m_max & 0x07))? 0xff : (1 << (m_max & 0x07)) - 1;
     mpz<uint32_t> e;
     e.zero_init((n+3)/4);
-    e = e + static_cast<uint8_t>(secret[n - 1] & mask);
+    e = e + static_cast<uint32_t>(secret[n - 1] & mask);
     for (size_t i=1; i < n; i++) {
-        e = e.mul_2exp(8) + secret[n - i - 1];
+        e = e.mul_2exp(8) + static_cast<uint32_t>(secret[n - i - 1]);
     }
 
     // If the exponent is zero the maximum bit size is set to 0

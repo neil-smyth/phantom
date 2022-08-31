@@ -155,8 +155,8 @@ int32_t aes_decrypt::decrypt(uint8_t out[16], const uint8_t in[16])
 }  // namespace phantom
 
 
-#ifdef __clang__
+#if defined(__clang__)
 #pragma clang attribute pop
-#else
+#elif defined(__GNUG__)
 #pragma GCC reset_options
 #endif

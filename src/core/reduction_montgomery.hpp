@@ -17,14 +17,12 @@
 #include "core/reduction.hpp"
 #include "core/number.hpp"
 #include "core/bit_manipulation.hpp"
+#include "./phantom_types.hpp"
 
 
 namespace phantom {
 namespace core {
 
-#if defined(__SIZEOF_INT128__)
-using uint128_t = unsigned __int128;
-#endif
 
 /**
  * @brief A Montgomery class derived from the reducer base class
@@ -40,7 +38,28 @@ class montgomery : public reducer<T>
                     std::is_same<T, uint64_t>::value,
             "number instantiated with unsupported type");
 
-    using U = next_size_t<T>;
+
+    static inline T mul_internal(T x, T y, T q, T invq, size_t b2)
+    {
+#if defined(__GNUG__)
+        using U = next_size_t<T>;
+        U a = static_cast<U>(x) * static_cast<U>(y);
+        U b = ((a * invq) & (-static_cast<T>(1) >> (std::numeric_limits<T>::digits - b2))) * q;
+        x  = (a + b) >> b2;
+        x -= q;
+        x += q & -(x >> (std::numeric_limits<T>::digits - 1));
+#else
+        T a[2], b[2];
+        number<T>::umul(&a[1], &a[0], x, y);
+        number<T>::umul(&b[1], &b[0],
+            ((a[0] * invq) & (-static_cast<T>(1) >> (std::numeric_limits<T>::digits - b2))), q);
+        number<T>::uadd(&b[1], &b[0], a[1], a[0], b[1], b[0]);
+        x  = (b[1] << (std::numeric_limits<T>::digits - b2)) | (b[0] >> b2);
+        x -= q;
+        x += q & -(x >> (std::numeric_limits<T>::digits - 1));
+#endif
+        return x;
+    }
 
 public:
     const T m_q;        ///< The modulus
@@ -48,7 +67,7 @@ public:
     const size_t m_b2;  ///< The word size in bits
     const T m_mask;     ///< A mask where all used bits in m_b are asserted high
     const T m_R;        ///< The Montgomery parameter R = B mod q
-    const U m_R2;       ///< The Montgomery parameter R2 = B^2 mod q
+    const T m_R2;       ///< The Montgomery parameter R2 = B^2 mod q
 
 public:
     /// Class constructor
@@ -91,7 +110,7 @@ public:
     }
 
     /// Return the Montgomery R2 parameter
-    U get_R2()
+    T get_R2()
     {
         return m_R2;
     }
@@ -113,15 +132,10 @@ public:
         z = z + z;
         z += ((q - z - 1) >> (std::numeric_limits<T>::digits - 1)) * q;
 
-        // Square it five times to obtain 2^32 in Montgomery representation
-        // (i.e. 2^63 mod p).
+        // Square z log2(B) times to obtain B in Montgomery representation
         T iter = core::bit_manipulation::log2(static_cast<uint32_t>(std::numeric_limits<T>::digits));
         for (size_t i = 0; i < iter; i++) {
-            U a = static_cast<U>(z) * static_cast<U>(z);
-            U b = ((a * invq) & (-static_cast<T>(1) >> (std::numeric_limits<T>::digits - b2))) * q;
-            z  = (a + b) >> b2;
-            z -= q;
-            z += q & -(z >> (std::numeric_limits<T>::digits - 1));
+            z = mul_internal(z, z, q, invq, b2);
         }
 
         // Halve the value mod p to get 2^(2*digits - 2).
@@ -139,22 +153,10 @@ public:
         z = R;
 
         for (size_t i=0; (1U << i) <= x; i++) {
-            U a, b;
             if ((x & (1U << i)) != 0) {
-                U a, b;
-                a  = static_cast<U>(y) * static_cast<U>(z);
-                b  = ((a * invq) & (-static_cast<T>(1) >> (std::numeric_limits<T>::digits - b2))) * q;
-                a  = static_cast<T>((a + b) >> b2);
-                a -= q;
-                a += q & -(a >> (std::numeric_limits<U>::digits - 1));
-                z = static_cast<T>(a);
+                z = mul_internal(y, z, q, invq, b2);
             }
-            a  = static_cast<U>(y) * static_cast<U>(y);
-            b  = ((a * invq) & (-static_cast<T>(1) >> (std::numeric_limits<T>::digits - b2))) * q;
-            a  = static_cast<T>((a + b) >> b2);
-            a -= q;
-            a += q & -(a >> (std::numeric_limits<U>::digits - 1));
-            y = static_cast<T>(a);
+            y = mul_internal(y, y, q, invq, b2);
         }
 
         return z;
@@ -177,7 +179,9 @@ class reduction_montgomery : public reduction<reduction_montgomery<T>, T>
                   std::is_same<T, uint64_t>::value,
                   "number instantiated with unsupported type");
 
+#if defined(__GNUG__)
     using U = next_size_t<T>;
+#endif
 
 public:
     explicit reduction_montgomery(const reducer<T>& r) : reduction<reduction_montgomery<T>, T>(r) {}
@@ -222,20 +226,36 @@ public:
     static T static_reduce(const reducer<T>& r, T x)
     {
         const montgomery<T>& mont = static_cast<const montgomery<T>&>(r);
+#if defined(__GNUG__)
         U d = x - mont.m_q;
         d += mont.m_q & -(d >> (std::numeric_limits<U>::digits - 1));
         return static_cast<T>(d);
+#else
+        T d[2];
+        number<T>::usub(&d[1], &d[0], 0, x, 0, mont.m_q);
+        d[0] += mont.m_q & -(d[1] >> (std::numeric_limits<T>::digits-1));
+        return d[0];
+#endif
     }
 
     /// Multiply two variables and apply reduction
     static T static_mul(const reducer<T>& r, T x, T y)
     {
         const montgomery<T>& mont = static_cast<const montgomery<T>&>(r);
+#if defined(__GNUG__)
         U z, w;
         T d;
         z  = static_cast<U>(x) * static_cast<U>(y);
         w  = ((z * mont.m_invq) & mont.m_mask) * static_cast<U>(mont.m_q);
         d  = static_cast<T>((z + w) >> mont.m_b2);
+#else
+        T d, z[2], w[2];
+        number<T>::umul(&z[1], &z[0], x, y);
+        w[0] = z[0] * mont.m_invq;
+        number<T>::umul(&w[1], &w[0], w[0] & mont.m_mask, mont.m_q);
+        number<T>::uadd(&z[1], &z[0], z[1], z[0], w[1], w[0]);
+        d = (z[1] << (std::numeric_limits<T>::digits - mont.m_b2)) | (z[0] >> mont.m_b2);
+#endif
         d -= mont.m_q;
         d += mont.m_q & -(d >> (std::numeric_limits<T>::digits - 1));
         return d;
@@ -244,15 +264,7 @@ public:
     /// Square a variable and apply reduction
     static T static_sqr(const reducer<T>& r, T x)
     {
-        const montgomery<T>& mont = static_cast<const montgomery<T>&>(r);
-        U z, w;
-        T d;
-        z  = static_cast<U>(x) * static_cast<U>(x);
-        w  = ((z * mont.m_invq) & mont.m_mask) * static_cast<U>(mont.m_q);
-        d  = static_cast<T>((z + w) >> mont.m_b2);
-        d -= mont.m_q;
-        d += mont.m_q & -(d >> (std::numeric_limits<T>::digits - 1));
-        return d;
+        return static_mul(r, x, x);
     }
 
     /// Divide x by y, returning the result in the Montgomery domain
@@ -349,10 +361,18 @@ public:
     static T static_lshift1(const reducer<T>& r, T a)
     {
         const montgomery<T>& mont = static_cast<const montgomery<T>&>(r);
+#if defined(__GNUG__)
         U b = static_cast<U>(a) << 1;
         U d = static_cast<U>(mont.m_q) - b;
         b -= mont.m_q & -(d >> (std::numeric_limits<U>::digits - 1));
         return b;
+#else
+        T b[2], d[2];
+        number<T>::uadd(&b[1], &b[0], 0, a, 0, a);
+        number<T>::usub(&d[1], &d[0], 0, mont.m_q, b[1], b[0]);
+        b[0] -= mont.m_q & -(d[1] >> (std::numeric_limits<T>::digits-1));
+        return b[0];
+#endif
     }
 
     /// x^e using square-and-multiply and Montgomery reduction

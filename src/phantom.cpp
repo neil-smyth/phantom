@@ -46,7 +46,7 @@ namespace phantom {
 #define COMPILER_VERSION "GNU C++ " COMPILER_VERSION_STRING(__GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__)
 #else
 #ifdef _MSC_VER
-#define COMPILER_VERSION "Microsoft Visual C++ (MSVC) " _MSC_FULL_VER
+#define COMPILER_VERSION "Microsoft Visual C++ (MSVC) " STRINGIFY(_MSC_FULL_VER)
 #else
 #define COMPILER_VERSION "Unknown compiler"
 #endif

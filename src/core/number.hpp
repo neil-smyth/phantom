@@ -39,7 +39,7 @@ public:
 
     static void umul_internal(uint8_t * _RESTRICT_ hi, uint8_t * _RESTRICT_ lo, uint8_t u, uint8_t v);
 
-#if !defined(__x86_64)
+#if !defined(__x86_64) && !defined(_IA64) && !defined(__aarch64__) && !defined(_WIN64)
     static void umul32(uint32_t * _RESTRICT_ hi, uint32_t * _RESTRICT_ lo, uint32_t u, uint32_t v);
 #endif
 
@@ -80,7 +80,6 @@ class number
                   "number instantiated with unsupported type");
 
     using V = half_size_t<U>;
-    using D = next_size_t<U>;
     using S = signed_type_t<U>;
 
 public:
@@ -458,7 +457,7 @@ public:
     // Compute invx = floor((B^3 - 1)/(Bx1 + x0)) - B
     static U uinverse_3by2(U ph, U pl)
     {
-        D mh, ml, qh, ql;
+        U mh, ml, qh, ql;
         U prod, rem, m;
         size_t u_digits_div2 = std::numeric_limits<U>::digits/2;
 
@@ -468,7 +467,8 @@ public:
         ml   = ph & U((U(1) << u_digits_div2) - 1);
 
         // Approximate the high half of the quotient
-        qh   = (~ph / mh) & U((U(1) << u_digits_div2) - 1);
+        udiv_qrnnd(&qh, &ql, 0, ~ph, mh);
+        qh   = qh & U((U(1) << u_digits_div2) - 1);
 
         // Get the upper half-limb 3/2 inverse
         //  qh  = floor((b^3 - 1) / (b*mh + ml)) - b

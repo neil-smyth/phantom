@@ -175,7 +175,7 @@ void fpe::encrypt_float(std::unique_ptr<fpe_ctx>& ctx, phantom_vector<double>& i
         ss << std::fixed << std::setprecision(precision) << inout[i];
         std::string inout_str = ss.str();
 
-        assert((range + precision + 1) >= inout_str.size());
+        assert((range + precision + 1) >= static_cast<int>(inout_str.size()));
         inout_str.insert(0, (range + precision + 1) - inout_str.size(), '0');
         encrypt_str(ctx, inout_str);
         inout[i] = std::stod(inout_str);
@@ -329,7 +329,7 @@ void fpe::decrypt_float(std::unique_ptr<fpe_ctx>& ctx,
         ss << std::fixed << std::setprecision(precision) << inout[i];
         std::string s = ss.str();
 
-        assert((range + precision + 1) >= s.size());
+        assert((range + precision + 1) >= static_cast<int>(s.size()));
         s.insert(0, (range + precision + 1) - s.size(), '0');
         decrypt_str(ctx, s);
         inout[i] = std::stod(s);

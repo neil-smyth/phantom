@@ -15,6 +15,7 @@
 #include <vector>
 
 #include "./phantom_memory.hpp"
+#include "./phantom_types.hpp"
 
 
 namespace phantom {
@@ -425,8 +426,8 @@ private:
 
         T inv3 = 43691, inv9 = 36409, inv15 = 61167;
 
-        alignas(DEFAULT_MEM_ALIGNMENT) T scratch[7*N_SB + 7*N_SB + 7*N_SB_RES];
-        T *aw1 = scratch;
+        phantom_vector<T> scratch(7*N_SB + 7*N_SB + 7*N_SB_RES);
+        T *aw1 = scratch.data();
         T *aw2 = aw1 + N_SB;
         T *aw3 = aw2 + N_SB;
         T *aw4 = aw3 + N_SB;

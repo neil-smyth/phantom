@@ -29,8 +29,6 @@ class reducer
                   std::is_same<T, uint64_t>::value,
                   "number instantiated with unsupported type");
 
-    using U = next_size_t<T>;
-
 public:
     virtual ~reducer() {}
     virtual T get_q() const = 0;
@@ -47,8 +45,6 @@ public:
 template<class C, typename T>
 class reduction
 {
-    using U = next_size_t<T>;
-
     static_assert(std::is_same<T, uint8_t>::value  ||
                   std::is_same<T, uint16_t>::value ||
                   std::is_same<T, uint32_t>::value ||

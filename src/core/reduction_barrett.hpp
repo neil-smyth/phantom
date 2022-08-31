@@ -15,12 +15,19 @@
 #include <limits>
 #include <iostream>
 
-#include "core/reduction.hpp"
 #include "core/bit_manipulation.hpp"
+#include "core/number.hpp"
+#include "core/reduction.hpp"
+#include "./phantom_types.hpp"
 
 
 namespace phantom {
 namespace core {
+
+
+template<typename T>
+class mpbase;
+
 
 /**
  * @brief Low-level Barrett reduction using floating point arithmetic
@@ -36,8 +43,6 @@ class barrett_fp : public reducer<T>
                   std::is_same<T, uint32_t>::value ||
                   std::is_same<T, uint64_t>::value,
                   "number instantiated with unsupported type");
-
-    using U = next_size_t<T>;
 
 public:
     const T m_q;
@@ -80,8 +85,6 @@ class reduction_barrett : public reduction<reduction_barrett<T>, T>
                   std::is_same<T, uint32_t>::value ||
                   std::is_same<T, uint64_t>::value,
                   "number instantiated with unsupported type");
-
-    using U = next_size_t<T>;
 
 public:
     explicit reduction_barrett(const reducer<T>& r) : reduction<reduction_barrett<T>, T>(r) {}
@@ -132,25 +135,36 @@ public:
     {
         const barrett_fp<T>& fp = static_cast<const barrett_fp<T>&>(r);
         float t = static_cast<float>(x) * fp.m_inv_q;
-        return x - fp.m_q * static_cast<U>(t);
+        T p[2];
+        number<T>::umul(&p[1], &p[0], fp.m_q, static_cast<T>(t));
+        number<T>::usub(&p[1], &p[0], 0, x, p[1], p[0]);
+        return p[0];
     }
 
     /// Multiplication of two words with Barrett reduction
     static T static_mul(const reducer<T>& r, T x, T y)
     {
         const barrett_fp<T>& fp = static_cast<const barrett_fp<T>&>(r);
-        U p = static_cast<U>(x) * static_cast<U>(y);
-        float t = static_cast<float>(p) * fp.m_inv_q;
-        return p - fp.m_q * static_cast<U>(t);
+        T p[2], q[2];
+        number<T>::umul(&p[1], &p[0], x, y);
+        float t = (static_cast<float>(p[1]) * static_cast<float>(1 << std::numeric_limits<T>::digits) +
+                   static_cast<float>(p[0])) * fp.m_inv_q;
+        number<T>::umul(&q[1], &q[0], fp.m_q, static_cast<T>(t));
+        number<T>::usub(&p[1], &p[0], p[1], p[0], q[1], q[0]);
+        return p[0];
     }
 
     /// Squaring of a word with Barrett reduction
     static T static_sqr(const reducer<T>& r, T x)
     {
         const barrett_fp<T>& fp = static_cast<const barrett_fp<T>&>(r);
-        U p = static_cast<U>(x) * static_cast<U>(x);
-        float t = static_cast<float>(p) * fp.m_inv_q;
-        return p - fp.m_q * static_cast<U>(t);
+        T p[2], q[2];
+        number<T>::umul(&p[1], &p[0], x, x);
+        float t = (static_cast<float>(p[1]) * static_cast<float>(1 << std::numeric_limits<T>::digits) +
+                   static_cast<float>(p[0])) * fp.m_inv_q;
+        number<T>::umul(&q[1], &q[0], fp.m_q, static_cast<T>(t));
+        number<T>::usub(&p[1], &p[0], p[1], p[0], q[1], q[0]);
+        return p[0];
     }
 
     /// Division with Barrett reduction
@@ -264,18 +278,21 @@ public:
     static T static_add(const reducer<T>& r, T a, T b)
     {
         const barrett_fp<T>& fp = static_cast<const barrett_fp<T>&>(r);
-        U d = static_cast<U>(a) + static_cast<U>(b) - static_cast<U>(fp.m_q);
-        d += fp.m_q & -(d >> (std::numeric_limits<U>::digits-1));
-        return d;
+        T d[2];
+        number<T>::uadd(&d[1], &d[0], 0, a, 0, b);
+        number<T>::usub(&d[1], &d[0], d[1], d[0], 0, fp.m_q);
+        d[0] += fp.m_q & -(d[1] >> (std::numeric_limits<T>::digits-1));
+        return d[0];
     }
 
     /// Subtraction of two words with Barrett reduction
     static T static_sub(const reducer<T>& r, T a, T b)
     {
         const barrett_fp<T>& fp = static_cast<const barrett_fp<T>&>(r);
-        U d = static_cast<U>(a) - static_cast<U>(b);
-        d += fp.m_q & -(d >> (std::numeric_limits<U>::digits-1));
-        return d;
+        T d[2];
+        number<T>::usub(&d[1], &d[0], 0, a, 0, b);
+        d[0] += fp.m_q & -(d[1] >> (std::numeric_limits<T>::digits-1));
+        return d[0];
     }
 
     /// Negation modulo q
@@ -297,10 +314,11 @@ public:
     static T static_lshift1(const reducer<T>& r, T a)
     {
         const barrett_fp<T>& fp = static_cast<const barrett_fp<T>&>(r);
-        U b = static_cast<U>(a) << 1;
-        U d = static_cast<U>(fp.m_q) - b;
-        b -= fp.m_q & -(d >> (std::numeric_limits<U>::digits-1));
-        return b;
+        T b[2], d[2];
+        number<T>::uadd(&b[1], &b[0], 0, a, 0, a);
+        number<T>::usub(&d[1], &d[0], 0, fp.m_q, b[1], b[0]);
+        b[0] -= fp.m_q & -(d[1] >> (std::numeric_limits<T>::digits-1));
+        return b[0];
     }
 
     /// x^e using square-and-multiply and Barrett reduction

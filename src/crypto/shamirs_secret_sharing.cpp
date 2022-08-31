@@ -30,14 +30,14 @@ shamirs_secret_sharing::~shamirs_secret_sharing()
 
 // Create key shares of the given key for a quorum of n users and k key shares
 // required to reconstruct the key
-int32_t shamirs_secret_sharing::create(phantom_vector<uint8_t>* shares,
+int32_t shamirs_secret_sharing::create(phantom_vector<phantom_vector<uint8_t>>& shares,
     const uint8_t* key, size_t n, size_t k)
 {
     assert(n != 0);
     assert(k != 0);
     assert(k <= n);
 
-    if (nullptr == shares) {
+    if (shares.size() != n) {
         return EXIT_FAILURE;
     }
     if (nullptr == key) {
@@ -85,40 +85,45 @@ int32_t shamirs_secret_sharing::create(phantom_vector<uint8_t>* shares,
 
 // Restore the k key shares and write the result to key.
 int32_t shamirs_secret_sharing::combine(uint8_t key[key_bytes],
-    const phantom_vector<uint8_t>* shares, size_t k)
+    const phantom_vector<phantom_vector<uint8_t>> &shares, size_t k)
 {
     if (0 == k) {
         return EXIT_FAILURE;
     }
 
-    uint32_t xs[k][key_words], ys[k][key_words];
-    uint32_t num[key_words], denom[key_words], tmp[key_words];
-    uint32_t secret[key_words] = {0};
+    phantom_vector<phantom_vector<uint32_t>> xs(k, phantom_vector<uint32_t>(key_words));
+    phantom_vector<phantom_vector<uint32_t>> ys(k, phantom_vector<uint32_t>(key_words));
+
+    phantom_vector<uint32_t> scratch(4 * key_words);
+    uint32_t *num = scratch.data();
+    uint32_t *denom = num + key_words;
+    uint32_t *tmp = denom + key_words;
+    uint32_t *secret = tmp + key_words;  // Will be initialized to zero
 
     // Collect the x and y values
     for (size_t i=0; i < k; i++) {
-        bitslice_single(xs[i], shares[i][0]);
-        bitslice(ys[i], &shares[i][1]);
+        bitslice_single(xs[i].data(), shares[i][0]);
+        bitslice(ys[i].data(), &shares[i][1]);
     }
 
     // Use Lagrange basis polynomials to calculate the secret coefficient
     for (size_t i=0; i < k; i++) {
-        memset(num, 0, sizeof(num));
-        memset(denom, 0, sizeof(denom));
+        memset(num, 0, sizeof(uint32_t) * key_words);
+        memset(denom, 0, sizeof(uint32_t) * key_words);
         num[0] = ~0;
         denom[0] = ~0;
         for (size_t j=0; j < k; j++) {
             if (i == j) continue;
-            core::gf256<uint32_t>::mul(num, num, xs[j]);
+            core::gf256<uint32_t>::mul(num, num, xs[j].data());
             for (size_t t=0; t < key_words; t++) {
                 tmp[t] = xs[i][t];
             }
-            core::gf256<uint32_t>::add(tmp, xs[j]);
+            core::gf256<uint32_t>::add(tmp, xs[j].data());
             core::gf256<uint32_t>::mul(denom, denom, tmp);
         }
         core::gf256<uint32_t>::inv(tmp, denom);       // inverted denominator
         core::gf256<uint32_t>::mul(num, num, tmp);    // basis polynomial
-        core::gf256<uint32_t>::mul(num, num, ys[i]);  // scaled coefficient
+        core::gf256<uint32_t>::mul(num, num, ys[i].data());  // scaled coefficient
         core::gf256<uint32_t>::add(secret, num);
     }
     unbitslice(key, secret);

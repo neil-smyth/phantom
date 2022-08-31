@@ -10,6 +10,7 @@
 #include "core/mpbase.hpp"
 
 #include <algorithm>
+#include <functional>
 #include <limits>
 
 
@@ -277,17 +278,11 @@ int32_t mpbase<T>::cmp_n(const T *in1, size_t n1, const T *in2, size_t n2)
 template<typename T>
 void mpbase<T>::incr_u(const T* p, T incr)
 {
-    T v;
     T* ptr = const_cast<T*>(p);
-    if (__builtin_constant_p(incr) && incr == 1) {
-        while (++(*ptr++) == 0) {}        // Increment array 'p' with carry propagation
-    }
-    else {
-        v = *ptr + incr;                  // Add 'incr'
-        *ptr = v;                         // Set the array value leats significant word
-        if (v < incr) {                   // Check if we need to propagate a carry bit
-            while (++(*(++ptr)) == 0) {}  // Carry propagation
-        }
+    T v = *ptr + incr;                // Add 'incr'
+    *ptr = v;                         // Set the array value leats significant word
+    if (v < incr) {                   // Check if we need to propagate a carry bit
+        while (++(*(++ptr)) == 0) {}  // Carry propagation
     }
 }
 
@@ -299,17 +294,11 @@ void mpbase<T>::incr_u(const T* p, T incr)
 template<typename T>
 void mpbase<T>::decr_u(const T* p, T decr)
 {
-    T v;
     T* ptr = const_cast<T*>(p);
-    if (__builtin_constant_p(decr) && decr == 1) {
-        while (++(*ptr--) == 0) {}        // Decrement array 'p' with carry propagation
-    }
-    else {
-        v = *ptr;
-        *ptr = v - decr;                  // Subtract 'decr'
-        if (v < decr) {                   // Check if we need to propagate a carry bit
-            while (++(*(++ptr)) == 0) {}  // Carry propagation
-        }
+    T v = *ptr;
+    *ptr = v - decr;                  // Subtract 'decr'
+    if (v < decr) {                   // Check if we need to propagate a carry bit
+        while (++(*(++ptr)) == 0) {}  // Carry propagation
     }
 }
 

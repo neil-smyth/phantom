@@ -31,8 +31,10 @@ if (NOT DEFINED CMAKE_TOOLCHAIN_FILE)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
     elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
         # Using Intel C++
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
     elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
         # Using Visual Studio C++
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -W4 -DNOMINMAX")
     endif ()
 endif ()
 
@@ -316,11 +318,15 @@ set(libsrc_shared ${libsrc})
 if (REQUIRE_PKC_LIBS)
     set(libsrc_static ${libsrc_static}
         $<TARGET_OBJECTS:ecc_obj>
+        $<TARGET_OBJECTS:core_obj>
+        $<TARGET_OBJECTS:rsa_obj>
         $<TARGET_OBJECTS:ntru_obj>
         $<TARGET_OBJECTS:sampling_obj>
         $<TARGET_OBJECTS:fft_obj>)
     set(libsrc_shared ${libsrc_shared}
         $<TARGET_OBJECTS:ecc_shared_obj>
+        $<TARGET_OBJECTS:core_shared_obj>
+        $<TARGET_OBJECTS:rsa_shared_obj>
         $<TARGET_OBJECTS:ntru_shared_obj>
         $<TARGET_OBJECTS:sampling_shared_obj>
         $<TARGET_OBJECTS:fft_shared_obj>)
@@ -333,10 +339,8 @@ if (BUILD_STATIC_LIBS)
     add_library(phantom_static STATIC
                 ${libsrc_static}
                 $<TARGET_OBJECTS:logging_obj>
-                $<TARGET_OBJECTS:core_obj>
                 $<TARGET_OBJECTS:crypto_obj>
                 $<TARGET_OBJECTS:packing_obj>
-                $<TARGET_OBJECTS:rsa_obj>
                 $<TARGET_OBJECTS:schemes_obj>)
     set_target_properties(phantom_static PROPERTIES
         OUTPUT_NAME phantom_static
@@ -351,10 +355,8 @@ if (BUILD_SHARED_LIBS)
     add_library(phantom_shared SHARED
                 ${libsrc_shared}
                 $<TARGET_OBJECTS:logging_shared_obj>
-                $<TARGET_OBJECTS:core_shared_obj>
                 $<TARGET_OBJECTS:crypto_shared_obj>
                 $<TARGET_OBJECTS:packing_shared_obj>
-                $<TARGET_OBJECTS:rsa_shared_obj>
                 $<TARGET_OBJECTS:schemes_shared_obj>)
     set_property(TARGET phantom_shared PROPERTY POSITION_INDEPENDENT_CODE 1)
     set_target_properties(phantom_shared PROPERTIES

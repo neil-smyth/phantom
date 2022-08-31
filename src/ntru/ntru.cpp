@@ -163,7 +163,7 @@ bool ntru::solve(const int32_t* f, const int32_t* g, int32_t* F, int32_t* G)
 bool ntru::gen_public(int32_t *h, uint32_t* h_ntt, const int32_t *f, const int32_t *g)
 {
     const size_t n = 1 << m_logn;
-    alignas(32) uint32_t t[n];
+    phantom_vector<uint32_t> t(n);
     uint32_t* uh = reinterpret_cast<uint32_t*>(h);
 
     // Obtain NTT(f) and NTT(g)
@@ -175,7 +175,7 @@ bool ntru::gen_public(int32_t *h, uint32_t* h_ntt, const int32_t *f, const int32
         t[i]  = m_reduction->convert_to(temp);
     }
     m_ntt->fwd(uh, m_logn);
-    m_ntt->fwd(t, m_logn);
+    m_ntt->fwd(t.data(), m_logn);
 
     // Attempt to invert NTT(f)
     if (!m_ntt->inverse(uh)) {
@@ -183,7 +183,7 @@ bool ntru::gen_public(int32_t *h, uint32_t* h_ntt, const int32_t *f, const int32
     }
 
     // h = g/f and f is invertible, so calculate public key
-    m_ntt->mul(uh, uh, t);
+    m_ntt->mul(uh, uh, t.data());
     for (size_t i = 0; i < n; i++) {
         h_ntt[i] = uh[i];
     }

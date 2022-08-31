@@ -41,7 +41,7 @@ const lest::test specification[] =
         cfg.mod.mod_bits = 163;
         cfg.mod.blog2 = 32;
         cfg.mod.reduction = reduction_e::REDUCTION_BARRETT;
-        cfg.a_is_1 = false;
+        cfg.a_is_1 = true;
 
         mp_gf2n<uint32_t> x("3F0EBA16286A2D57EA0991168D4994637E8343E36", p163, 16);
         mp_gf2n<uint32_t> y("D51FBC6C71A0094FA2CDD545B11C5C0C797324F1", p163, 16);
@@ -64,7 +64,7 @@ const lest::test specification[] =
         cfg.mod.mod_bits = 163;
         cfg.mod.blog2 = 32;
         cfg.mod.reduction = reduction_e::REDUCTION_BARRETT;
-        cfg.a_is_1 = false;
+        cfg.a_is_1 = true;
 
         mp_gf2n<uint32_t> x("3F0EBA16286A2D57EA0991168D4994637E8343E36", p163, 16);
         mp_gf2n<uint32_t> y("D51FBC6C71A0094FA2CDD545B11C5C0C797324F1", p163, 16);
@@ -88,7 +88,7 @@ const lest::test specification[] =
         cfg.mod.mod_bits = 163;
         cfg.mod.blog2 = 32;
         cfg.mod.reduction = reduction_e::REDUCTION_BARRETT;
-        cfg.a_is_1 = false;
+        cfg.a_is_1 = true;
 
         mp_gf2n<uint32_t> x("3F0EBA16286A2D57EA0991168D4994637E8343E36", p163, 16);
         mp_gf2n<uint32_t> y("D51FBC6C71A0094FA2CDD545B11C5C0C797324F1", p163, 16);
@@ -113,7 +113,7 @@ const lest::test specification[] =
         cfg.mod.mod_bits = 163;
         cfg.mod.blog2 = 32;
         cfg.mod.reduction = reduction_e::REDUCTION_BARRETT;
-        cfg.a_is_1 = false;
+        cfg.a_is_1 = true;
 
         mp_gf2n<uint32_t> x("3F0EBA16286A2D57EA0991168D4994637E8343E36", p163, 16);
         mp_gf2n<uint32_t> y("D51FBC6C71A0094FA2CDD545B11C5C0C797324F1", p163, 16);
@@ -137,7 +137,7 @@ const lest::test specification[] =
         cfg.mod.mod_bits = 163;
         cfg.mod.blog2 = 32;
         cfg.mod.reduction = reduction_e::REDUCTION_BARRETT;
-        cfg.a_is_1 = false;
+        cfg.a_is_1 = true;
 
         mp_gf2n<uint32_t> x("3F0EBA16286A2D57EA0991168D4994637E8343E36", p163, 16);
         mp_gf2n<uint32_t> y("D51FBC6C71A0094FA2CDD545B11C5C0C797324F1", p163, 16);
@@ -163,7 +163,7 @@ const lest::test specification[] =
         cfg.mod.mod_bits = 163;
         cfg.mod.blog2 = 32;
         cfg.mod.reduction = reduction_e::REDUCTION_BARRETT;
-        cfg.a_is_1 = false;
+        cfg.a_is_1 = true;
 
         mp_gf2n<uint32_t> x("3F0EBA16286A2D57EA0991168D4994637E8343E36", p163, 16);
         mp_gf2n<uint32_t> y("D51FBC6C71A0094FA2CDD545B11C5C0C797324F1", p163, 16);

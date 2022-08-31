@@ -13,18 +13,11 @@
 #include <cmath>
 #include <limits>
 #include <vector>
+#include "./phantom_types.hpp"
 
 
 namespace phantom {
 namespace core {
-
-#if defined(__SIZEOF_INT128__)
-// Define 128-bit integer types as per stdint naming convention if compiler supported
-/// @{
-using uint128_t = unsigned __int128;
-using int128_t  = __int128;
-/// @}
-#endif
 
 
 /// A template method to swap pointers

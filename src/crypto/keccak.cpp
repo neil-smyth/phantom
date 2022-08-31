@@ -8,7 +8,6 @@
  *****************************************************************************/
 
 #include "crypto/keccak.hpp"
-#include <byteswap.h>
 #include "./phantom_memory.hpp"
 
 

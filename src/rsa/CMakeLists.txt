@@ -10,6 +10,7 @@ include_directories(
 # list of source files
 set(libsrc
     ${PROJECT_SOURCE_DIR}/ctx_rsa.hpp /
+    ${PROJECT_SOURCE_DIR}/rsa_cryptosystem.cpp /
     ${PROJECT_SOURCE_DIR}/rsa_cryptosystem.hpp /
     ${PROJECT_SOURCE_DIR}/rsa_cryptosystem_oaep.hpp /
     ${PROJECT_SOURCE_DIR}/rsa_cryptosystem_rsassa_pss.hpp

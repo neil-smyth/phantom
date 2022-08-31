@@ -277,7 +277,8 @@ public:
 
             if (config.a_is_minus_3) {
                 m_u2.set(m_z).square_mod(config.mod);
-                a.set(m_x).add_mod(m_u2, config.mod).mul_mod(m_x.sub_mod(m_u2, config.mod), config.mod);
+                a.set(m_x).add_mod(m_u2, config.mod);
+                a.mul_mod(m_x.sub_mod(m_u2, config.mod), config.mod);
                 m_u1.set(a).add_mod(a, config.mod).add_mod(a, config.mod);
             }
             else {
@@ -296,7 +297,10 @@ public:
             m_w.add_mod(m_w, config.mod);
             m_w.add_mod(m_w, config.mod);
             m_w.add_mod(m_w, config.mod);
-            m_y.swap(m_v1.sub_mod(m_x, config.mod).mul_mod(m_u1, config.mod).sub_mod(m_w, config.mod));
+            m_v1.sub_mod(m_x, config.mod);
+            m_v1.mul_mod(m_u1, config.mod);
+            m_v1.sub_mod(m_w, config.mod);
+            m_y.swap(m_v1);
         } while (--w);
 
         return POINT_OK;

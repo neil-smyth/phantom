@@ -145,8 +145,9 @@ void kyber_indcpa::create_rand_product(
     const size_t n = 1 << logn;
 
     uint16_t *yu = reinterpret_cast<uint16_t*>(y);
-    alignas(DEFAULT_MEM_ALIGNMENT) uint16_t block[n];
-    alignas(DEFAULT_MEM_ALIGNMENT) uint16_t c[n];
+    phantom_vector<uint16_t> scratch(2 * n);
+    uint16_t *block = scratch.data();
+    uint16_t *c     = block + n;
 
     for (size_t i = 0; i < k*n; i++) {
         int16_t tmp = y[i];

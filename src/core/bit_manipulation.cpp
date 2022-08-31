@@ -82,10 +82,13 @@ uint64_t bit_manipulation::clz(uint64_t x)
     if (0ULL == x) {
         return 64;
     }
-#if defined (__x86_64)
+#if defined (__x86_64) && defined(__GNUC__)
     uint64_t n;
     __asm__("bsrq %1,%0" : "=r" (n) : "rm" (x));
     return n ^ 63;
+#else
+#if defined(_M_AMD64) && defined(_MSC_VER)
+    return __lzcnt64(x);
 #else
     uint64_t n = 0ULL;
     if (x <= 0x00000000ffffffff) n += 32, x <<= 32;
@@ -95,6 +98,7 @@ uint64_t bit_manipulation::clz(uint64_t x)
     if (x <= 0x3fffffffffffffff) n +=  2, x <<= 2;
     if (x <= 0x7fffffffffffffff) n +=  1;
     return n;
+#endif
 #endif
 }
 
@@ -147,10 +151,20 @@ uint64_t bit_manipulation::ctz(uint64_t x)
         return 64;
     }
 
-#if defined (__x86_64)
+#if defined (__x86_64) || defined(__GNUC__)
     uint64_t c;
     __asm__("bsfq %1,%q0" : "=r" (c) : "rm" (x));
     return c;
+#else
+#if defined(_M_AMD64) && defined(_MSC_VER)
+    unsigned long c = 0;  // NOLINT
+
+    if (_BitScanForward64(&c, x)) {
+        return c;
+    }
+    else {
+        return 32;
+    }
 #else
     uint64_t c = 64;
     x &= -static_cast<int64_t>(x);
@@ -162,6 +176,7 @@ uint64_t bit_manipulation::ctz(uint64_t x)
     if (x & 0x3333333333333333) c -= 2;
     if (x & 0x5555555555555555) c -= 1;
     return c;
+#endif
 #endif
 }
 

@@ -312,16 +312,16 @@ void dilithium::h_function(int32_t *c, const uint8_t *mu, const uint8_t *w1, siz
 {
     const size_t weight_of_c = m_params[m_set].weight_of_c;
     const size_t num_weight_bytes = (weight_of_c + 7) >> 3;
-    alignas(DEFAULT_MEM_ALIGNMENT) uint8_t signs[num_weight_bytes + weight_of_c];
+    phantom_vector<uint8_t> signs(num_weight_bytes + weight_of_c);
 
     m_xof->init(16);
     m_xof->absorb(mu, 48);
     m_xof->absorb(w1, k*n);
     m_xof->final();
-    m_xof->squeeze(signs, num_weight_bytes + weight_of_c);
+    m_xof->squeeze(signs.data(), num_weight_bytes + weight_of_c);
 
     // Generate the output coefficients for the spare polynomial
-    oracle(n, weight_of_c, c, num_weight_bytes, signs);
+    oracle(n, weight_of_c, c, num_weight_bytes, signs.data());
 }
 
 void dilithium::collision_resistant_hash_t1(const uint8_t *rho, const int32_t *t1,

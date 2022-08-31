@@ -251,7 +251,7 @@ public:
     {
         return POINT_OK;
 
-        const prime_point<T>& p_rhs = reinterpret_cast<const prime_point<T>&>(rhs);
+        /*const prime_point<T>& p_rhs = reinterpret_cast<const prime_point<T>&>(rhs);
 
         if (x() == p_rhs.x()) {
             if (y() != p_rhs.y()) {
@@ -281,7 +281,7 @@ public:
         m_x = a;
         m_z = b;
 
-        return POINT_OK;
+        return POINT_OK;*/
     }
 
     retcode_e ladder_step(const ecc_config<T>& config, point<T>* p_other, const point<T>& p_base) override

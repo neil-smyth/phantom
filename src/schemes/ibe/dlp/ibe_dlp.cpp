@@ -143,7 +143,7 @@ restart:
 
     // Calculate the GramSchmidt norm
     double gs_norm = ntru::ntru_master_tree::gram_schmidt_norm(f, g, q, logn, bd, thresh);
-    if (isnanl(gs_norm)) {
+    if (std::isnan(gs_norm)) {
         num_retries++;
         goto restart;
     }
