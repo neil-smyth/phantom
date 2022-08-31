@@ -55,7 +55,7 @@ public:
 
         // Reduction occurs in-place in r, so copy the contents of a into r if required
         if (a != r) {
-            size_t used = mpbase<T>::normalized_size(a.data(), a.size());
+            int used = static_cast<int>(mpbase<T>::normalized_size(a.data(), a.size()));
             r.resize(used);
 
             for (j = 0; j < used; j++) {
