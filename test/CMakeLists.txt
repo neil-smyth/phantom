@@ -152,6 +152,9 @@ if (ENABLE_KEY_EXCHANGE_ECDH)
     add_executable(unit_weierstrass_prime_projective unit/unit_weierstrass_prime_projective.cpp) 
     target_link_libraries(unit_weierstrass_prime_projective phantom_static)
 
+    add_executable(unit_weierstrass_prime_jacobian unit/unit_weierstrass_prime_jacobian.cpp) 
+    target_link_libraries(unit_weierstrass_prime_jacobian phantom_static)
+
     add_executable(unit_weierstrass_binary_affine unit/unit_weierstrass_binary_affine.cpp) 
     target_link_libraries(unit_weierstrass_binary_affine phantom_static)
 
@@ -191,6 +194,7 @@ if (ENABLE_KEY_EXCHANGE_ECDH)
     add_test(UNIT_WEIERSTRASS_PRIME_AFFINE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/unit_weierstrass_prime_affine)
     add_test(UNIT_WEIERSTRASS_BINARY_AFFINE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/unit_weierstrass_binary_affine)
     add_test(UNIT_WEIERSTRASS_PRIME_PROJECTIVE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/unit_weierstrass_prime_projective)
+    add_test(UNIT_WEIERSTRASS_PRIME_JACOBIAN ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/unit_weierstrass_prime_jacobian)
     add_test(UNIT_WEIERSTRASS_BINARY_PROJECTIVE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/unit_weierstrass_binary_projective)
     add_test(UNIT_WEIERSTRASS_BINARY_JACOBIAN ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/unit_weierstrass_binary_jacobian)
     add_test(UNIT_MONTGOMERY_PRIME_AFFINE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/unit_montgomery_prime_affine)

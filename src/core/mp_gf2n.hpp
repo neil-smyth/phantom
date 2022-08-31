@@ -209,7 +209,7 @@ public:
             return;
         }
 
-        for (int i = modulus.size() - 1; i >= 0; i--) {
+        for (int i = static_cast<int>(modulus.size()) - 1; i >= 0; i--) {
             if (!modulus[i]) {
                 continue;
             }
@@ -282,7 +282,7 @@ public:
 
         bytes.resize(n);
 
-        T mask = num_bytes - 1;
+        T mask = static_cast<T>(num_bytes) - 1;
         T w = 0;
         for (size_t i=0; i < n; i++) {
             if (0 == (i & mask)) {
@@ -650,7 +650,6 @@ public:
 
         // Compare the two multiple precision signed limb arrays
         if (in1_used >= 0) {
-            auto in_limbs = const_cast<phantom_vector<T>&>(in.get_limbs());
             return mpbase<T>::cmp(m_poly.data(), in_limbs.data(), in1_used);
         }
         else {
@@ -804,7 +803,7 @@ public:
             return;
         }
 
-        int in_used = in1.size();
+        int in_used = static_cast<int>(in1.size());
         if (0 == in_used || (bits >= (in_used * std::numeric_limits<T>::digits))) {
             out.resize(0);
             return;

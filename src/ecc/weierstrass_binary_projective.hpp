@@ -187,7 +187,8 @@ public:
                 e.set(b).square().add(m_temp.set(b).mul(c)).add(d);
             }
             else {
-                e.set(b).square().add(m_temp.set(b).mul(c)).add(m_temp.set(constant_a).mul(d));
+                e.set(b).square().add(m_temp.set(b).mul(c));
+                e.add(m_temp.set(constant_a).mul(d));
             }
 
             m_x.set(c).mul(e);
@@ -222,20 +223,23 @@ public:
             d.set(m_z).mul(a_rhs.z());
         }
         c.set(b).square();
+        e.set(a).square().add(m_temp.set(a).mul(b));
         if (config.a_is_1) {
-            e.set(a).square().add(m_temp.set(a).mul(b)).add(c).mul(d).add(m_temp.set(b).mul(c));
+            e.add(c).mul(d).add(m_temp.set(b).mul(c));
         }
         else {
             const core::mp_gf2n<T>& constant_a = dynamic_cast<const core::mp_gf2n<T>&>(*config.a.get());
-            e.set(a).square().add(m_temp.set(a).mul(b)).add(m_temp.set(constant_a).mul(c))
-                .mul(d).add(m_temp.set(b).mul(c));
+            e.add(m_temp.set(constant_a).mul(c));
+            e.mul(d).add(m_temp.set(b).mul(c));
         }
 
+        m_y.mul(b).add(m_temp.set(a).mul(m_x));
         if (a_rhs.z_is_one()) {
-            m_y.mul(b).add(m_temp.set(a).mul(m_x)).mul(c).add(m_temp.set(a).add(b).mul(e));
+            m_y.mul(c).add(m_temp.set(a).add(b).mul(e));
         }
         else {
-            m_y.mul(b).add(m_temp.set(a).mul(m_x)).mul(c).mul(a_rhs.z()).add(m_temp.set(a).add(b).mul(e));
+            m_y.mul(c).mul(a_rhs.z());
+            m_y.add(m_temp.set(a).add(b).mul(e));
         }
         m_x.set(b).mul(e);
         m_z.set(b).mul(c).mul(d);

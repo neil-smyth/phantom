@@ -86,7 +86,7 @@ class ecc
             case core::scalar_coding_e::SCALAR_PRE_7:
             case core::scalar_coding_e::SCALAR_PRE_8:
             {
-                size_t w = (1 << (static_cast<size_t>(m_coding_type) ^ SCALAR_CODING_PRE_BIT));
+                size_t w = (1U << (static_cast<size_t>(m_coding_type) ^ SCALAR_CODING_PRE_BIT));
 
                 for (size_t i=1; i < w; i++) {
                     m_point_pre[i] = std::unique_ptr<point<T>>(new P<T>(m_config));

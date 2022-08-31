@@ -58,7 +58,7 @@ public:
             size_t used = mpbase<T>::normalized_size(a.data(), a.size());
             r.resize(used);
 
-            for (size_t j = 0; j < used; j++) {
+            for (j = 0; j < used; j++) {
                 r[j] = a[j];
             }
         }
