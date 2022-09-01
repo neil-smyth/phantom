@@ -11,6 +11,8 @@
 #include "crypto/aes_ni.hpp"
 #include "crypto/aes_sw.hpp"
 
+#if defined(__aarch64__) || defined(__arm__) || defined(_M_ARM64) || defined(_M_ARM)
+#else
 #if defined(__clang__)
 
 // Ensure that we enable support for AES-NI
@@ -24,6 +26,7 @@
 #pragma GCC target("sse4.1")
 #pragma GCC target("aes")
 
+#endif
 #endif
 
 

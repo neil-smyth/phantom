@@ -151,7 +151,7 @@ uint64_t bit_manipulation::ctz(uint64_t x)
         return 64;
     }
 
-#if defined (__x86_64) || defined(__GNUC__)
+#if defined (__x86_64) && defined(__GNUG__)
     uint64_t c;
     __asm__("bsfq %1,%q0" : "=r" (c) : "rm" (x));
     return c;

@@ -315,19 +315,19 @@ public:
     /// @{
 
     /// Return a flag indicating that the mpz object is zero
-    virtual bool is_zero() const;
+    bool is_zero() const override;
 
     /// Return a flag indicating that the mpz object is one
-    virtual bool is_one() const;
+    bool is_one() const override;
 
     /// Return a flag indicating that the mpz object is negative
-    virtual bool is_negative() const;
+    bool is_negative() const override;
 
     /// Set the sign flag to the defined value
-    virtual void set_sign(bool sign);
+    void set_sign(bool sign) override;
 
     // Memory pre-allocation and value set to zero
-    virtual void zero_init(size_t n);
+    void zero_init(size_t n) override;
 
     /// Return a flag indicating if the defined bit is asserted
     bool tstbit(size_t bit_index) const;
@@ -344,9 +344,9 @@ public:
 
     double get_d() const;
 
-    virtual void get_bytes(phantom_vector<uint8_t> &bytes, bool little_endian = false) const;
+    void get_bytes(phantom_vector<uint8_t> &bytes, bool little_endian = false) const override;
 
-    virtual void set_bytes(const phantom_vector<uint8_t> &bytes, bool little_endian = false);
+    void set_bytes(const phantom_vector<uint8_t> &bytes, bool little_endian = false) override;
 
     template<typename A>
     mpz<T>& from_radix_array(const phantom_vector<A>& x, T radix, bool little_endian)
@@ -404,9 +404,9 @@ public:
 
     virtual std::string get_str(size_t base, bool uppercase = false) const;
 
-    virtual const phantom_vector<T> &get_limbs() const;
+    const phantom_vector<T> &get_limbs() const override;
 
-    virtual phantom_vector<T> &get_limbs();
+    phantom_vector<T> &get_limbs() override;
 
     /// @}
 

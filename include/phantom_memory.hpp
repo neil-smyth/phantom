@@ -30,7 +30,13 @@
 #endif
 
 /// Default byte alignment of memory
+#if defined(__aarch64__) || defined(_M_ARM64)
+#define DEFAULT_MEM_ALIGNMENT   8
+#elif defined(__arm__) || defined (_M_ARM)
+#define DEFAULT_MEM_ALIGNMENT   4
+#else
 #define DEFAULT_MEM_ALIGNMENT   16
+#endif
 
 
 /// Restricted pointers and references
@@ -156,7 +162,7 @@ class alignas(ALIGNMENT) aligned_base
 public:
     static_assert(ALIGNMENT > 0, "ALIGNMENT must be positive");
     static_assert((ALIGNMENT & (ALIGNMENT - 1)) == 0, "ALIGNMENT must be a power of 2)");
-    static_assert((ALIGNMENT & sizeof(void*)) == 0, "ALIGNMENT must be a multiple of sizeof(void*)");
+    //static_assert((ALIGNMENT & sizeof(void*)) == 0, "ALIGNMENT must be a multiple of sizeof(void*)");
     static void* operator new(size_t count) { return aligned_malloc(count, ALIGNMENT); }
     static void* operator new[](size_t count) { return aligned_malloc(count, ALIGNMENT); }
     static void operator delete(void* ptr) { return aligned_free(ptr, ALIGNMENT); }
