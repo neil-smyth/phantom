@@ -30,14 +30,14 @@ set(libsrc
     ${PROJECT_SOURCE_DIR}/mpbase_redc.cpp /
     ${PROJECT_SOURCE_DIR}/mpbase_toom_cook.cpp /
     ${PROJECT_SOURCE_DIR}/mpbase.hpp /
+    ${PROJECT_SOURCE_DIR}/mpz_core.cpp /
     ${PROJECT_SOURCE_DIR}/mpz.cpp /
-    ${PROJECT_SOURCE_DIR}/mpz.hpp /
     ${PROJECT_SOURCE_DIR}/mpz_additive.cpp /
     ${PROJECT_SOURCE_DIR}/mpz_comparative.cpp /
     ${PROJECT_SOURCE_DIR}/mpz_control.cpp /
-    ${PROJECT_SOURCE_DIR}/mpz_core.cpp /
     ${PROJECT_SOURCE_DIR}/mpz_logical.cpp /
     ${PROJECT_SOURCE_DIR}/mpz_multiplicative.cpp /
+    ${PROJECT_SOURCE_DIR}/mpz.hpp /
     ${PROJECT_SOURCE_DIR}/mp_gf2n.hpp /
     ${PROJECT_SOURCE_DIR}/mp.hpp /
     ${PROJECT_SOURCE_DIR}/ntt_binary.cpp /

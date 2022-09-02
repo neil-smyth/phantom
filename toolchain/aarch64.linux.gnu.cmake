@@ -2,8 +2,8 @@
 SET (CMAKE_SYSTEM_NAME Linux)
 
 # Compiler selection
-SET (CMAKE_C_COMPILER   /usr/bin/arm-linux-gnueabihf-gcc-7)
-SET (CMAKE_CXX_COMPILER /usr/bin/arm-linux-gnueabihf-g++-7)
+SET (CMAKE_C_COMPILER   /usr/bin/aarch64-linux-gnu-gcc-7)
+SET (CMAKE_CXX_COMPILER /usr/bin/aarch64-linux-gnu-g++-7)
 
 SET (CMAKE_FIND_ROOT_PATH ${TOOLCHAIN_ROOT})
 SET (CMAKE_SYSROOT ${TOOLCHAIN_ROOT})
