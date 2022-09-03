@@ -82,10 +82,10 @@ extern "C" {
         }
 
         if (encrypt_flag) {
-            phantom::format_preserving_encryption::encrypt_str(p_ctx->smart_ctx, vec);
+            phantom::format_preserving_encryption::encrypt(p_ctx->smart_ctx, vec);
         }
         else {
-            phantom::format_preserving_encryption::decrypt_str(p_ctx->smart_ctx, vec);
+            phantom::format_preserving_encryption::decrypt(p_ctx->smart_ctx, vec);
         }
 
         for (int i=0; i < n; i++) {
@@ -103,10 +103,10 @@ extern "C" {
 
         phantom::phantom_vector<int> vec = phantom::phantom_vector<int>(inout, inout + n);
         if (encrypt_flag) {
-            phantom::format_preserving_encryption::encrypt_number(p_ctx->smart_ctx, vec, range);
+            phantom::format_preserving_encryption::encrypt(p_ctx->smart_ctx, vec, range);
         }
         else {
-            phantom::format_preserving_encryption::decrypt_number(p_ctx->smart_ctx, vec, range);
+            phantom::format_preserving_encryption::decrypt(p_ctx->smart_ctx, vec, range);
         }
         std::copy(vec.begin(), vec.end(), inout);
 
@@ -122,37 +122,12 @@ extern "C" {
 
         phantom::phantom_vector<double> vec = phantom::phantom_vector<double>(inout, inout + n);
         if (encrypt_flag) {
-            phantom::format_preserving_encryption::encrypt_float(p_ctx->smart_ctx, vec, range, precision);
+            phantom::format_preserving_encryption::encrypt(p_ctx->smart_ctx, vec, range, precision);
         }
         else {
-            phantom::format_preserving_encryption::decrypt_float(p_ctx->smart_ctx, vec, range, precision);
+            phantom::format_preserving_encryption::decrypt(p_ctx->smart_ctx, vec, range, precision);
         }
         std::copy(vec.begin(), vec.end(), inout);
-
-        return true;
-    }
-
-    bool fpe_encrypt_iso8601(cfpe* p_fpe, bool encrypt_flag, cfpe_ctx* p_ctx, char** inout, int n)
-    {
-        if (nullptr == p_ctx || nullptr == p_ctx->smart_ctx.get() || nullptr == inout) {
-            return false;
-        }
-
-        phantom::phantom_vector<std::string> vec;
-        for (int i=0; i < n; i++) {
-            vec.push_back(std::string(inout[i]));
-        }
-
-        if (encrypt_flag) {
-            phantom::format_preserving_encryption::encrypt_iso8601(p_ctx->smart_ctx, vec);
-        }
-        else {
-            phantom::format_preserving_encryption::decrypt_iso8601(p_ctx->smart_ctx, vec);
-        }
-
-        for (int i=0; i < n; i++) {
-            std::copy(vec[i].begin(), vec[i].end(), inout[i]);
-        }
 
         return true;
     }

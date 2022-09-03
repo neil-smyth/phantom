@@ -429,86 +429,78 @@ std::unique_ptr<fpe_ctx> format_preserving_encryption::create_ctx(const phantom_
     return fpe::create_ctx(user_key, type, format, tweak);
 }
 
-void format_preserving_encryption::encrypt_str(std::unique_ptr<fpe_ctx>& ctx, std::string& inout)
+void format_preserving_encryption::encrypt(std::unique_ptr<fpe_ctx>& ctx, std::string& inout)
 {
-    fpe::encrypt_str(ctx, inout);
+    switch (ctx->format)
+    {
+        case FPE_ISO8601: fpe::encrypt_iso8601(ctx, inout); break;
+        default:          fpe::encrypt_str(ctx, inout);     break;
+    }
 }
 
-void format_preserving_encryption::encrypt_number(std::unique_ptr<fpe_ctx>& ctx, int& inout, int range)
+void format_preserving_encryption::encrypt(std::unique_ptr<fpe_ctx>& ctx, int& inout, int range)
 {
     fpe::encrypt_number(ctx, inout, range);
 }
 
-void format_preserving_encryption::encrypt_float(std::unique_ptr<fpe_ctx>& ctx, double& inout, int range, int precision)
+void format_preserving_encryption::encrypt(std::unique_ptr<fpe_ctx>& ctx, double& inout, int range, int precision)
 {
     fpe::encrypt_float(ctx, inout, range, precision);
 }
 
-void format_preserving_encryption::encrypt_iso8601(std::unique_ptr<fpe_ctx>& ctx, std::string& inout)
-{
-    fpe::encrypt_iso8601(ctx, inout);
-}
-
-void format_preserving_encryption::encrypt_str(std::unique_ptr<fpe_ctx>& ctx, phantom_vector<std::string>& inout)
+void format_preserving_encryption::encrypt(std::unique_ptr<fpe_ctx>& ctx, phantom_vector<std::string>& inout)
 {
     fpe::encrypt_str(ctx, inout);
 }
 
-void format_preserving_encryption::encrypt_number(std::unique_ptr<fpe_ctx>& ctx, phantom_vector<int>& inout, int range)
+void format_preserving_encryption::encrypt(std::unique_ptr<fpe_ctx>& ctx, phantom_vector<int>& inout, int range)
 {
     fpe::encrypt_number(ctx, inout, range);
 }
 
-void format_preserving_encryption::encrypt_float(std::unique_ptr<fpe_ctx>& ctx,
+void format_preserving_encryption::encrypt(std::unique_ptr<fpe_ctx>& ctx,
     phantom_vector<double>& inout, int range, int precision)
 {
     fpe::encrypt_float(ctx, inout, range, precision);
 }
 
-void format_preserving_encryption::encrypt_iso8601(std::unique_ptr<fpe_ctx>& ctx, phantom_vector<std::string>& inout)
+void format_preserving_encryption::decrypt(std::unique_ptr<fpe_ctx>& ctx, std::string& inout)
 {
-    fpe::encrypt_iso8601(ctx, inout);
+    switch (ctx->format)
+    {
+        case FPE_ISO8601: fpe::decrypt_iso8601(ctx, inout); break;
+        default:          fpe::decrypt_str(ctx, inout);     break;
+    }
 }
 
-void format_preserving_encryption::decrypt_str(std::unique_ptr<fpe_ctx>& ctx, std::string& inout)
-{
-    fpe::decrypt_str(ctx, inout);
-}
-
-void format_preserving_encryption::decrypt_number(std::unique_ptr<fpe_ctx>& ctx, int& inout, int range)
+void format_preserving_encryption::decrypt(std::unique_ptr<fpe_ctx>& ctx, int& inout, int range)
 {
     fpe::decrypt_number(ctx, inout, range);
 }
 
-void format_preserving_encryption::decrypt_float(std::unique_ptr<fpe_ctx>& ctx, double& inout, int range, int precision)
+void format_preserving_encryption::decrypt(std::unique_ptr<fpe_ctx>& ctx, double& inout, int range, int precision)
 {
     fpe::decrypt_float(ctx, inout, range, precision);
 }
 
-void format_preserving_encryption::decrypt_iso8601(std::unique_ptr<fpe_ctx>& ctx, std::string& inout)
+void format_preserving_encryption::decrypt(std::unique_ptr<fpe_ctx>& ctx, phantom_vector<std::string>& inout)
 {
-    fpe::decrypt_iso8601(ctx, inout);
+    switch (ctx->format)
+    {
+        case FPE_ISO8601: fpe::decrypt_iso8601(ctx, inout); break;
+        default:          fpe::decrypt_str(ctx, inout);     break;
+    }
 }
 
-void format_preserving_encryption::decrypt_str(std::unique_ptr<fpe_ctx>& ctx, phantom_vector<std::string>& inout)
-{
-    fpe::decrypt_str(ctx, inout);
-}
-
-void format_preserving_encryption::decrypt_number(std::unique_ptr<fpe_ctx>& ctx, phantom_vector<int>& inout, int range)
+void format_preserving_encryption::decrypt(std::unique_ptr<fpe_ctx>& ctx, phantom_vector<int>& inout, int range)
 {
     fpe::decrypt_number(ctx, inout, range);
 }
 
-void format_preserving_encryption::decrypt_float(std::unique_ptr<fpe_ctx>& ctx,
+void format_preserving_encryption::decrypt(std::unique_ptr<fpe_ctx>& ctx,
     phantom_vector<double>& inout, int range, int precision)
 {
     fpe::decrypt_float(ctx, inout, range, precision);
-}
-
-void format_preserving_encryption::decrypt_iso8601(std::unique_ptr<fpe_ctx>& ctx, phantom_vector<std::string>& inout)
-{
-    fpe::decrypt_iso8601(ctx, inout);
 }
 
 
