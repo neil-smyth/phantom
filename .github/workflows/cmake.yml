@@ -3,13 +3,34 @@ name: CMake
 on:
   pull_request:
     branches: [ "main" ]
+  schedule:
+    - cron: '00 04 * * *'  # 4am zulu every day
 
 env:
   BUILD_TYPE: Release
 
 jobs:
-  build:
+  check_date:
     runs-on: ubuntu-latest
+    name: Check latest commit
+    outputs:
+      BUILD_REQUIRED: ${{ steps.check_date.outputs.BUILD_REQUIRED }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: develop
+
+      - id: check_date
+        name: Check for commits in last 24 hours
+        if: ${{ github.event_name == 'schedule' }}
+        run: echo '::set-output name=BUILD_REQUIRED::'$(test -n "$(git log --format=%H --since='24 hours ago')" && echo 'true' || echo 'false')
+
+  build:
+    needs: [check_date]
+    if: ${{ github.event_name == 'pull_request' || needs.check_date.outputs.BUILD_REQUIRED == 'true' }}
+
+    runs-on: ubuntu-latest
+    name: Build and test main branch
 
     steps:
     - uses: actions/checkout@v3
