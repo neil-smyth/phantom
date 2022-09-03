@@ -35,12 +35,17 @@ public:
     explicit shamirs_secret_sharing(const std::shared_ptr<csprng>& prng);
     virtual ~shamirs_secret_sharing();
 
-    virtual key_sharing_type_e get_keylen() {
+    key_sharing_type_e get_keylen() override {
         return KEY_SHARING_SHAMIRS;
     }
 
-    virtual int32_t create(phantom_vector<phantom_vector<uint8_t>> &out, const uint8_t* key, size_t n, size_t k);
-    virtual int32_t combine(uint8_t* key, const phantom_vector<phantom_vector<uint8_t>> &shares, size_t k);
+    int32_t create(phantom_vector<phantom_vector<uint8_t>> &out,
+                   const phantom_vector<uint8_t>& key,
+                   size_t n,
+                   size_t k) override;
+    int32_t combine(phantom_vector<uint8_t>& key,
+                    const phantom_vector<phantom_vector<uint8_t>> &shares,
+                    size_t k) override;
 
 private:
     static void bitslice(uint32_t r[key_words], const uint8_t x[key_bytes]);

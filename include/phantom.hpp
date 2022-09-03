@@ -482,20 +482,24 @@ public:
     static key_sharing* make(key_sharing_type_e type, size_t key_len, std::shared_ptr<csprng>& prng);
 
     /// @brief Consume a secret key and produce an array of shared keys
-    /// @param obj The key sharing context
     /// @param out A reference to n vectors of key shares that are produced
     /// @param key The secret key to be consumed
     /// @param n The total quorum size
     /// @param k The minimum number of users required to retrieve the secret key
     /// @return EXIT_SUCCESS upon success, otherwise EXIT_FAILURE
-    virtual int32_t create(phantom_vector<phantom_vector<uint8_t>> &out, const uint8_t *key, size_t n, size_t k) = 0;
+    virtual int32_t create(phantom_vector<phantom_vector<uint8_t>> &out,
+                           const phantom_vector<uint8_t>& key,
+                           size_t n,
+                           size_t k) = 0;
 
     /// @brief Consume an array of shared keys and produce the secret key
     /// @param key The secret key to be produced
     /// @param shares A reference to k vectors of key shares that are consumed
     /// @param k The minimum number of users required to retrieve the secret key
     /// @return EXIT_SUCCESS upon success, otherwise EXIT_FAILURE
-    virtual int32_t combine(uint8_t *key, const phantom_vector<phantom_vector<uint8_t>> &shares, size_t k) = 0;
+    virtual int32_t combine(phantom_vector<uint8_t>& key,
+                            const phantom_vector<phantom_vector<uint8_t>> &shares,
+                            size_t k) = 0;
 
 protected:
     // Private constructor (factory method used)

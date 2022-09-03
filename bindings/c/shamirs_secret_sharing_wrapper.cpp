@@ -117,7 +117,7 @@ extern "C" {
         size_t n = p_sss->ctx.n;
         size_t k = p_sss->ctx.k;
         phantom::phantom_vector<phantom::phantom_vector<uint8_t>> user_shares(n);
-        p_sss->obj->create(user_shares, keyBytes.data(), n, k);
+        p_sss->obj->create(user_shares, keyBytes, n, k);
 
         p_sss->ctx.shards = phantom::phantom_vector<std::string>(n);
 
@@ -143,7 +143,7 @@ extern "C" {
             quorum_shares[i] = phantom::phantom_vector<uint8_t>(share.c_str(), share.c_str() + share.size());
         }
         phantom::phantom_vector<uint8_t> key(phantom::shamirs_secret_sharing::key_bytes);
-        p_sss->obj->combine(key.data(), quorum_shares, k);
+        p_sss->obj->combine(key, quorum_shares, k);
         auto key_base64 = base64_encode(&key[0], phantom::shamirs_secret_sharing::key_bytes);
         return strncpy(new char[key_base64.length()],  // flawfinder: ignore
                        key_base64.c_str(),

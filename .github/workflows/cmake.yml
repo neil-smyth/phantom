@@ -1,17 +1,37 @@
 name: CMake
 
 on:
-  push:
-    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  schedule:
+    - cron: '00 04 * * *'  # 4am zulu every day
 
 env:
   BUILD_TYPE: Release
 
 jobs:
-  build:
+  check_date:
     runs-on: ubuntu-latest
+    name: Check latest commit
+    outputs:
+      BUILD_REQUIRED: ${{ steps.check_date.outputs.BUILD_REQUIRED }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: print latest_commit
+        run: echo ${{ github.sha }}
+
+      - id: check_date
+        name: Check for commits in last 24 hours
+        if: ${{ github.event_name == 'schedule' }}
+        run: test -z $(git rev-list  --after="24 hours"  ${{ github.sha }}) && echo "::set-output name=BUILD_REQUIRED::false"
+
+  build:
+    needs:
+      - check_date
+    if: ${{ github.event_name == 'pull_request' || needs.check_date.outputs.BUILD_REQUIRED != 'false' }}
+
+    runs-on: ubuntu-latest
+    name: Build and test main branch
 
     steps:
     - uses: actions/checkout@v3
@@ -25,6 +45,9 @@ jobs:
 
     - name: Configure CMake
       run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DBUILD_TESTS=ON
+    
+    - name: Cpplint
+      run: cmake --build ${{github.workspace}}/build --target cpplint
 
     - name: Build
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
