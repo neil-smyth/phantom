@@ -614,7 +614,8 @@ int32_t symmetric_key_cipher::set_key(symmetric_key_ctx* ctx, const uint8_t *key
     return EXIT_FAILURE;
 }
 
-int32_t symmetric_key_cipher::encrypt_start(symmetric_key_ctx* ctx, const uint8_t *iv, size_t iv_len)
+int32_t symmetric_key_cipher::encrypt_start(symmetric_key_ctx* ctx, const uint8_t *iv, size_t iv_len,
+    const uint8_t *authdata, size_t authdata_len)
 {
     switch (ctx->get_keylen())
     {
@@ -625,16 +626,6 @@ int32_t symmetric_key_cipher::encrypt_start(symmetric_key_ctx* ctx, const uint8_
             reinterpret_cast<crypto::aes_ctr*>(ctx)->encrypt_start(iv, iv_len);
         } break;
 #endif
-        default: return EXIT_FAILURE;
-    }
-    return EXIT_SUCCESS;
-}
-
-int32_t symmetric_key_cipher::encrypt_start(symmetric_key_ctx* ctx, const uint8_t *iv, size_t iv_len,
-    const uint8_t *authdata, size_t authdata_len)
-{
-    switch (ctx->get_keylen())
-    {
 #if defined(ENABLE_AES_GCM)
         case SYMKEY_AES_128_GCM:
         case SYMKEY_AES_192_GCM:
@@ -647,7 +638,7 @@ int32_t symmetric_key_cipher::encrypt_start(symmetric_key_ctx* ctx, const uint8_
     return EXIT_SUCCESS;
 }
 
-int32_t symmetric_key_cipher::encrypt_update(symmetric_key_ctx* ctx, uint8_t *out, const uint8_t *in, size_t len)
+int32_t symmetric_key_cipher::encrypt(symmetric_key_ctx* ctx, uint8_t *out, const uint8_t *in, size_t len)
 {
     switch (ctx->get_keylen())
     {
@@ -655,6 +646,7 @@ int32_t symmetric_key_cipher::encrypt_update(symmetric_key_ctx* ctx, uint8_t *ou
         case SYMKEY_AES_192_ENC:
         case SYMKEY_AES_256_ENC:
         {
+            // We expect the user to perform all padding operations for ECB mode
             if (0 != (len & 0xf)) {
                 return EXIT_FAILURE;
             }
@@ -670,9 +662,6 @@ int32_t symmetric_key_cipher::encrypt_update(symmetric_key_ctx* ctx, uint8_t *ou
         case SYMKEY_AES_192_CTR:
         case SYMKEY_AES_256_CTR:
         {
-            if (0 != (len & 0xf)) {
-                return EXIT_FAILURE;
-            }
             reinterpret_cast<crypto::aes_ctr*>(ctx)->encrypt_update(out, in, len);
         } break;
 #endif
@@ -682,37 +671,6 @@ int32_t symmetric_key_cipher::encrypt_update(symmetric_key_ctx* ctx, uint8_t *ou
         case SYMKEY_AES_256_GCM:
         {
             reinterpret_cast<crypto::aes_gcm*>(ctx)->encrypt_update(out, in, len);
-        } break;
-#endif
-        default: return EXIT_FAILURE;
-    }
-    return EXIT_SUCCESS;
-}
-
-int32_t symmetric_key_cipher::encrypt_finish(symmetric_key_ctx* ctx, uint8_t *out, const uint8_t *in, size_t len)
-{
-    switch (ctx->get_keylen())
-    {
-        case SYMKEY_AES_128_ENC:
-        case SYMKEY_AES_192_ENC:
-        case SYMKEY_AES_256_ENC:
-        {
-            if (0 != (len & 0xf)) {
-                return EXIT_FAILURE;
-            }
-            if (len > 0) {
-                reinterpret_cast<aes_encrypt*>(ctx)->encrypt(out, in);
-            }
-        } break;
-#if defined(ENABLE_AES_CTR)
-        case SYMKEY_AES_128_CTR:
-        case SYMKEY_AES_192_CTR:
-        case SYMKEY_AES_256_CTR:
-        {
-            if (0 != (len & 0xf)) {
-                return EXIT_FAILURE;
-            }
-            reinterpret_cast<crypto::aes_ctr*>(ctx)->encrypt_finish(out, in, len);
         } break;
 #endif
         default: return EXIT_FAILURE;
@@ -736,7 +694,8 @@ int32_t symmetric_key_cipher::encrypt_finish(symmetric_key_ctx* ctx, uint8_t *ta
     }
 }
 
-int32_t symmetric_key_cipher::decrypt_start(symmetric_key_ctx* ctx, const uint8_t *iv, size_t iv_len)
+int32_t symmetric_key_cipher::decrypt_start(symmetric_key_ctx* ctx, const uint8_t *iv, size_t iv_len,
+    const uint8_t *authdata, size_t authdata_len)
 {
     switch (ctx->get_keylen())
     {
@@ -747,16 +706,6 @@ int32_t symmetric_key_cipher::decrypt_start(symmetric_key_ctx* ctx, const uint8_
             reinterpret_cast<crypto::aes_ctr*>(ctx)->decrypt_start(iv, iv_len);
         } break;
 #endif
-        default:                 return EXIT_FAILURE;
-    }
-    return EXIT_SUCCESS;
-}
-
-int32_t symmetric_key_cipher::decrypt_start(symmetric_key_ctx* ctx, const uint8_t *iv, size_t iv_len,
-    const uint8_t *authdata, size_t authdata_len)
-{
-    switch (ctx->get_keylen())
-    {
 #if defined(ENABLE_AES_GCM)
         case SYMKEY_AES_128_GCM:
         case SYMKEY_AES_192_GCM:
@@ -769,7 +718,7 @@ int32_t symmetric_key_cipher::decrypt_start(symmetric_key_ctx* ctx, const uint8_
     return EXIT_SUCCESS;
 }
 
-int32_t symmetric_key_cipher::decrypt_update(symmetric_key_ctx* ctx, uint8_t *out, const uint8_t *in, size_t len)
+int32_t symmetric_key_cipher::decrypt(symmetric_key_ctx* ctx, uint8_t *out, const uint8_t *in, size_t len)
 {
     switch (ctx->get_keylen())
     {
@@ -792,9 +741,6 @@ int32_t symmetric_key_cipher::decrypt_update(symmetric_key_ctx* ctx, uint8_t *ou
         case SYMKEY_AES_192_CTR:
         case SYMKEY_AES_256_CTR:
         {
-            if (0 != (len & 0xf)) {
-                return EXIT_FAILURE;
-            }
             reinterpret_cast<crypto::aes_ctr*>(ctx)->decrypt_update(out, in, len);
         } break;
 #endif
@@ -804,37 +750,6 @@ int32_t symmetric_key_cipher::decrypt_update(symmetric_key_ctx* ctx, uint8_t *ou
         case SYMKEY_AES_256_GCM:
         {
             reinterpret_cast<crypto::aes_gcm*>(ctx)->decrypt_update(out, in, len);
-        } break;
-#endif
-        default: return EXIT_FAILURE;
-    }
-    return EXIT_SUCCESS;
-}
-
-int32_t symmetric_key_cipher::decrypt_finish(symmetric_key_ctx* ctx, uint8_t *out, const uint8_t *in, size_t len)
-{
-    switch (ctx->get_keylen())
-    {
-        case SYMKEY_AES_128_DEC:
-        case SYMKEY_AES_192_DEC:
-        case SYMKEY_AES_256_DEC:
-        {
-            if (0 != (len & 0xf)) {
-                return EXIT_FAILURE;
-            }
-            if (len > 0) {
-                reinterpret_cast<aes_decrypt*>(ctx)->decrypt(out, in);
-            }
-        } break;
-#if defined(ENABLE_AES_CTR)
-        case SYMKEY_AES_128_CTR:
-        case SYMKEY_AES_192_CTR:
-        case SYMKEY_AES_256_CTR:
-        {
-            if (0 != (len & 0xf)) {
-                return EXIT_FAILURE;
-            }
-            reinterpret_cast<crypto::aes_ctr*>(ctx)->decrypt_finish(out, in, len);
         } break;
 #endif
         default: return EXIT_FAILURE;

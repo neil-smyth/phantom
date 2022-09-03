@@ -63,6 +63,9 @@ int32_t aes_ctr::encrypt_start(const uint8_t *iv, size_t iv_len)
         for (size_t i=0; i < iv_len; i++) {
             m_iv.data[i] = iv[i];
         }
+        for (size_t i=iv_len; i < 16; i++) {
+            m_iv.data[i] = 0;
+        }
         return EXIT_SUCCESS;
     }
     else {
@@ -82,22 +85,29 @@ int32_t aes_ctr::encrypt_update(uint8_t *out, const uint8_t *in, size_t len)
         m_aes->encrypt(block.data(), m_iv.data);
 
         // XOR with input
-        out[ 0] = block[ 0] ^ in[ 0];
-        out[ 1] = block[ 1] ^ in[ 1];
-        out[ 2] = block[ 2] ^ in[ 2];
-        out[ 3] = block[ 3] ^ in[ 3];
-        out[ 4] = block[ 4] ^ in[ 4];
-        out[ 5] = block[ 5] ^ in[ 5];
-        out[ 6] = block[ 6] ^ in[ 6];
-        out[ 7] = block[ 7] ^ in[ 7];
-        out[ 8] = block[ 8] ^ in[ 8];
-        out[ 9] = block[ 9] ^ in[ 9];
-        out[10] = block[10] ^ in[10];
-        out[11] = block[11] ^ in[11];
-        out[12] = block[12] ^ in[12];
-        out[13] = block[13] ^ in[13];
-        out[14] = block[14] ^ in[14];
-        out[15] = block[15] ^ in[15];
+        if (use_len == 16) {
+            out[ 0] = block[ 0] ^ in[ 0];
+            out[ 1] = block[ 1] ^ in[ 1];
+            out[ 2] = block[ 2] ^ in[ 2];
+            out[ 3] = block[ 3] ^ in[ 3];
+            out[ 4] = block[ 4] ^ in[ 4];
+            out[ 5] = block[ 5] ^ in[ 5];
+            out[ 6] = block[ 6] ^ in[ 6];
+            out[ 7] = block[ 7] ^ in[ 7];
+            out[ 8] = block[ 8] ^ in[ 8];
+            out[ 9] = block[ 9] ^ in[ 9];
+            out[10] = block[10] ^ in[10];
+            out[11] = block[11] ^ in[11];
+            out[12] = block[12] ^ in[12];
+            out[13] = block[13] ^ in[13];
+            out[14] = block[14] ^ in[14];
+            out[15] = block[15] ^ in[15];
+        }
+        else {
+            for (size_t i=0; i < use_len; i++) {
+                out[i] = block[i] ^ in[i];
+            }
+        }
 
         // Increment the counter
         size_t idx = 0;
@@ -117,22 +127,7 @@ int32_t aes_ctr::encrypt_update(uint8_t *out, const uint8_t *in, size_t len)
 
 int32_t aes_ctr::encrypt_finish(uint8_t *out, const uint8_t *in, size_t len)
 {
-    phantom_vector<uint8_t> block(16);
-
-    assert(len <= 16);
-
-    // Encrypt the IV
-    int32_t retval = m_aes->encrypt(block.data(), m_iv.data);
-    if (EXIT_FAILURE == retval) {
-        return EXIT_FAILURE;
-    }
-
-    // XOR with input
-    for (size_t i=0; i < len; i++) {
-        out[i] = block[i] ^ in[i];
-    }
-
-    return EXIT_SUCCESS;
+    return EXIT_FAILURE;
 }
 
 int32_t aes_ctr::decrypt_start(const uint8_t *iv, size_t iv_len)
@@ -147,7 +142,7 @@ int32_t aes_ctr::decrypt_update(uint8_t *out, const uint8_t *in, size_t len)
 
 int32_t aes_ctr::decrypt_finish(uint8_t *out, const uint8_t *in, size_t len)
 {
-    return encrypt_finish(out, in, len);
+    return EXIT_FAILURE;
 }
 
 }  // namespace crypto

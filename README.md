@@ -84,8 +84,10 @@ make test
 
 A number of toolchain files are provided principally for cross-compiling and allowing the user to control the compiler and its settings. The following example toolchains are provided (these are also used for CI build testing):
 
-* 32/64-bit Linux GNU
-* 32/64-bit Linux Clang
+* [x86 | x86-64] Linux [GNU | Clang | Intel DPC++]
+* [x86 | x86-64] Windows [MSVC | MinGW]
+* ARM64 Linux GNU
+
 
 The toolchain file can be selected using the _CMAKE_TOOLCHAIN_FILE_ option:
 

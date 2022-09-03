@@ -47,16 +47,16 @@ const lest::test specification[] =
         uint8_t result_ct[16], result_pt[16], pt_tag[16], ct_tag[16];
         auto aesenc = std::unique_ptr<symmetric_key_ctx>(symmetric_key_cipher::make(SYMKEY_AES_128_GCM));
         symmetric_key_cipher::set_key(aesenc.get(), key, 16);
-        symmetric_key_cipher::encrypt_start(aesenc.get(), ctr, 12, nullptr, 0);
-        symmetric_key_cipher::encrypt_update(aesenc.get(), result_ct, pt, 0);
+        symmetric_key_cipher::encrypt_start(aesenc.get(), ctr, 12);
+        symmetric_key_cipher::encrypt(aesenc.get(), result_ct, pt, 0);
         symmetric_key_cipher::encrypt_finish(aesenc.get(), ct_tag, 16);
         for (size_t i=0; i < 16; i++) {
             EXPECT(tag[i] == ct_tag[i]);
         }
         auto aesdec = std::unique_ptr<symmetric_key_ctx>(symmetric_key_cipher::make(SYMKEY_AES_128_GCM));
         symmetric_key_cipher::set_key(aesdec.get(), key, 16);
-        symmetric_key_cipher::decrypt_start(aesdec.get(), ctr, 12, nullptr, 0);
-        symmetric_key_cipher::decrypt_update(aesenc.get(), result_pt, result_ct, 0);
+        symmetric_key_cipher::decrypt_start(aesdec.get(), ctr, 12);
+        symmetric_key_cipher::decrypt(aesenc.get(), result_pt, result_ct, 0);
         symmetric_key_cipher::decrypt_finish(aesdec.get(), pt_tag, 16);
         for (size_t i=0; i < 16; i++) {
             EXPECT(tag[i] == pt_tag[i]);
@@ -77,16 +77,16 @@ const lest::test specification[] =
         uint8_t result_ct[16], result_pt[16], pt_tag[16], ct_tag[16];
         auto aesenc = std::unique_ptr<symmetric_key_ctx>(symmetric_key_cipher::make(SYMKEY_AES_128_GCM));
         symmetric_key_cipher::set_key(aesenc.get(), key, 16);
-        symmetric_key_cipher::encrypt_start(aesenc.get(), ctr, 12, nullptr, 0);
-        symmetric_key_cipher::encrypt_update(aesenc.get(), result_ct, pt, 0);
+        symmetric_key_cipher::encrypt_start(aesenc.get(), ctr, 12);
+        symmetric_key_cipher::encrypt(aesenc.get(), result_ct, pt, 0);
         symmetric_key_cipher::encrypt_finish(aesenc.get(), ct_tag, 15);
         for (size_t i=0; i < 15; i++) {
             EXPECT(tag[i] == ct_tag[i]);
         }
         auto aesdec = std::unique_ptr<symmetric_key_ctx>(symmetric_key_cipher::make(SYMKEY_AES_128_GCM));
         symmetric_key_cipher::set_key(aesdec.get(), key, 16);
-        symmetric_key_cipher::decrypt_start(aesdec.get(), ctr, 12, nullptr, 0);
-        symmetric_key_cipher::decrypt_update(aesenc.get(), result_pt, result_ct, 0);
+        symmetric_key_cipher::decrypt_start(aesdec.get(), ctr, 12);
+        symmetric_key_cipher::decrypt(aesenc.get(), result_pt, result_ct, 0);
         symmetric_key_cipher::decrypt_finish(aesdec.get(), pt_tag, 15);
         for (size_t i=0; i < 15; i++) {
             EXPECT(tag[i] == pt_tag[i]);
@@ -112,7 +112,7 @@ const lest::test specification[] =
         auto aesenc = std::unique_ptr<symmetric_key_ctx>(symmetric_key_cipher::make(SYMKEY_AES_128_GCM));
         symmetric_key_cipher::set_key(aesenc.get(), key, 16);
         symmetric_key_cipher::encrypt_start(aesenc.get(), ctr, 12, aad, 20);
-        symmetric_key_cipher::encrypt_update(aesenc.get(), result_ct, pt, 0);
+        symmetric_key_cipher::encrypt(aesenc.get(), result_ct, pt, 0);
         symmetric_key_cipher::encrypt_finish(aesenc.get(), ct_tag, 16);
         for (size_t i=0; i < 16; i++) {
             EXPECT(tag[i] == ct_tag[i]);
@@ -120,7 +120,7 @@ const lest::test specification[] =
         auto aesdec = std::unique_ptr<symmetric_key_ctx>(symmetric_key_cipher::make(SYMKEY_AES_128_GCM));
         symmetric_key_cipher::set_key(aesdec.get(), key, 16);
         symmetric_key_cipher::decrypt_start(aesdec.get(), ctr, 12, aad, 20);
-        symmetric_key_cipher::decrypt_update(aesenc.get(), result_pt, result_ct, 0);
+        symmetric_key_cipher::decrypt(aesenc.get(), result_pt, result_ct, 0);
         symmetric_key_cipher::decrypt_finish(aesdec.get(), pt_tag, 16);
         for (size_t i=0; i < 16; i++) {
             EXPECT(tag[i] == pt_tag[i]);
@@ -146,8 +146,8 @@ const lest::test specification[] =
         uint8_t result_ct[16], result_pt[16], pt_tag[16], ct_tag[16];
         auto aesenc = std::unique_ptr<symmetric_key_ctx>(symmetric_key_cipher::make(SYMKEY_AES_128_GCM));
         symmetric_key_cipher::set_key(aesenc.get(), key, 16);
-        symmetric_key_cipher::encrypt_start(aesenc.get(), ctr, 12, nullptr, 0);
-        symmetric_key_cipher::encrypt_update(aesenc.get(), result_ct, pt, 16);
+        symmetric_key_cipher::encrypt_start(aesenc.get(), ctr, 12);
+        symmetric_key_cipher::encrypt(aesenc.get(), result_ct, pt, 16);
         symmetric_key_cipher::encrypt_finish(aesenc.get(), ct_tag, 12);
         for (size_t i=0; i < 16; i++) {
             EXPECT(ct[i] == result_ct[i]);
@@ -157,8 +157,8 @@ const lest::test specification[] =
         }
         auto aesdec = std::unique_ptr<symmetric_key_ctx>(symmetric_key_cipher::make(SYMKEY_AES_128_GCM));
         symmetric_key_cipher::set_key(aesdec.get(), key, 16);
-        symmetric_key_cipher::decrypt_start(aesdec.get(), ctr, 12, nullptr, 0);
-        symmetric_key_cipher::decrypt_update(aesdec.get(), result_pt, result_ct, 16);
+        symmetric_key_cipher::decrypt_start(aesdec.get(), ctr, 12);
+        symmetric_key_cipher::decrypt(aesdec.get(), result_pt, result_ct, 16);
         symmetric_key_cipher::decrypt_finish(aesdec.get(), pt_tag, 12);
         for (size_t i=0; i < 16; i++) {
             EXPECT(pt[i] == result_pt[i]);
@@ -196,7 +196,7 @@ const lest::test specification[] =
         auto aesenc = std::unique_ptr<symmetric_key_ctx>(symmetric_key_cipher::make(SYMKEY_AES_128_GCM));
         symmetric_key_cipher::set_key(aesenc.get(), key, 16);
         symmetric_key_cipher::encrypt_start(aesenc.get(), ctr, 1, aad, 90);
-        symmetric_key_cipher::encrypt_update(aesenc.get(), result_ct, pt, 13);
+        symmetric_key_cipher::encrypt(aesenc.get(), result_ct, pt, 13);
         symmetric_key_cipher::encrypt_finish(aesenc.get(), ct_tag, 4);
         for (size_t i=0; i < 13; i++) {
             EXPECT(ct[i] == result_ct[i]);
@@ -207,7 +207,7 @@ const lest::test specification[] =
         auto aesdec = std::unique_ptr<symmetric_key_ctx>(symmetric_key_cipher::make(SYMKEY_AES_128_GCM));
         symmetric_key_cipher::set_key(aesdec.get(), key, 16);
         symmetric_key_cipher::decrypt_start(aesdec.get(), ctr, 1, aad, 90);
-        symmetric_key_cipher::decrypt_update(aesdec.get(), result_pt, result_ct, 13);
+        symmetric_key_cipher::decrypt(aesdec.get(), result_pt, result_ct, 13);
         symmetric_key_cipher::decrypt_finish(aesdec.get(), pt_tag, 4);
         for (size_t i=0; i < 13; i++) {
             EXPECT(pt[i] == result_pt[i]);

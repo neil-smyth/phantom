@@ -50,14 +50,14 @@ const lest::test specification[] =
         auto aesenc = std::unique_ptr<symmetric_key_ctx>(symmetric_key_cipher::make(SYMKEY_AES_128_CTR));
         symmetric_key_cipher::set_key(aesenc.get(), key, 16);
         symmetric_key_cipher::encrypt_start(aesenc.get(), ctr, 16);
-        symmetric_key_cipher::encrypt_finish(aesenc.get(), result_ct, pt, 16);
+        symmetric_key_cipher::encrypt(aesenc.get(), result_ct, pt, 16);
         for (size_t i=0; i < 16; i++) {
             EXPECT(ct[i] == result_ct[i]);
         }
         auto aesdec = std::unique_ptr<symmetric_key_ctx>(symmetric_key_cipher::make(SYMKEY_AES_128_CTR));
         symmetric_key_cipher::set_key(aesdec.get(), key, 16);
         symmetric_key_cipher::decrypt_start(aesdec.get(), ctr, 16);
-        symmetric_key_cipher::decrypt_finish(aesdec.get(), result_pt, result_ct, 16);
+        symmetric_key_cipher::decrypt(aesdec.get(), result_pt, result_ct, 16);
         for (size_t i=0; i < 16; i++) {
             EXPECT(pt[i] == result_pt[i]);
         }
