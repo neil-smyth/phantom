@@ -16,18 +16,18 @@ jobs:
     outputs:
       BUILD_REQUIRED: ${{ steps.check_date.outputs.BUILD_REQUIRED }}
     steps:
-      - uses: actions/checkout@v2
-        with:
-          ref: develop
+      - uses: actions/checkout@v3
+        run: echo ${{ github.sha }}
 
       - id: check_date
         name: Check for commits in last 24 hours
         if: ${{ github.event_name == 'schedule' }}
-        run: echo '::set-output name=BUILD_REQUIRED::'$(test -n "$(git log --format=%H --since='24 hours ago')" && echo 'true' || echo 'false')
+        run: test -z $(git rev-list  --after="24 hours"  ${{ github.sha }}) && echo "::set-output name=BUILD_REQUIRED::false"
 
   build:
-    needs: [check_date]
-    if: ${{ github.event_name == 'pull_request' || needs.check_date.outputs.BUILD_REQUIRED == 'true' }}
+    needs:
+      - check_date
+    if: ${{ github.event_name == 'pull_request' || needs.check_date.outputs.BUILD_REQUIRED != 'false' }}
 
     runs-on: ubuntu-latest
     name: Build and test main branch
