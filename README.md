@@ -1,4 +1,4 @@
-# Phantom
+# Phantom [<!--lint ignore no-dead-urls-->![main workflow](https://github.com/neil-smyth/phantom/actions/workflows/main_cmake.yml/badge.svg)](https://github.com/neil-smyth/phantom/actions?workflow=Main) [<!--lint ignore no-dead-urls-->![cpplint workflow](https://github.com/neil-smyth/phantom/actions/workflows/cpplint.yml/badge.svg)](https://github.com/neil-smyth/phantom/actions?workflow=Cpplint)
 
 A C++ library for application level cryptography with a design goal of employing secure software best practices. Created initially for fun and learning, this has evolved and is now being used in other projects. The code base is targeted at generic C++11 with support for variable machine word length.
 
@@ -110,7 +110,7 @@ This is a big item on the TODO list - the functional tests in the _test_ directo
 Support for _Cpplint_ is provided if the cmake project detects the presence of of the _Cpplint_ parser. If so, static analysis of the source code can be conveniently performed using the target _cpplint_, for example:
 
 ```
-_make cpplint_
+make cpplint
 ```
 
 ## Reference Manual
