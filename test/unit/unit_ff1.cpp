@@ -400,10 +400,10 @@ const lest::test specification[] =
         std::string pt = "The red fox jumped over the brown gate";
         std::string m = pt;
 
-        format_preserving_encryption::encrypt_str(ctx, m);
+        format_preserving_encryption::encrypt(ctx, m);
         EXPECT(nullptr != ctx.get());
 
-        format_preserving_encryption::decrypt_str(ctx, m);
+        format_preserving_encryption::decrypt(ctx, m);
         EXPECT(m.size() == pt.size());
         for (size_t i=0; i < pt.size(); i++) {
             EXPECT(pt[i] == m[i]);
@@ -422,10 +422,10 @@ const lest::test specification[] =
         std::string pt = "The red fox jumped over the brown gate";
         std::string m = pt;
 
-        format_preserving_encryption::encrypt_str(ctx, m);
+        format_preserving_encryption::encrypt(ctx, m);
         EXPECT(nullptr != ctx.get());
 
-        format_preserving_encryption::decrypt_str(ctx, m);
+        format_preserving_encryption::decrypt(ctx, m);
         EXPECT(m.size() == pt.size());
         for (size_t i=0; i < pt.size(); i++) {
             EXPECT(pt[i] == m[i]);
@@ -444,10 +444,10 @@ const lest::test specification[] =
         std::string pt = "The secret code is 012345-6789-3210";
         std::string m = pt;
 
-        format_preserving_encryption::encrypt_str(ctx, m);
+        format_preserving_encryption::encrypt(ctx, m);
         EXPECT(nullptr != ctx.get());
 
-        format_preserving_encryption::decrypt_str(ctx, m);
+        format_preserving_encryption::decrypt(ctx, m);
         EXPECT(m.size() == pt.size());
         for (size_t i=0; i < pt.size(); i++) {
             EXPECT(pt[i] == m[i]);
@@ -466,10 +466,10 @@ const lest::test specification[] =
         std::string pt = "The secret code is 012345-6789-3210";
         std::string m = pt;
 
-        format_preserving_encryption::encrypt_str(ctx, m);
+        format_preserving_encryption::encrypt(ctx, m);
         EXPECT(nullptr != ctx.get());
 
-        format_preserving_encryption::decrypt_str(ctx, m);
+        format_preserving_encryption::decrypt(ctx, m);
         EXPECT(m.size() == pt.size());
         for (size_t i=0; i < pt.size(); i++) {
             EXPECT(pt[i] == m[i]);
@@ -488,10 +488,10 @@ const lest::test specification[] =
         std::string pt = "The secret code is 012345-6789-3210";
         std::string m = pt;
 
-        format_preserving_encryption::encrypt_str(ctx, m);
+        format_preserving_encryption::encrypt(ctx, m);
         EXPECT(nullptr != ctx.get());
 
-        format_preserving_encryption::decrypt_str(ctx, m);
+        format_preserving_encryption::decrypt(ctx, m);
         EXPECT(m.size() == pt.size());
         for (size_t i=0; i < pt.size(); i++) {
             EXPECT(pt[i] == m[i]);
@@ -510,10 +510,10 @@ const lest::test specification[] =
         std::string pt = "The secret code is 012345-6789-3210";
         std::string m = pt;
 
-        format_preserving_encryption::encrypt_str(ctx, m);
+        format_preserving_encryption::encrypt(ctx, m);
         EXPECT(nullptr != ctx.get());
 
-        format_preserving_encryption::decrypt_str(ctx, m);
+        format_preserving_encryption::decrypt(ctx, m);
         EXPECT(m.size() == pt.size());
         for (size_t i=0; i < pt.size(); i++) {
             EXPECT(pt[i] == m[i]);
@@ -532,10 +532,10 @@ const lest::test specification[] =
         std::string pt = "The secret code is 012345-6789-3210";
         std::string m = pt;
 
-        format_preserving_encryption::encrypt_str(ctx, m);
+        format_preserving_encryption::encrypt(ctx, m);
         EXPECT(nullptr != ctx.get());
 
-        format_preserving_encryption::decrypt_str(ctx, m);
+        format_preserving_encryption::decrypt(ctx, m);
         EXPECT(m.size() == pt.size());
         for (size_t i=0; i < pt.size(); i++) {
             EXPECT(pt[i] == m[i]);
@@ -554,10 +554,10 @@ const lest::test specification[] =
         std::string pt = "The secret code is 012345-6789-3210";
         std::string m = pt;
 
-        format_preserving_encryption::encrypt_str(ctx, m);
+        format_preserving_encryption::encrypt(ctx, m);
         EXPECT(nullptr != ctx.get());
 
-        format_preserving_encryption::decrypt_str(ctx, m);
+        format_preserving_encryption::decrypt(ctx, m);
         EXPECT(m.size() == pt.size());
         for (size_t i=0; i < pt.size(); i++) {
             EXPECT(pt[i] == m[i]);
@@ -576,10 +576,10 @@ const lest::test specification[] =
         int pt = 22;
         int m = pt;
 
-        format_preserving_encryption::encrypt_number(ctx, m, 5);
+        format_preserving_encryption::encrypt(ctx, m, 5);
         EXPECT(nullptr != ctx.get());
 
-        format_preserving_encryption::decrypt_number(ctx, m, 5);
+        format_preserving_encryption::decrypt(ctx, m, 5);
         EXPECT(pt == m);
     },
     CASE("FPE FF1 DOUBLE NUMBER string")
@@ -595,30 +595,30 @@ const lest::test specification[] =
         double pt, ct, rt;
 
         pt = ct = 22.01;
-        format_preserving_encryption::encrypt_float(ctx, ct, 10, 2);
+        format_preserving_encryption::encrypt(ctx, ct, 10, 2);
         rt = ct;
-        format_preserving_encryption::decrypt_float(ctx, rt, 10, 2);
+        format_preserving_encryption::decrypt(ctx, rt, 10, 2);
         EXPECT(pt == rt);
 
         pt = ct = 22.02;
-        format_preserving_encryption::encrypt_float(ctx, ct, 10, 2);
+        format_preserving_encryption::encrypt(ctx, ct, 10, 2);
         rt = ct;
-        format_preserving_encryption::decrypt_float(ctx, rt, 10, 2);
+        format_preserving_encryption::decrypt(ctx, rt, 10, 2);
         EXPECT(pt == rt);
 
         pt = ct = 1000000000.00;
-        format_preserving_encryption::encrypt_float(ctx, ct, 10, 2);
+        format_preserving_encryption::encrypt(ctx, ct, 10, 2);
         rt = ct;
-        format_preserving_encryption::decrypt_float(ctx, rt, 10, 2);
+        format_preserving_encryption::decrypt(ctx, rt, 10, 2);
         EXPECT(pt == rt);
 
         pt = 0.00;
         while (pt < 1000000) {
             pt += 1387.31;
             ct = pt;
-            format_preserving_encryption::encrypt_float(ctx, ct, 10, 2);
+            format_preserving_encryption::encrypt(ctx, ct, 10, 2);
             rt = ct;
-            format_preserving_encryption::decrypt_float(ctx, rt, 10, 2);
+            format_preserving_encryption::decrypt(ctx, rt, 10, 2);
             EXPECT(double_equals(pt, rt));
         }
 
@@ -626,9 +626,9 @@ const lest::test specification[] =
         while (pt < 1000) {
             pt += 10.31497;
             ct = pt;
-            format_preserving_encryption::encrypt_float(ctx, ct, 5, 7);
+            format_preserving_encryption::encrypt(ctx, ct, 5, 7);
             rt = ct;
-            format_preserving_encryption::decrypt_float(ctx, rt, 5, 7);
+            format_preserving_encryption::decrypt(ctx, rt, 5, 7);
             EXPECT(double_equals(pt, rt));
         }
     },
@@ -645,21 +645,21 @@ const lest::test specification[] =
         std::string ct, rt, pt;
 
         pt = ct = "2021-05-15T12:03:58Z";
-        format_preserving_encryption::encrypt_str(ctx, ct);
+        format_preserving_encryption::encrypt(ctx, ct);
         rt = ct;
-        format_preserving_encryption::decrypt_str(ctx, rt);
+        format_preserving_encryption::decrypt(ctx, rt);
         EXPECT(pt == rt);
 
         pt = ct = "2500-12-31T23:59:59Z";
-        format_preserving_encryption::encrypt_str(ctx, ct);
+        format_preserving_encryption::encrypt(ctx, ct);
         rt = ct;
-        format_preserving_encryption::decrypt_str(ctx, rt);
+        format_preserving_encryption::decrypt(ctx, rt);
         EXPECT(pt == rt);
 
         pt = ct = "0001-01-01T00:00:00Z";
-        format_preserving_encryption::encrypt_str(ctx, ct);
+        format_preserving_encryption::encrypt(ctx, ct);
         rt = ct;
-        format_preserving_encryption::decrypt_str(ctx, rt);
+        format_preserving_encryption::decrypt(ctx, rt);
         EXPECT(pt == rt);
     },
 };

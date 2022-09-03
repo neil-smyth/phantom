@@ -367,30 +367,30 @@ public:
 
     /// Single value encryption methods
     /// @{
-    static void encrypt_str(std::unique_ptr<fpe_ctx>& ctx, std::string& inout);
-    static void encrypt_number(std::unique_ptr<fpe_ctx>& ctx, int& inout, int range);
-    static void encrypt_float(std::unique_ptr<fpe_ctx>& ctx, double& inout, int range, int precision);
+    static void encrypt(std::unique_ptr<fpe_ctx>& ctx, std::string& inout);
+    static void encrypt(std::unique_ptr<fpe_ctx>& ctx, int& inout, int range);
+    static void encrypt(std::unique_ptr<fpe_ctx>& ctx, double& inout, int range, int precision);
     /// @}
 
     /// Array encryption methods
     /// @{
-    static void encrypt_str(std::unique_ptr<fpe_ctx>& ctx, phantom_vector<std::string>& inout);
-    static void encrypt_number(std::unique_ptr<fpe_ctx>& ctx, phantom_vector<int>& inout, int range);
-    static void encrypt_float(std::unique_ptr<fpe_ctx>& ctx, phantom_vector<double>& inout, int range, int precision);
+    static void encrypt(std::unique_ptr<fpe_ctx>& ctx, phantom_vector<std::string>& inout);
+    static void encrypt(std::unique_ptr<fpe_ctx>& ctx, phantom_vector<int>& inout, int range);
+    static void encrypt(std::unique_ptr<fpe_ctx>& ctx, phantom_vector<double>& inout, int range, int precision);
     /// @}
 
     /// Single value decryption methods
     /// @{
-    static void decrypt_str(std::unique_ptr<fpe_ctx>& ctx, std::string& inout);
-    static void decrypt_number(std::unique_ptr<fpe_ctx>& ctx, int& inout, int range);
-    static void decrypt_float(std::unique_ptr<fpe_ctx>& ctx, double& inout, int range, int precision);
+    static void decrypt(std::unique_ptr<fpe_ctx>& ctx, std::string& inout);
+    static void decrypt(std::unique_ptr<fpe_ctx>& ctx, int& inout, int range);
+    static void decrypt(std::unique_ptr<fpe_ctx>& ctx, double& inout, int range, int precision);
     /// @}
 
     /// Array decryption methods
     /// @{
-    static void decrypt_str(std::unique_ptr<fpe_ctx>& ctx, phantom_vector<std::string>& inout);
-    static void decrypt_number(std::unique_ptr<fpe_ctx>& ctx, phantom_vector<int>& inout, int range);
-    static void decrypt_float(std::unique_ptr<fpe_ctx>& ctx, phantom_vector<double>& inout, int range, int precision);
+    static void decrypt(std::unique_ptr<fpe_ctx>& ctx, phantom_vector<std::string>& inout);
+    static void decrypt(std::unique_ptr<fpe_ctx>& ctx, phantom_vector<int>& inout, int range);
+    static void decrypt(std::unique_ptr<fpe_ctx>& ctx, phantom_vector<double>& inout, int range, int precision);
     /// @}
 };
 
