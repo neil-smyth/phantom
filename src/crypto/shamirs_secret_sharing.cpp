@@ -31,7 +31,7 @@ shamirs_secret_sharing::~shamirs_secret_sharing()
 // Create key shares of the given key for a quorum of n users and k key shares
 // required to reconstruct the key
 int32_t shamirs_secret_sharing::create(phantom_vector<phantom_vector<uint8_t>>& shares,
-    const uint8_t* key, size_t n, size_t k)
+    const phantom_vector<uint8_t>& key, size_t n, size_t k)
 {
     assert(n != 0);
     assert(k != 0);
@@ -40,7 +40,7 @@ int32_t shamirs_secret_sharing::create(phantom_vector<phantom_vector<uint8_t>>& 
     if (shares.size() != n) {
         return EXIT_FAILURE;
     }
-    if (nullptr == key) {
+    if (key.size() != shamirs_secret_sharing::key_bytes) {
         return EXIT_FAILURE;
     }
 
@@ -53,7 +53,7 @@ int32_t shamirs_secret_sharing::create(phantom_vector<phantom_vector<uint8_t>>& 
     uint32_t* tmp  = xpow + 8;
 
     // Initialize the polynomial with the key
-    bitslice(poly, key);
+    bitslice(poly, key.data());
 
     // Fill the rest of the polynomial with random data
     m_prng->get_mem(reinterpret_cast<uint8_t*>(poly + 8), (k-1)*8);
@@ -84,10 +84,13 @@ int32_t shamirs_secret_sharing::create(phantom_vector<phantom_vector<uint8_t>>& 
 }
 
 // Restore the k key shares and write the result to key.
-int32_t shamirs_secret_sharing::combine(uint8_t key[key_bytes],
+int32_t shamirs_secret_sharing::combine(phantom_vector<uint8_t>& key,
     const phantom_vector<phantom_vector<uint8_t>> &shares, size_t k)
 {
     if (0 == k) {
+        return EXIT_FAILURE;
+    }
+    if (key.size() != shamirs_secret_sharing::key_bytes) {
         return EXIT_FAILURE;
     }
 
@@ -126,7 +129,7 @@ int32_t shamirs_secret_sharing::combine(uint8_t key[key_bytes],
         core::gf256<uint32_t>::mul(num, num, ys[i].data());  // scaled coefficient
         core::gf256<uint32_t>::add(secret, num);
     }
-    unbitslice(key, secret);
+    unbitslice(key.data(), secret);
 
     return EXIT_SUCCESS;
 }

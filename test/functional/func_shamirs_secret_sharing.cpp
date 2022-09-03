@@ -31,8 +31,8 @@ int main(int argc, char *argv[])
     auto shamirs = new shamirs_secret_sharing(prng);
 
     for (size_t n=2; n < 128; n++) {
-        uint8_t key[shamirs_secret_sharing::key_bytes], keyout[shamirs_secret_sharing::key_bytes];
-        prng->get_mem(key, shamirs_secret_sharing::key_bytes);
+        phantom_vector<uint8_t> key(shamirs_secret_sharing::key_bytes), keyout(shamirs_secret_sharing::key_bytes);
+        prng->get_mem(key.data(), shamirs_secret_sharing::key_bytes);
 
         phantom_vector<phantom_vector<uint8_t>> shares(n);
 

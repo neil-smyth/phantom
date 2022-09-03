@@ -162,7 +162,7 @@ class alignas(ALIGNMENT) aligned_base
 public:
     static_assert(ALIGNMENT > 0, "ALIGNMENT must be positive");
     static_assert((ALIGNMENT & (ALIGNMENT - 1)) == 0, "ALIGNMENT must be a power of 2)");
-    //static_assert((ALIGNMENT & sizeof(void*)) == 0, "ALIGNMENT must be a multiple of sizeof(void*)");
+    static_assert((ALIGNMENT & sizeof(void*)) == 0, "ALIGNMENT must be a multiple of sizeof(void*)");
     static void* operator new(size_t count) { return aligned_malloc(count, ALIGNMENT); }
     static void* operator new[](size_t count) { return aligned_malloc(count, ALIGNMENT); }
     static void operator delete(void* ptr) { return aligned_free(ptr, ALIGNMENT); }
