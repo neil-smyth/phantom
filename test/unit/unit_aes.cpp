@@ -103,7 +103,7 @@ const lest::test specification[] =
         auto aesenc = std::unique_ptr<symmetric_key_ctx>(symmetric_key_cipher::make(SYMKEY_AES_128_ENC));
         retval = symmetric_key_cipher::set_key(aesenc.get(), key, 16);
         EXPECT(retval == EXIT_SUCCESS);
-        retval = symmetric_key_cipher::encrypt_finish(aesenc.get(), result_ct, pt, 16);
+        retval = symmetric_key_cipher::encrypt(aesenc.get(), result_ct, pt, 16);
         EXPECT(retval == EXIT_SUCCESS);
         for (size_t i=0; i < 16; i++) {
             EXPECT(ct[i] == result_ct[i]);
@@ -111,7 +111,7 @@ const lest::test specification[] =
         auto aesdec = std::unique_ptr<symmetric_key_ctx>(symmetric_key_cipher::make(SYMKEY_AES_128_DEC));
         retval = symmetric_key_cipher::set_key(aesdec.get(), key, 16);
         EXPECT(retval == EXIT_SUCCESS);
-        retval = symmetric_key_cipher::decrypt_finish(aesdec.get(), result_pt, result_ct, 16);
+        retval = symmetric_key_cipher::decrypt(aesdec.get(), result_pt, result_ct, 16);
         EXPECT(retval == EXIT_SUCCESS);
         for (size_t i=0; i < 16; i++) {
             EXPECT(pt[i] == result_pt[i]);

@@ -64,8 +64,8 @@ int main(int argc, char *argv[])
             encrypt_us += sw_encrypt.elapsed_us();
             decrypt_us += sw_decrypt.elapsed_us();
 
-            for (size_t i=0; i < rt.size(); i++) {
-                if (pt[i] != rt[i]) {
+            for (size_t k=0; k < rt.size(); k++) {
+                if (pt[k] != rt[k]) {
                     std::cerr << "Mismatch found" << std::endl;
                     return EXIT_FAILURE;
                 }
@@ -111,8 +111,8 @@ int main(int argc, char *argv[])
             encrypt_us += sw_encrypt.elapsed_us();
             decrypt_us += sw_decrypt.elapsed_us();
 
-            for (size_t i=0; i < rt.size(); i++) {
-                if (m[i] != rt[i]) {
+            for (size_t k=0; k < rt.size(); k++) {
+                if (m[k] != rt[k]) {
                     std::cerr << "Mismatch found: " << m << ", " << rt << std::endl;
                     return EXIT_FAILURE;
                 }

@@ -444,21 +444,17 @@ public:
 
     /// Encrypt an array of data using the specified symmetric cipher context
     /// {@
-    static int32_t encrypt_start(symmetric_key_ctx* ctx, const uint8_t *iv, size_t iv_len);
     static int32_t encrypt_start(symmetric_key_ctx* ctx, const uint8_t *iv, size_t iv_len,
-        const uint8_t *authdata, size_t authdata_len);
-    static int32_t encrypt_update(symmetric_key_ctx* ctx, uint8_t *out, const uint8_t *in, size_t len);
-    static int32_t encrypt_finish(symmetric_key_ctx* ctx, uint8_t *out, const uint8_t *in, size_t len);
+        const uint8_t *authdata = nullptr, size_t authdata_len = 0);
+    static int32_t encrypt(symmetric_key_ctx* ctx, uint8_t *out, const uint8_t *in, size_t len);
     static int32_t encrypt_finish(symmetric_key_ctx* ctx, uint8_t *tag, size_t tag_len);
     /// @}
 
     /// Decrypt an array of data using the specified symmetric cipher context
     /// {@
-    static int32_t decrypt_start(symmetric_key_ctx* ctx, const uint8_t *iv, size_t iv_len);
     static int32_t decrypt_start(symmetric_key_ctx* ctx, const uint8_t *iv, size_t iv_len,
-        const uint8_t *authdata, size_t authdata_len);
-    static int32_t decrypt_update(symmetric_key_ctx* ctx, uint8_t *out, const uint8_t *in, size_t len);
-    static int32_t decrypt_finish(symmetric_key_ctx* ctx, uint8_t *out, const uint8_t *in, size_t len);
+        const uint8_t *authdata = nullptr, size_t authdata_len = 0);
+    static int32_t decrypt(symmetric_key_ctx* ctx, uint8_t *out, const uint8_t *in, size_t len);
     static int32_t decrypt_finish(symmetric_key_ctx* ctx, uint8_t *tag, size_t tag_len);
     /// @}
 

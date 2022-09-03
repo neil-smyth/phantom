@@ -72,6 +72,7 @@ int32_t aes_gcm::set_key(const uint8_t *key, size_t key_len)
     GET_UINT64_BE(vh, h, 0);
     GET_UINT64_BE(vl, h, 8);
     memset(m_hh, 0, sizeof(m_hh));
+    memset(m_hl, 0, sizeof(m_hl));
     m_hh[8] = vh;
     m_hl[8] = vl;
 
@@ -292,6 +293,7 @@ int32_t aes_gcm::encrypt_finish(uint8_t *tag, size_t tag_len)
         // Add the working buffer to the accumulated authentication buffer, perform
         // GCM multiplication and then add to the output tag
         xor_block_16(m_authbuf, m_authbuf, work_buf.data());
+
         gcm_mult(m_authbuf, m_authbuf);
         xor_block(tag, tag, m_authbuf, tag_len);
     }
