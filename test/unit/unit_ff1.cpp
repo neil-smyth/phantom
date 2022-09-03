@@ -640,26 +640,26 @@ const lest::test specification[] =
         };
         phantom_vector<uint8_t> tweak = {0x39, 0x38, 0x37, 0x36, 0x35, 0x34, 0x33, 0x32, 0x31, 0x30};
 
-        auto ctx = format_preserving_encryption::create_ctx(user_key, AES_FF1_128, FPE_NUMBER_INT, tweak);
+        auto ctx = format_preserving_encryption::create_ctx(user_key, AES_FF1_128, FPE_ISO8601, tweak);
 
         std::string ct, rt, pt;
 
         pt = ct = "2021-05-15T12:03:58Z";
-        format_preserving_encryption::encrypt_iso8601(ctx, ct);
+        format_preserving_encryption::encrypt_str(ctx, ct);
         rt = ct;
-        format_preserving_encryption::decrypt_iso8601(ctx, rt);
+        format_preserving_encryption::decrypt_str(ctx, rt);
         EXPECT(pt == rt);
 
         pt = ct = "2500-12-31T23:59:59Z";
-        format_preserving_encryption::encrypt_iso8601(ctx, ct);
+        format_preserving_encryption::encrypt_str(ctx, ct);
         rt = ct;
-        format_preserving_encryption::decrypt_iso8601(ctx, rt);
+        format_preserving_encryption::decrypt_str(ctx, rt);
         EXPECT(pt == rt);
 
         pt = ct = "0001-01-01T00:00:00Z";
-        format_preserving_encryption::encrypt_iso8601(ctx, ct);
+        format_preserving_encryption::encrypt_str(ctx, ct);
         rt = ct;
-        format_preserving_encryption::decrypt_iso8601(ctx, rt);
+        format_preserving_encryption::decrypt_str(ctx, rt);
         EXPECT(pt == rt);
     },
 };

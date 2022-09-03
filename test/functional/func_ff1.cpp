@@ -101,11 +101,11 @@ int main(int argc, char *argv[])
 
             rt = m;
             sw_encrypt.start();
-            format_preserving_encryption::encrypt_iso8601(ctx, rt);
+            format_preserving_encryption::encrypt_str(ctx, rt);
             sw_encrypt.stop();
 
             sw_decrypt.start();
-            format_preserving_encryption::decrypt_iso8601(ctx, rt);
+            format_preserving_encryption::decrypt_str(ctx, rt);
             sw_decrypt.stop();
 
             encrypt_us += sw_encrypt.elapsed_us();

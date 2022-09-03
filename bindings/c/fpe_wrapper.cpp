@@ -132,7 +132,7 @@ extern "C" {
         return true;
     }
 
-    bool fpe_encrypt_iso8601(cfpe* p_fpe, bool encrypt_flag, cfpe_ctx* p_ctx, char** inout, int n)
+    /*bool fpe_encrypt_iso8601(cfpe* p_fpe, bool encrypt_flag, cfpe_ctx* p_ctx, char** inout, int n)
     {
         if (nullptr == p_ctx || nullptr == p_ctx->smart_ctx.get() || nullptr == inout) {
             return false;
@@ -155,7 +155,7 @@ extern "C" {
         }
 
         return true;
-    }
+    }*/
 
     bool fpe_cache_encrypt_str(cfpe* p_fpe, bool encrypt_flag, const char* hashkey, char** inout, int n)
     {
