@@ -105,9 +105,11 @@ private:
     }
 
     template<typename T, size_t M, const T* k>
-    static void sha_core(sha2_ctx<T>* ctx)
+    static inline void sha_core(sha2_ctx<T>* ctx)
     {
-        T v[8], *p = ctx->wbuf;
+        T *p = ctx->wbuf;
+        alignas(DEFAULT_MEM_ALIGNMENT) T v[8];
+
         v[0] = ctx->hash[0];
         v[1] = ctx->hash[1];
         v[2] = ctx->hash[2];

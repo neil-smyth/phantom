@@ -334,7 +334,7 @@ void hash_sha2::sha256_end(uint8_t* hval, sha2_ctx<uint32_t>* ctx, size_t hlen)
     static const uint8_t shift_lut[4] = {24, 16, 8, 0};
     size_t j = 0;
     for (i = 0; i < hlen; i++) {
-        hval[i] = static_cast<uint8_t>(ctx->hash[i >> 2] >> shift_lut[j]);
+        hval[i] = ctx->hash[i >> 2] >> shift_lut[j];
         j++;
         j &= 0x3;
     }
@@ -381,7 +381,7 @@ void hash_sha2::sha512_end(uint8_t* hval, sha2_ctx<uint64_t>* ctx, size_t hlen)
     static const uint8_t shift_lut[8] = {56, 48, 40, 32, 24, 16, 8, 0};
     size_t j = 0;
     for (i=0; i < hlen; i++) {
-        hval[i] = static_cast<uint8_t>(ctx->hash[i >> 3] >> shift_lut[j]);
+        hval[i] = ctx->hash[i >> 3] >> shift_lut[j];
         j++;
         j &= 0x7;
     }
