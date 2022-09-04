@@ -81,7 +81,7 @@ void hash_sha3::final(uint8_t *data)
     m_st.b[m_rsiz - 1] ^= 0x80;
     keccak::core(m_st.q, m_rounds);
 
-    std::copy(data, data + m_mdlen, m_st.b);
+    std::copy(m_st.b, m_st.b + m_mdlen, data);
 }
 
 }  // namespace crypto
