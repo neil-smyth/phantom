@@ -13,50 +13,48 @@ The focus is currently to build for x86_64 with GNU compiler and Linux, There is
 * Add some new cryptosystems (zero-knowledge proof's, maybe not SIKE...)
 * More testing and options for CSPRNG's
 
-The following public key cryptosystems are currently supported:
+<br></br>
 
-Signatures:
-1. Dilithium (requires update to latest/final NIST submission)
-2. Falcon (requires update to latest/final NIST submission)
-3. RSASSA-PSS (RSA exponentiation algorithms require optimisation)
-4. ECDSA
-5. EDDSA
+<figcaption align = "center"><b>Table 1 - Currently supported public key cryptosystems</b></figcaption>
 
-KEM:
-1. Kyber (requires update to latest/final NIST submission)
-2. Saber (requires update to latest/final NIST submission)
+| Type | Algorithm | Status |
+| ---- | --------- | ------ |
+| Signatures                | Dilithium<sup>1</sup> | Functional, requires KAT tests for validation |
+| Signatures                | Falcon<sup>1</sup> | Functional, requires KAT tests for validation |
+| Signatures                | RSASSA-PSS<sup>2</sup> | Functional, requires optimization |
+| Signatures                | ECDSA | Functional (NIST, SECG) |
+| Signatures                | EDDSA | Functional (ed25519, ed448) |
+| KEM                       | Kyber<sup>1</sup> | Functional, requires KAT tests for validation |
+| KEM                       | SABER<sup>1</sup> | Functional, requires KAT tests for validation |
+| Encryption                | Kyber<sup>1</sup> | Functional, requires KAT tests for validation |
+| Encryption                | SABER<sup>1</sup> | Functional, requires KAT tests for validation |
+| Encryption                | RSAES-OAEP<sup>2</sup> | Functional, requires optimization |
+| Key Exchange              | ECDH | Functional (NIST, SECG, Curve25510, Curve448) |
+| Identity Based Encryption | DLP (experimental) | Experimental |
+| Identity Based Signature  | DLP (experimental) | Experimental |
 
-Public-Key Encryption:
-1. Kyber (requires update to latest/final NIST submission)
-2. Saber (requires update to latest/final NIST submission)
-3. RSAES-OAEP (RSA exponentiation algorithms require optimisation)
+> <sup>1</sup> Requires update to latest/final NIST submission
 
-Key Exchange:
-1. ECDH
+> <sup>2</sup> RSA exponentiation algorithms require optimisation
 
-Identity-Based Encryption:
-1. DLP (experimental)
+<br></br>
 
-Identity-Based Signatures:
-1. DLP (experimental)
+<figcaption align = "center"><b>Table 2 - Currently supported miscellaneous cryptosystems</b></figcaption>
 
-The following symmetric cryptosystems are available:
+| Type | Algorithm | Status |
+| ---- | --------- | ------ |
+| Format Preserving Encryption        | AES-FPE-FF1 | Compliant with NIST test vectors |
+| Format Preserving Encryption        | AES-FPE-FF3-1 | Compliant with NIST test vectors |
+| Encryption                          | AES-CTR | Functional, requires KAT testing |
+| Authenticated Encryption            | AES-CBC-MAC | Functional, requires KAT testing |
+| Authenticated Encryption            | AES-CBC-MAC | Functional, requires KAT testing |
+| Authenticated Encryption            | AES-CBC-MAC | Functional, requires KAT testing |
+| Cryptographic Hash | SHA-2          | Compliant with NIST test vectors |
+| Cryptographic Hash | SHA-3          | Compliant with NIST test vectors |
+| Extendable-output function (XOF)    | SHAKE        | Functional, requires KAT testing |
+| Secret sharing                      | Shamir's scheme |
 
-1. Format Preserving Encryption (AES-FPE-FF1, AES-FPE-FF3-1)
-2. AES (AES-CTR, AES-GCM)
-
-
-The following cryptographic hash functions and message authentication codes are available:
-
-1. SHA-2 (SHA-224, SHA-256, SHA-384, SHA-512)
-2. SHA-3 (SHA3-224, SHA3-256, SHA3-384, SHA3-512)
-3. SHAKE-128, SHAKE-256
-
-
-The following secret sharing schemes are available:
-
-1. Shamir's scheme
-
+<br></br>
 
 ## Third-Party Libraries
 
@@ -92,7 +90,7 @@ A number of toolchain files are provided principally for cross-compiling and all
 The toolchain file can be selected using the _CMAKE_TOOLCHAIN_FILE_ option:
 
 ```
-_cmake -DCMAKE_TOOLCHAIN_FILE=x86_linux.gnu.cmake .._
+cmake -DCMAKE_TOOLCHAIN_FILE=x86_linux.gnu.cmake ..
 ```
 
 ## Bindings
