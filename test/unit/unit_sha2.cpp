@@ -11,6 +11,7 @@
 #include <memory>
 #include "./lest.hpp"
 #include "crypto/hash_sha2.hpp"
+#include "./phantom.hpp"
 
 namespace phantom {
 namespace crypto {
@@ -121,6 +122,110 @@ const lest::test specification[] =
         EXPECT(64U == len);
         len = hash2->get_length();
         EXPECT(32U == len);
+    },
+    CASE("Phantom Hash Construct")
+    {
+        std::unique_ptr<hashing_function> hash;
+        hash = std::unique_ptr<hashing_function>(hashing_function::make(static_cast<hash_alg_e>(999999)));
+        EXPECT(nullptr == hash);
+        hash = std::unique_ptr<hashing_function>(hashing_function::make(HASH_SHA2_256));
+        EXPECT(nullptr != hash);
+    },
+    CASE("Phantom Hash 224")
+    {
+        const uint8_t data[4] = { 0, 1, 2, 3 };
+        uint8_t hash_bytes[28] = { 0 };
+        std::unique_ptr<hashing_function> hash;
+        bool result, hash_check = false;
+        hash   = std::unique_ptr<hashing_function>(hashing_function::make(HASH_SHA2_224));
+        result = hash->init();
+        EXPECT(true == result);
+        EXPECT(28U == hash->get_length());
+        hash->update(nullptr, 0);
+        hash->update(data, 4);
+        hash->final(hash_bytes);
+        for (size_t i=0; i < hash->get_length(); i++) {
+            hash_check |= hash_bytes[i] != 0;
+        };
+        EXPECT(true == hash_check);
+    },
+    CASE("Phantom Hash 256")
+    {
+        const uint8_t data[4] = { 0, 1, 2, 3 };
+        uint8_t hash_bytes[32] = { 0 };
+        std::unique_ptr<hashing_function> hash;
+        bool result, hash_check = false;
+        hash   = std::unique_ptr<hashing_function>(hashing_function::make(HASH_SHA2_256));
+        result = hash->init();
+        EXPECT(true == result);
+        EXPECT(32U == hash->get_length());
+        hash->update(nullptr, 0);
+        hash->update(data, 4);
+        hash->final(hash_bytes);
+        for (size_t i=0; i < hash->get_length(); i++) {
+            hash_check |= hash_bytes[i] != 0;
+        };
+        EXPECT(true == hash_check);
+    },
+    CASE("Phantom Hash 384")
+    {
+        const uint8_t data[4] = { 0, 1, 2, 3 };
+        uint8_t hash_bytes[48] = { 0 };
+        std::unique_ptr<hashing_function> hash;
+        bool result, hash_check = false;
+        hash   = std::unique_ptr<hashing_function>(hashing_function::make(HASH_SHA2_384));
+        result = hash->init();
+        EXPECT(true == result);
+        EXPECT(48U == hash->get_length());
+        hash->update(nullptr, 0);
+        hash->update(data, 4);
+        hash->final(hash_bytes);
+        for (size_t i=0; i < hash->get_length(); i++) {
+            hash_check |= hash_bytes[i] != 0;
+        };
+        EXPECT(true == hash_check);
+    },
+    CASE("Phantom Hash 512")
+    {
+        const uint8_t data[4] = { 0, 1, 2, 3 };
+        uint8_t hash_bytes[64] = { 0 };
+        std::unique_ptr<hashing_function> hash;
+        bool result, hash_check = false;
+        hash   = std::unique_ptr<hashing_function>(hashing_function::make(HASH_SHA2_512));
+        result = hash->init();
+        EXPECT(true == result);
+        EXPECT(64U == hash->get_length());
+        hash->update(nullptr, 0);
+        hash->update(data, 4);
+        hash->final(hash_bytes);
+        for (size_t i=0; i < hash->get_length(); i++) {
+            hash_check |= hash_bytes[i] != 0;
+        };
+        EXPECT(true == hash_check);
+    },
+    CASE("Phantom Hash 256 update multiple")
+    {
+        const uint8_t data[4] = { 0, 1, 2, 3 };
+        uint8_t hash_bytes[32] = { 0 };
+        bool result;
+        std::unique_ptr<hashing_function> hash;
+        hash   = std::unique_ptr<hashing_function>(hashing_function::make(HASH_SHA2_256));
+        result = hash->init();
+        EXPECT(true == result);
+        hash->update(data, 4);
+        hash->final(hash_bytes);
+
+        uint8_t hash_bytes_multiple[32] = { 0 };
+        result = hash->init();
+        EXPECT(true == result);
+        hash->update(data, 1);
+        hash->update(data + 1, 2);
+        hash->update(data + 3, 1);
+        hash->final(hash_bytes_multiple);
+
+        for (size_t i=0; i < hash->get_length(); i++) {
+            EXPECT(hash_bytes_multiple[i] == hash_bytes[i]);
+        };
     },
 };
 

@@ -57,6 +57,9 @@ target_link_libraries(unit_sha3 phantom_static)
 add_executable(unit_xof unit/unit_xof.cpp) 
 target_link_libraries(unit_xof phantom_static)
 
+add_executable(func_hash functional/func_hash.cpp) 
+target_link_libraries(func_hash phantom_static)
+
 add_executable(unit_bit_manipulation unit/unit_bit_manipulation.cpp) 
 target_link_libraries(unit_bit_manipulation phantom_static)
 
@@ -130,6 +133,7 @@ add_test(UNIT_CSPRNG ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/unit_csprng)
 add_test(UNIT_SHA2 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/unit_sha2)
 add_test(UNIT_SHA3 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/unit_sha3)
 add_test(UNIT_XOF ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/unit_xof)
+add_test(FUNC_HASH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/func_hash)
 
 add_test(UNIT_BIT_MANIPULATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/unit_bit_manipulation)
 add_test(UNIT_MPBASE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/unit_mpbase)

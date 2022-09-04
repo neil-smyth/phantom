@@ -460,6 +460,77 @@ private:
 };
 
 
+/// Forward declaration of classes required by hashing_function
+/// @{
+
+namespace crypto {
+
+class hash;
+
+}  // namespace crypto
+
+/**
+ * @brief Cryptographic hashing function
+ * 
+ * A common interface to create and operate hashing functions
+ */
+class hashing_function
+{
+public:
+    virtual ~hashing_function();
+
+    /**
+     * @brief Create a hashing context for a user specified hashing function
+     * 
+     * @param type The type of hashing algorithm
+     * @return key_sharing* A pointer to a hashing object
+     */
+    static hashing_function* make(hash_alg_e type);
+
+    /**
+     * @brief Get the length of hash that will be generated
+     * 
+     * @return size_t Hash length
+     */
+    size_t get_length() const;
+
+    /**
+     * @brief Initialization of the hashing function
+     * 
+     * @return true Success
+     * @return false Failure
+     */
+    bool init();
+
+    /**
+     * @brief Update the hash with a specified number of bytes
+     * 
+     * This can be called none to many times.
+     *
+     * @param data A pointer to an array of bytes
+     * @param len The number of bytes to be consumed
+     */
+    void update(const uint8_t *data, size_t len);
+
+    /**
+     * @brief Generate the final hash value and copy to the output
+     * 
+     * @param data A pointer to the hash value output
+     */
+    void final(uint8_t *data);
+
+private:
+    // Private constructor (factory method used)
+    hashing_function();
+
+    /// An instance of the selected hashing function - PIMPL idiom
+    std::unique_ptr<crypto::hash> m_hash;
+
+    /// The type of hash
+    hash_alg_e m_hash_type;
+};
+
+
 /**
  * @brief Key Sharing
  * 

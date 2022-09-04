@@ -25,19 +25,6 @@ namespace crypto {
  * Hash and Extensible Output Function (XOF) classes, structs, types,etc.
  */
 
-enum hash_alg_e {
-    HASH_SHA2_224 = 0,
-    HASH_SHA2_256,
-    HASH_SHA2_384,
-    HASH_SHA2_512,
-    HASH_SHA2_512_224,
-    HASH_SHA2_512_256,
-    HASH_SHA3_224,
-    HASH_SHA3_256,
-    HASH_SHA3_384,
-    HASH_SHA3_512,
-};
-
 /**
  * @ingroup hashing
  * @brief Hash interface
