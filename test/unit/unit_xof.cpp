@@ -10,6 +10,7 @@
 #include <iostream>
 #include <memory>
 #include "./lest.hpp"
+#include "./phantom.hpp"
 #include "crypto/xof_sha3.hpp"
 
 using namespace phantom;  // NOLINT
@@ -86,6 +87,33 @@ const lest::test specification[] =
         for (size_t i=8; i < 64; i++) {
             EXPECT(0 == out[i]);
         }
+    },
+    CASE("Phantom XOF Construct")
+    {
+        std::unique_ptr<hashing_function> xof;
+        xof = std::unique_ptr<hashing_function>(hashing_function::make(static_cast<xof_alg_e>(999999)));
+        EXPECT(nullptr == xof);
+        xof = std::unique_ptr<hashing_function>(hashing_function::make(XOF_SHAKE_128));
+        EXPECT(nullptr != xof);
+    },
+    CASE("Phantom SHAKE-128")
+    {
+        const uint8_t data[4] = { 0, 1, 2, 3 };
+        uint8_t xof_bytes[128] = { 0 };
+        std::unique_ptr<hashing_function> xof;
+        bool result, xof_check = false;
+        xof   = std::unique_ptr<hashing_function>(hashing_function::make(XOF_SHAKE_128));
+        result = xof->init();
+        EXPECT(true == result);
+        EXPECT(0U == xof->get_length());
+        xof->update(nullptr, 0);
+        xof->update(data, 4);
+        xof->final();
+        xof->squeeze(xof_bytes, 128);
+        for (size_t i=0; i < 128; i++) {
+            xof_check |= xof_bytes[i] != 0;
+        };
+        EXPECT(true == xof_check);
     },
 };
 
