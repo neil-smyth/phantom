@@ -23,6 +23,7 @@ jobs:
         run: echo ${{ github.sha }}
 
       - id: check_date
+        continue-on-error: true
         name: Check for commits in last 24 hours
         if: ${{ github.event_name == 'schedule' }}
         run: test -z $(git rev-list  --after="24 hours"  ${{ github.sha }}) && echo "::set-output name=BUILD_REQUIRED::false"
@@ -36,8 +37,6 @@ jobs:
     name: Build and test main branch
 
     steps:
-    - uses: actions/checkout@v3
-    
     - name: Checkout
       uses: actions/checkout@v3
       with:
@@ -56,3 +55,5 @@ jobs:
     - name: Functional Test
       working-directory: ${{github.workspace}}/build
       run: ctest -C ${{env.BUILD_TYPE}} -R "FUNC"
+
+    # TODO Nightly builds for a variety of platforms rather than every push
