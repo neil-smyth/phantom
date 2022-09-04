@@ -765,6 +765,69 @@ int32_t symmetric_key_cipher::decrypt_finish(symmetric_key_ctx* ctx, uint8_t *ta
     }
 }
 
+
+hashing_function::hashing_function()
+{
+}
+
+hashing_function::~hashing_function()
+{
+}
+
+hashing_function* hashing_function::make(hash_alg_e type)
+{
+    hashing_function* obj = new hashing_function();
+
+    obj->m_hash_type = type;
+
+    switch (type)
+    {
+        case HASH_SHA2_224:
+        case HASH_SHA2_256:
+        case HASH_SHA2_384:
+        case HASH_SHA2_512: obj->m_hash = std::unique_ptr<crypto::hash>(new crypto::hash_sha2()); break;
+        case HASH_SHA3_224:
+        case HASH_SHA3_256:
+        case HASH_SHA3_384:
+        case HASH_SHA3_512: obj->m_hash = std::unique_ptr<crypto::hash>(new crypto::hash_sha3()); break;
+        default:            return nullptr;
+    }
+
+    return obj;
+}
+
+size_t hashing_function::get_length() const
+{
+    return m_hash->get_length();
+}
+
+bool hashing_function::init()
+{
+    switch (m_hash_type)
+    {
+        case HASH_SHA2_224:
+        case HASH_SHA3_224: return m_hash->init(224);
+        case HASH_SHA2_256:
+        case HASH_SHA3_256: return m_hash->init(256);
+        case HASH_SHA2_384:
+        case HASH_SHA3_384: return m_hash->init(384);
+        case HASH_SHA2_512:
+        case HASH_SHA3_512: return m_hash->init(512);
+        default:            return false;
+    }
+}
+
+void hashing_function::update(const uint8_t *data, size_t len)
+{
+    m_hash->update(data, len);
+}
+
+void hashing_function::final(uint8_t *data)
+{
+    m_hash->final(data);
+}
+
+
 key_sharing* key_sharing::make(key_sharing_type_e type, size_t key_len, std::shared_ptr<csprng>& prng)
 {
     key_sharing* ctx = nullptr;

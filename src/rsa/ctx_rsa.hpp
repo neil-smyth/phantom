@@ -38,7 +38,7 @@ public:
 
     virtual void set_label(phantom_vector<uint8_t>& label) = 0;
     virtual phantom_vector<uint8_t>& get_label() = 0;
-    virtual bool set_hash(crypto::hash_alg_e alg) = 0;
+    virtual bool set_hash(hash_alg_e alg) = 0;
     virtual crypto::hash* get_hash() = 0;
     virtual size_t get_hlen() = 0;
     virtual size_t get_saltlen() = 0;
@@ -59,7 +59,7 @@ public:
         m_rsa_pke = std::unique_ptr<phantom::rsa::rsa_cryptosystem<T>>(
             new phantom::rsa::rsa_cryptosystem<T>(core::scalar_coding_e::SCALAR_BINARY, masking));
 
-        if (!set_hash(static_cast<crypto::hash_alg_e>((set >> 8) & 0x1f))) {
+        if (!set_hash(static_cast<hash_alg_e>((set >> 8) & 0x1f))) {
             throw std::runtime_error("Hash is unknown");
         }
     }
@@ -151,41 +151,41 @@ public:
         return m_label;
     }
 
-    virtual bool set_hash(crypto::hash_alg_e alg)
+    virtual bool set_hash(hash_alg_e alg)
     {
         m_hash_alg = alg;
 
         switch (alg)
         {
-        case crypto::HASH_SHA2_224:
+        case HASH_SHA2_224:
             m_hblocklen = 28; m_hlen = 28; m_hash = std::unique_ptr<crypto::hash>(new crypto::hash_sha2());
             break;
-        case crypto::HASH_SHA2_256:
+        case HASH_SHA2_256:
             m_hblocklen = 32; m_hlen = 32; m_hash = std::unique_ptr<crypto::hash>(new crypto::hash_sha2());
             break;
-        case crypto::HASH_SHA2_384:
+        case HASH_SHA2_384:
             m_hblocklen = 48; m_hlen = 48; m_hash = std::unique_ptr<crypto::hash>(new crypto::hash_sha2());
             break;
-        case crypto::HASH_SHA2_512:
+        case HASH_SHA2_512:
             m_hblocklen = 64; m_hlen = 64; m_hash = std::unique_ptr<crypto::hash>(new crypto::hash_sha2());
             break;
-        case crypto::HASH_SHA2_512_224:
+        case HASH_SHA2_512_224:
             m_hblocklen = 64; m_hlen = 28; m_hash = std::unique_ptr<crypto::hash>(new crypto::hash_sha2());
             break;
-        case crypto::HASH_SHA2_512_256:
+        case HASH_SHA2_512_256:
             m_hblocklen = 64; m_hlen = 32; m_hash = std::unique_ptr<crypto::hash>(new crypto::hash_sha2());
             break;
 
-        case crypto::HASH_SHA3_224:
+        case HASH_SHA3_224:
             m_hblocklen = 28; m_hlen = 28; m_hash = std::unique_ptr<crypto::hash>(new crypto::hash_sha3());
             break;
-        case crypto::HASH_SHA3_256:
+        case HASH_SHA3_256:
             m_hblocklen = 32; m_hlen = 32; m_hash = std::unique_ptr<crypto::hash>(new crypto::hash_sha3());
             break;
-        case crypto::HASH_SHA3_384:
+        case HASH_SHA3_384:
             m_hblocklen = 48; m_hlen = 48; m_hash = std::unique_ptr<crypto::hash>(new crypto::hash_sha3());
             break;
-        case crypto::HASH_SHA3_512:
+        case HASH_SHA3_512:
             m_hblocklen = 64; m_hlen = 64; m_hash = std::unique_ptr<crypto::hash>(new crypto::hash_sha3());
             break;
 
@@ -230,7 +230,7 @@ private:
     phantom_vector<uint8_t> m_label;
     size_t m_hlen;
     size_t m_hblocklen;
-    crypto::hash_alg_e m_hash_alg;
+    hash_alg_e m_hash_alg;
 
     core::mpz<T> m_n;
     core::mpz<T> m_e;

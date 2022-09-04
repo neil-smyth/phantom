@@ -183,7 +183,7 @@ enum fpe_format_e
 
 /// An enumerated type for a block cipher keylength and type
 enum symmetric_key_type_e {
-    SYMKEY_AES_128_ENC,
+    SYMKEY_AES_128_ENC = 0,
     SYMKEY_AES_192_ENC,
     SYMKEY_AES_256_ENC,
     SYMKEY_AES_128_DEC,
@@ -195,6 +195,20 @@ enum symmetric_key_type_e {
     SYMKEY_AES_128_GCM,
     SYMKEY_AES_192_GCM,
     SYMKEY_AES_256_GCM
+};
+
+/// An enumerated type for hashing functions
+enum hash_alg_e {
+    HASH_SHA2_224 = 0,
+    HASH_SHA2_256,
+    HASH_SHA2_384,
+    HASH_SHA2_512,
+    HASH_SHA2_512_224,
+    HASH_SHA2_512_256,
+    HASH_SHA3_224,
+    HASH_SHA3_256,
+    HASH_SHA3_384,
+    HASH_SHA3_512,
 };
 
 /// An enumerated type for key sharing
