@@ -26,6 +26,7 @@
 #include "crypto/aes_ctr.hpp"
 #include "crypto/aes_gcm.hpp"
 #include "crypto/fpe.hpp"
+#include "crypto/xof_sha3.hpp"
 #include "crypto/shamirs_secret_sharing.hpp"
 
 namespace phantom {
@@ -796,35 +797,87 @@ hashing_function* hashing_function::make(hash_alg_e type)
     return obj;
 }
 
+hashing_function* hashing_function::make(xof_alg_e type)
+{
+    hashing_function* obj = new hashing_function();
+
+    obj->m_xof_type = type;
+
+    switch (type)
+    {
+        case XOF_SHAKE_128:
+        case XOF_SHAKE_256: obj->m_xof = std::unique_ptr<crypto::xof>(new crypto::xof_sha3()); break;
+        default:            return nullptr;
+    }
+
+    return obj;
+}
+
 size_t hashing_function::get_length() const
 {
-    return m_hash->get_length();
+    if (nullptr != m_hash) {
+        return m_hash->get_length();
+    }
+    else {
+        return 0;
+    }
 }
 
 bool hashing_function::init()
 {
-    switch (m_hash_type)
-    {
-        case HASH_SHA2_224:
-        case HASH_SHA3_224: return m_hash->init(224);
-        case HASH_SHA2_256:
-        case HASH_SHA3_256: return m_hash->init(256);
-        case HASH_SHA2_384:
-        case HASH_SHA3_384: return m_hash->init(384);
-        case HASH_SHA2_512:
-        case HASH_SHA3_512: return m_hash->init(512);
-        default:            return false;
+    if (nullptr != m_hash) {
+        switch (m_hash_type)
+        {
+            case HASH_SHA2_224:
+            case HASH_SHA3_224: return m_hash->init(224);
+            case HASH_SHA2_256:
+            case HASH_SHA3_256: return m_hash->init(256);
+            case HASH_SHA2_384:
+            case HASH_SHA3_384: return m_hash->init(384);
+            case HASH_SHA2_512:
+            case HASH_SHA3_512: return m_hash->init(512);
+            default:            return false;
+        }
+    }
+    else {
+        switch (m_xof_type)
+        {
+            case XOF_SHAKE_128: return m_xof->init(16);
+            case XOF_SHAKE_256: return m_xof->init(32);
+            default:            return false;
+        }
     }
 }
 
 void hashing_function::update(const uint8_t *data, size_t len)
 {
-    m_hash->update(data, len);
+    if (nullptr != m_hash) {
+        m_hash->update(data, len);
+    }
+    else {
+        m_xof->absorb(data, len);
+    }
 }
 
 void hashing_function::final(uint8_t *data)
 {
-    m_hash->final(data);
+    if (nullptr != m_hash) {
+        m_hash->final(data);
+    }
+}
+
+void hashing_function::final()
+{
+    if (nullptr != m_xof) {
+        m_xof->final();
+    }
+}
+
+void hashing_function::squeeze(uint8_t *data, size_t len)
+{
+    if (nullptr != m_xof) {
+        m_xof->squeeze(data, len);
+    }
 }
 
 

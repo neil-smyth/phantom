@@ -211,6 +211,12 @@ enum hash_alg_e {
     HASH_SHA3_512,
 };
 
+/// An enumerated type for XOF's
+enum xof_alg_e {
+    XOF_SHAKE_128 = 0,
+    XOF_SHAKE_256,
+};
+
 /// An enumerated type for key sharing
 enum key_sharing_type_e {
     KEY_SHARING_SHAMIRS,

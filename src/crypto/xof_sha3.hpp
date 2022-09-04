@@ -22,7 +22,7 @@ namespace crypto {
  * 
  * SHAKE-128 and SHAKE-256
  */
-class xof_sha3 : public keccak, xof
+class xof_sha3 : public xof, keccak
 {
 public:
     xof_sha3();

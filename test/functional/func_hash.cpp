@@ -17,7 +17,7 @@
 
 using namespace phantom;  // NOLINT
 
-#define NUM_ITER   65536ULL
+#define NUM_ITER   8192ULL
 
 static inline const char *stringFromEnum(hash_alg_e type)
 {
@@ -99,14 +99,80 @@ int main(int argc, char *argv[])
         float iter_sec = static_cast<float>(NUM_ITER) * 1000000.0f;
 
         std::cout << "Hash " << stringFromEnum(type) << std::endl;
-        std::cout << "hashing time - 16 bytes  = " << static_cast<float>(hash_16_us)/(NUM_ITER)
+        std::cout << "time - 16 bytes  = " << static_cast<float>(hash_16_us)/(NUM_ITER)
                   << " us, " << (16.0f*iter_sec)/(static_cast<float>(hash_16_us) * 1024.0f * 1024.0f)
                   << " MB/sec" << std::endl;
-        std::cout << "hashing time - 512 bytes = " << static_cast<float>(hash_512_us)/(NUM_ITER)
+        std::cout << "time - 512 bytes = " << static_cast<float>(hash_512_us)/(NUM_ITER)
                   << " us, " << (512.0f*iter_sec)/(static_cast<float>(hash_512_us) * 1024.0f * 1024.0f)
                   << " MB/sec" << std::endl;
-        std::cout << "hashing time - 16 kB     = " << static_cast<float>(hash_16384_us)/(NUM_ITER)
+        std::cout << "time - 16 kB     = " << static_cast<float>(hash_16384_us)/(NUM_ITER)
                   << " us, " << (16384.0f*iter_sec)/(static_cast<float>(hash_16384_us) * 1024.0f * 1024.0f)
+                  << " MB/sec" << std::endl;
+    }
+
+    for (size_t i=0; i < 2; i++) {
+
+        utilities::stopwatch sw_xof;
+        uint32_t xof_16_us = 0, xof_512_us = 0, xof_16384_us = 0;
+
+        xof_alg_e type;
+        switch (i)
+        {
+            case 0: type = XOF_SHAKE_128; break;
+            case 1: type = XOF_SHAKE_256; break;
+        }
+
+        auto xof = std::unique_ptr<hashing_function>(hashing_function::make(type));
+
+        phantom_vector<uint8_t> xof_vec(16384);
+        uint8_t *xof_bytes = xof_vec.data();
+        phantom_vector<uint8_t> msg(16384);
+        rng->get_mem(msg.data(), 16384);
+
+        sw_xof.start();
+        for (size_t j=0; j < NUM_ITER; j++) {
+            xof->init();
+            xof->update(msg.data(), 16);
+            xof->final();
+            xof->squeeze(xof_bytes, 16);
+        }
+        sw_xof.stop();
+
+        xof_16_us += sw_xof.elapsed_us();
+
+        sw_xof.start();
+        for (size_t j=0; j < NUM_ITER; j++) {
+            xof->init();
+            xof->update(msg.data(), 512);
+            xof->final();
+            xof->squeeze(xof_bytes, 512);
+        }
+        sw_xof.stop();
+
+        xof_512_us += sw_xof.elapsed_us();
+
+        sw_xof.start();
+        for (size_t j=0; j < NUM_ITER; j++) {
+            xof->init();
+            xof->update(msg.data(), 16384);
+            xof->final();
+            xof->squeeze(xof_bytes, 16384);
+        }
+        sw_xof.stop();
+
+        xof_16384_us += sw_xof.elapsed_us();
+
+        float iter_sec = static_cast<float>(NUM_ITER) * 1000000.0f;
+
+        std::cout << "XOF " << ((0 == i)? "SHAKE-128" : "SHAKE-256") << std::endl;
+        std::cout << "time - 16 bytes  = " << static_cast<float>(xof_16_us)/(NUM_ITER)
+                  << " us, " << (16.0f*iter_sec)/(static_cast<float>(xof_16_us) * 1024.0f * 1024.0f)
+                  << " MB/sec" << std::endl;
+        std::cout << "time - 512 bytes = " << static_cast<float>(xof_512_us)/(NUM_ITER)
+                  << " us, " << (512.0f*iter_sec)/(static_cast<float>(xof_512_us) * 1024.0f * 1024.0f)
+                  << " MB/sec" << std::endl;
+        std::cout << "time - 16 kB     = " << static_cast<float>(xof_16384_us)/(NUM_ITER)
+                  << " us, " << (16384.0f*iter_sec)/(static_cast<float>(xof_16384_us) * 1024.0f * 1024.0f)
                   << " MB/sec" << std::endl;
     }
 

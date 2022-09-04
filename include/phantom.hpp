@@ -466,6 +466,7 @@ private:
 namespace crypto {
 
 class hash;
+class xof;
 
 }  // namespace crypto
 
@@ -483,9 +484,17 @@ public:
      * @brief Create a hashing context for a user specified hashing function
      * 
      * @param type The type of hashing algorithm
-     * @return key_sharing* A pointer to a hashing object
+     * @return hashing_function* A pointer to a hashing object
      */
     static hashing_function* make(hash_alg_e type);
+
+    /**
+     * @brief Create a hashing context for a user specified XOF
+     * 
+     * @param type The type of XOF algorithm
+     * @return hashing_function* A pointer to a XOF object
+     */
+    static hashing_function* make(xof_alg_e type);
 
     /**
      * @brief Get the length of hash that will be generated
@@ -519,6 +528,19 @@ public:
      */
     void final(uint8_t *data);
 
+    /**
+     * @brief Generate the final XOF value and copy to the output
+     */
+    void final();
+
+    /**
+     * @brief Generate XOF output
+     * 
+     * @param data A pointer to the XOF output array
+     * @param len The number of bytes to output
+     */
+    void squeeze(uint8_t *data, size_t len);
+
 private:
     // Private constructor (factory method used)
     hashing_function();
@@ -528,6 +550,12 @@ private:
 
     /// The type of hash
     hash_alg_e m_hash_type;
+
+    /// An instance of the selected XOF - PIMPL idiom
+    std::unique_ptr<crypto::xof> m_xof;
+
+    /// The type of XOF
+    xof_alg_e m_xof_type;
 };
 
 
