@@ -31,6 +31,7 @@ public:
     static uint32_t log2(uint32_t x);
     static uint16_t log2(uint16_t x);
     static uint8_t log2(uint8_t x);
+    static float log2(float x);
     /// @}
 
     /// Ceiling of log base 2

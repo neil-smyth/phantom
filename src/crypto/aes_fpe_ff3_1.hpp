@@ -240,9 +240,9 @@ private:
                              int* ceil_vlog2,
                              int* b,
                              int* tweaklen,
-        const T radix)
+                             const T radix)
     {
-        *ceil_vlog2 = v * core::bit_manipulation::log2_ceil(radix);
+        *ceil_vlog2 = std::ceil(static_cast<float>(v) * core::bit_manipulation::log2(static_cast<float>(radix)));
         *b          = ceil2(*ceil_vlog2, 3);
 
         *tweaklen   = ctx.tweak.size();
