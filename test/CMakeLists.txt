@@ -102,7 +102,15 @@ target_link_libraries(unit_build_info phantom_static)
 add_executable(tuning_mul tuning/tuning_mul.cpp) 
 target_link_libraries(tuning_mul phantom_static)
 
+add_executable(kat_aes_ff1 kat/kat_aes_ff1.cpp) 
+target_link_libraries(kat_aes_ff1 phantom_static)
+
+add_executable(kat_aes_ff3 kat/kat_aes_ff3.cpp) 
+target_link_libraries(kat_aes_ff3 phantom_static)
+
+
 enable_testing()
+
 
 add_test(UNIT_BUILD_INFO ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/unit_build_info)
 
@@ -304,3 +312,6 @@ if (ENABLE_IBE_DLP)
 
     add_test(FUNC_IBE_DLP ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/func_ibe_dlp)
 endif (ENABLE_IBE_DLP)
+
+add_test(KAT_AES_FF1 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kat_aes_ff1)
+add_test(KAT_AES_FF3 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kat_aes_ff3)

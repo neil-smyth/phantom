@@ -246,7 +246,7 @@ private:
                              int* pad,
                              int* Qlen)
     {
-        *ceil_vlog2 = v * core::bit_manipulation::log2_ceil(radix);
+        *ceil_vlog2 = std::ceil(static_cast<float>(v) * core::bit_manipulation::log2(static_cast<float>(radix)));
         *b          = ceil2(*ceil_vlog2, 3);
         *d          = 4 * ceil2(*b, 2) + 4;
 
