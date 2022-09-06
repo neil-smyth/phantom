@@ -44,7 +44,7 @@ The focus is currently to build for x86_64 with GNU compiler and Linux, There is
 | Type | Algorithm | Status |
 | ---- | --------- | ------ |
 | Format Preserving Encryption        | AES-FPE-FF1 | Compliant with NIST test vectors |
-| Format Preserving Encryption        | AES-FPE-FF3-1 | Compliant with NIST test vectors |
+| Format Preserving Encryption        | AES-FPE-FF3-1 | Require NIST test vectors to test |
 | Encryption                          | AES-CTR | Functional, requires KAT testing |
 | Authenticated Encryption            | AES-CBC-MAC | Functional, requires KAT testing |
 | Authenticated Encryption            | AES-CBC-MAC | Functional, requires KAT testing |
