@@ -866,7 +866,11 @@ void hashing_function::update(const uint8_t *data, size_t len)
     if (nullptr != m_hash) {
         m_hash->update(data, len);
     }
-    else {
+}
+
+void hashing_function::absorb(const uint8_t *data, size_t len)
+{
+    if (nullptr != m_xof) {
         m_xof->absorb(data, len);
     }
 }
