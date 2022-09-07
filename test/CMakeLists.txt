@@ -108,6 +108,9 @@ target_link_libraries(kat_aes_ff1 phantom_static)
 add_executable(kat_aes_ff3 kat/kat_aes_ff3.cpp) 
 target_link_libraries(kat_aes_ff3 phantom_static)
 
+add_executable(kat_sha2 kat/kat_sha2.cpp) 
+target_link_libraries(kat_sha2 phantom_static)
+
 
 enable_testing()
 
@@ -315,3 +318,4 @@ endif (ENABLE_IBE_DLP)
 
 add_test(KAT_AES_FF1 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kat_aes_ff1)
 add_test(KAT_AES_FF3 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kat_aes_ff3)
+add_test(KAT_SHA2 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kat_sha2)
