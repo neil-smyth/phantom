@@ -522,6 +522,16 @@ public:
     void update(const uint8_t *data, size_t len);
 
     /**
+     * @brief Update the XOF with a specified number of bytes
+     * 
+     * This can be called none to many times.
+     *
+     * @param data A pointer to an array of bytes
+     * @param len The number of bytes to be consumed
+     */
+    void absorb(const uint8_t *data, size_t len);
+
+    /**
      * @brief Generate the final hash value and copy to the output
      * 
      * @param data A pointer to the hash value output

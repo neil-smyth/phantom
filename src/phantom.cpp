@@ -816,6 +816,18 @@ hashing_function* hashing_function::make(xof_alg_e type)
 size_t hashing_function::get_length() const
 {
     if (nullptr != m_hash) {
+        switch (m_hash_type)
+        {
+            case HASH_SHA2_224: return 28;
+            case HASH_SHA2_256: return 32;
+            case HASH_SHA2_384: return 48;
+            case HASH_SHA2_512: return 64;
+            case HASH_SHA3_224: return 28;
+            case HASH_SHA3_256: return 32;
+            case HASH_SHA3_384: return 48;
+            case HASH_SHA3_512: return 64;
+            default:            return 0;
+        }
         return m_hash->get_length();
     }
     else {
@@ -854,7 +866,11 @@ void hashing_function::update(const uint8_t *data, size_t len)
     if (nullptr != m_hash) {
         m_hash->update(data, len);
     }
-    else {
+}
+
+void hashing_function::absorb(const uint8_t *data, size_t len)
+{
+    if (nullptr != m_xof) {
         m_xof->absorb(data, len);
     }
 }

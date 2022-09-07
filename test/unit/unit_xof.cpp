@@ -106,8 +106,8 @@ const lest::test specification[] =
         result = xof->init();
         EXPECT(true == result);
         EXPECT(0U == xof->get_length());
-        xof->update(nullptr, 0);
-        xof->update(data, 4);
+        xof->absorb(nullptr, 0);
+        xof->absorb(data, 4);
         xof->final();
         xof->squeeze(xof_bytes, 128);
         for (size_t i=0; i < 128; i++) {
