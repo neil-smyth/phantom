@@ -71,14 +71,31 @@ This software is MIT licensed. Please see the attached _LICENSE_ file.
 
 ## Build & Install
 
-CMake should be used to build and install the library using an out-of-source build: create a folder within the root directory of the project (or elsewhere) and change directory to it, run cmake using the script in the root directory and then use make to build and then run the tests.
+CMake should be used to build and install the library using an out-of-source build: create a folder within the root directory of the project (or elsewhere) and change directory to it, run cmake using the script in the root directory and then use make to build and then optionally run the tests if they are enabled. A static and shared library will be built by default together with all available cryptographic algorithms.
+
+The following will create and test an optimised release build supporting all available cryptographic algorithms:
 
 ```
 mkdir build && cd build
-cmake ..
-make
-make test
+cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON ..
+cmake --build .
+ctest
 ```
+
+A specific set of algorithms can be included in the library. For example, the following will build a library supporting AES-FF1 Format Preserving Encryption only:
+
+```
+cmake -DENABLE_ALL=OFF -DENABLE_FPE_AES_FF1=ON ..
+cmake --build .
+```
+
+Algorithms are also logically grouped allowing them to be enabled/disabled within those groups. For example, the following will build all available algorithms except all KEM cryptosystems:
+
+```
+cmake -DENABLE_ALL=ON -DENABLE_PKC_KEM=OFF ..
+cmake --build .
+```
+
 
 A number of toolchain files are provided principally for cross-compiling and allowing the user to control the compiler and its settings. The following example toolchains are provided (these are also used for CI build testing):
 
