@@ -78,6 +78,7 @@ option(ENABLE_ALL "Build all cryptosystems" ON)
 # -------- Enable/disable cryptosystems and features as appropriate --------- #
 
 set(REQUIRE_PKC_LIBS OFF)
+set(REQUIRE_MPZ OFF)
 
 if (ENABLE_ALL OR ENABLE_PKC OR ENABLE_PKC_IBE)
     if (NOT ENABLE_IBE_DLP)
@@ -137,6 +138,7 @@ if (ENABLE_ALL OR ENABLE_FPE)
     if (NOT ENABLE_FPE_AES_FF3_1)
         set (ENABLE_FPE_AES_FF3_1 ON CACHE BOOL "" FORCE)
     endif (NOT ENABLE_FPE_AES_FF3_1)
+    set(REQUIRE_MPZ ON)
 endif (ENABLE_ALL OR ENABLE_FPE)
 
 if (ENABLE_ALL OR ENABLE_KEY_SHARING)
@@ -227,6 +229,7 @@ if (ENABLE_IBE_DLP OR
     ENABLE_SIGNATURE_FALCON OR
     ENABLE_SIGNATURE_RSASSA_PSS)
     set(REQUIRE_PKC_LIBS ON)
+    set(REQUIRE_MPZ ON)
 endif ()
 
 
@@ -306,11 +309,11 @@ if (REQUIRE_PKC_LIBS)
     add_subdirectory(src/ecc)
     add_subdirectory(src/fft)
     add_subdirectory(src/ntru)
+    add_subdirectory(src/rsa)
     add_subdirectory(src/sampling)
 endif (REQUIRE_PKC_LIBS)
 add_subdirectory(src/logging)
 add_subdirectory(src/packing)
-add_subdirectory(src/rsa)
 add_subdirectory(src/schemes)
 
 set(libsrc_static ${libsrc})
@@ -331,6 +334,12 @@ if (REQUIRE_PKC_LIBS)
         $<TARGET_OBJECTS:sampling_shared_obj>
         $<TARGET_OBJECTS:fft_shared_obj>)
 endif (REQUIRE_PKC_LIBS)
+if (REQUIRE_MPZ)
+    set(libsrc_static ${libsrc_static}
+        $<TARGET_OBJECTS:core_obj>)
+    set(libsrc_shared ${libsrc_shared}
+        $<TARGET_OBJECTS:core_shared_obj>)
+endif (REQUIRE_MPZ)
 
 
 # ----------------------------- Static library ------------------------------ #
