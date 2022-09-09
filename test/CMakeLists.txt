@@ -117,6 +117,9 @@ target_link_libraries(kat_sha3 phantom_static)
 add_executable(kat_shake kat/kat_shake.cpp) 
 target_link_libraries(kat_shake phantom_static)
 
+add_executable(kat_aes_ecb kat/kat_aes_ecb.cpp) 
+target_link_libraries(kat_aes_ecb phantom_static)
+
 
 enable_testing()
 
@@ -327,3 +330,4 @@ add_test(KAT_AES_FF3 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kat_aes_ff3)
 add_test(KAT_SHA2 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kat_sha2)
 add_test(KAT_SHA3 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kat_sha3)
 add_test(KAT_SHAKE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kat_shake)
+add_test(KAT_AES_ECB ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kat_aes_ecb)
