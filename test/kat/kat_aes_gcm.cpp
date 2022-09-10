@@ -94,6 +94,65 @@ aes_gcm_tv tv[] = {
         "d62875d2aca417034c34aee5",
     },
     {
+        SYMKEY_AES_192_GCM,
+        "0e5d6e68f82f32bea3f0b69498c1a31ef6d955cd3d27a2a8",
+        "caf72ee1e62e1001e8cfbc63",
+        "",
+        "",
+        "db1a74ffb5f7de26f5742e0942b1b9cb",
+        "",
+    },
+    {
+        SYMKEY_AES_192_GCM,
+        "7bcf2b2a5f8a9fefef59f36fe591cccd5a44fc0f127bdd6a",
+        "05567095ee93e17e974da10e",
+        "1e284eaf33f71e074b827f47450356c9",
+        "dc2828ee143a6e20e76c5d9562fd65e7",
+        "939b708c2e6060f829ce723ccef0f8",
+        "b425dd981bb5e82466e0cc6583049727",
+    },
+    {
+        SYMKEY_AES_192_GCM,
+        "4105dfd75cb77495adc1ba442cfde0ca1519321769e15dfe",
+        "ed8597e64a7f0f31735d8bd5",
+        "96633c41c64c7b1598489759fe6d7b8287c199c6de449ebfc1731bf92b1620b11b96af4ea7832612c1517e82ddea9338"
+        "c04a02dc7fe2465130ad10fa83a9417f167cfd923a846694150304917eccb9ebde1c711e48f04071a0e0",
+        "d7b4f118a71c378b8bc1792e5c",
+        "33d834db19bfdf51a3d34b54bf91",
+        "36755f02869e0243c809603c38",
+    },
+    {
+        SYMKEY_AES_192_GCM,
+        "158aa6459ced7ba416bb1a236796c45695395aa5f2e3fc90",
+        "b0",
+        "f5f05f1f157f62681c6b3410fae689818010b7ecb05721d753e11eb876316790002901f52fa6a7f991e17d1758d92e7a",
+        "3a8a02870d6f61d84bcaf2ddb1",
+        "e150663463c05e42",
+        "a9f8bd2ff174df5bbe311de231",
+    },
+    {
+        SYMKEY_AES_192_GCM,
+        "f88dfb3aec18d831c02b5c1fca570daa04a65ef4c6b91ab7",
+        "9d54266f19140efd5b55209428219b9b70d1a8e04cf128e7d75e2dcb60abbbbd7925db36d5b98710e7525286c6ecd528"
+        "cfb0dd77d49fa052677bd045bb62c38347abfc5495849139a37d3475a6b8689641cba25f2bda33ab139f5d7f7a0d0b11"
+        "1efad96d3bd28624e72c2ecadeb957edc65e3338cc0b938483ea791fbe9af192",
+        "72e5a4fd3f2f7ec533ec341d35bd177ca41288c0c91a2ae834dd0a6b9015e3936632ab02f290bdca846a91f463e09376",
+        "",
+        "2d3d3e03414a24889b617f7aee",
+        "",
+    },
+    {
+        SYMKEY_AES_192_GCM,
+        "8e130235ac7c930d648a502c9b81ba45cb397c1fb369334e",
+        "dabeba450ab9009985576fab76a61a2b7aeb0e2e2883433b550aaec2b8521f39cb0ad3732a39270863f4318ffbcbad71"
+        "506ead658310e352bae03ec2a07abe31b1abc5822c105a7b0d796f6a2c5f1b0feabb8278e999ce820492c7a442d35e85"
+        "db04bef05cc834aed1b2e77d0974ea4af51531ee6d185795c356cf04b2c5e218",
+        "ec90b7b0b33ffe7df1ab0bc4715e7016",
+        "24667172615cfee12526c8c6cc5dc501376f179bb538e9eb8bd0e20aa85d2b14",
+        "e118825529a74e3d62bcfef4",
+        "ce954b47de7c4226c1b4617a6264dd4aa0bd5068e431ed29c04afbe72494a607",
+    },
+    {
         SYMKEY_AES_256_GCM,
         "0000000000000000000000000000000000000000000000000000000000000000",
         "000000000000000000000000",
@@ -162,7 +221,7 @@ int main(int argc, char *argv[])
 {
     std::cout << "AES GCM Known Answer Test" << std::endl;
 
-    for (size_t i=0; i < 12; i++) {
+    for (size_t i=0; i < 18; i++) {
 
         core::mpz<uint32_t> mpz_key(tv[i].key, 16);
         phantom_vector<uint8_t> key;
