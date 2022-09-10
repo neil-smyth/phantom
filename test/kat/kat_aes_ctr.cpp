@@ -18,7 +18,7 @@
 using namespace phantom;  // NOLINT
 using namespace crypto;   // NOLINT
 
-struct aes_ccm_tv
+struct aes_ctr_tv
 {
     symmetric_key_type_e keytype;
     const char  *key;
@@ -30,7 +30,7 @@ struct aes_ccm_tv
 // Mixture of test vectors from https://www.ietf.org/rfc/rfc3686.txt and
 // https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38a.pdf
 
-aes_ccm_tv tv[] = {
+aes_ctr_tv tv[] = {
     {
         SYMKEY_AES_128_CTR,
         "2b7e151628aed2a6abf7158809cf4f3c",
