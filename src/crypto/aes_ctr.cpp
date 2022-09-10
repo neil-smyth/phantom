@@ -110,11 +110,11 @@ int32_t aes_ctr::encrypt_update(uint8_t *out, const uint8_t *in, size_t len)
         }
 
         // Increment the counter
-        size_t idx = 0;
-        m_iv.components.m_ctr[idx]++;
-        while (0 == m_iv.components.m_ctr[idx]) {
-            idx++;
-            m_iv.components.m_ctr[idx]++;
+        size_t idx = 15;
+        m_iv.data[idx]++;
+        while (0 == m_iv.data[idx]) {
+            idx--;
+            m_iv.data[idx]++;
         }
 
         len -= use_len;

@@ -60,8 +60,9 @@ protected:
 
     /// A nonce struct for AES-CTR
     struct taes_ctr_nonce_ctr {
-        uint8_t m_nonce[8];
-        uint8_t m_ctr[8];
+        uint8_t m_nonce[4];
+        uint8_t m_iv[8];
+        uint8_t m_ctr[4];
     };
 
     /// A union for an AES-CTR

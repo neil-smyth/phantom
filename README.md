@@ -43,16 +43,15 @@ The focus is currently to build for x86_64 with GNU compiler and Linux, There is
 
 | Type | Algorithm | Status |
 | ---- | --------- | ------ |
-| Format Preserving Encryption        | AES-FPE-FF1 | Compliant with NIST test vectors |
-| Format Preserving Encryption        | AES-FPE-FF3-1 | Require NIST test vectors to test |
-| Encryption                          | AES-CTR | Functional, requires KAT testing |
-| Authenticated Encryption            | AES-CBC-MAC | Functional, requires KAT testing |
-| Authenticated Encryption            | AES-CBC-MAC | Functional, requires KAT testing |
-| Authenticated Encryption            | AES-CBC-MAC | Functional, requires KAT testing |
-| Cryptographic Hash | SHA-2          | Compliant with NIST test vectors |
-| Cryptographic Hash | SHA-3          | Compliant with NIST test vectors |
-| Extendable-output function (XOF)    | SHAKE        | Functional, requires KAT testing |
-| Secret sharing                      | Shamir's scheme |
+| Format Preserving Encryption        | AES-FPE-FF1     | Compliant with NIST test vectors  |
+| Format Preserving Encryption        | AES-FPE-FF3-1   | Require NIST test vectors to test |
+| Encryption                          | AES-CTR         | Functional, requires KAT testing  |
+| Authenticated Encryption            | AES-CCM         | Future development                |
+| Authenticated Encryption            | AES-GCM         | Compliant with NIST test vectors  |
+| Cryptographic Hash                  | SHA-2           | Compliant with NIST test vectors  |
+| Cryptographic Hash                  | SHA-3           | Compliant with NIST test vectors  |
+| Extendable-output function (XOF)    | SHAKE           | Compliant with NIST test vectors  |
+| Secret sharing                      | Shamir's scheme | Functional                        |
 
 <br></br>
 

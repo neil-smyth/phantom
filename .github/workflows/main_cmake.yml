@@ -56,4 +56,8 @@ jobs:
       working-directory: ${{github.workspace}}/build
       run: ctest -C ${{env.BUILD_TYPE}} -R "FUNC"
 
+    - name: Known Answer Test
+      working-directory: ${{github.workspace}}/build
+      run: ctest -C ${{env.BUILD_TYPE}} -R "KAT"
+
     # TODO Nightly builds for a variety of platforms rather than every push
