@@ -217,53 +217,42 @@ aes_gcm_tv tv[] = {
     },
 };
 
+const uint8_t hex_lut[0x80] =
+{   // 0     1     2     3     4     5     6    7      8     9     A     B     C     D     E     F
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  // 0
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  // 1
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  // 2
+    0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  // 3
+    0x00, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  // 4
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  // 5
+    0x00, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  // 6
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00   // 7
+};
+
+phantom_vector<uint8_t> cstring_to_hex(const std::string& input)
+{
+    size_t len = input.length() /2;
+    phantom_vector<uint8_t> output(len);
+    const char *str = input.c_str();
+    for (size_t i = 0; i < len; i++) {
+        output[i]  = hex_lut[static_cast<int>(*str++)] << 4;
+        output[i] |= hex_lut[static_cast<int>(*str++)];
+    }
+    return output;
+}
+
 int main(int argc, char *argv[])
 {
     std::cout << "AES GCM Known Answer Test" << std::endl;
 
     for (size_t i=0; i < 18; i++) {
 
-        core::mpz<uint32_t> mpz_key(tv[i].key, 16);
-        phantom_vector<uint8_t> key;
-        if (0 != strlen(tv[i].key)) {
-            mpz_key.get_bytes(key, true);
-        }
-        key.resize(strlen(tv[i].key)/2);
-
-        core::mpz<uint32_t> mpz_pt(tv[i].plaintext, 16);
-        phantom_vector<uint8_t> pt(strlen(tv[i].plaintext)/2);
-        if (0 != strlen(tv[i].plaintext)) {
-            mpz_pt.get_bytes(pt, true);
-        }
-        pt.resize(strlen(tv[i].plaintext)/2);
-
-        core::mpz<uint32_t> mpz_iv(tv[i].iv, 16);
-        phantom_vector<uint8_t> iv(strlen(tv[i].iv)/2);
-        if (0 != strlen(tv[i].iv)) {
-            mpz_iv.get_bytes(iv, true);
-        }
-        iv.resize(strlen(tv[i].iv)/2);
-
-        core::mpz<uint32_t> mpz_aad(tv[i].aad, 16);
-        phantom_vector<uint8_t> aad(strlen(tv[i].aad)/2);
-        if (0 != strlen(tv[i].aad)) {
-            mpz_aad.get_bytes(aad, true);
-        }
-        aad.resize(strlen(tv[i].aad)/2);
-
-        core::mpz<uint32_t> mpz_ref_authtag(tv[i].authtag, 16);
-        phantom_vector<uint8_t> ref_authtag(strlen(tv[i].authtag)/2);
-        if (0 != strlen(tv[i].authtag)) {
-            mpz_ref_authtag.get_bytes(ref_authtag, true);
-        }
-        ref_authtag.resize(strlen(tv[i].authtag)/2);
-
-        core::mpz<uint32_t> mpz_ref_ct(tv[i].ciphertext, 16);
-        phantom_vector<uint8_t> ref_ct(strlen(tv[i].ciphertext)/2);
-        if (0 != strlen(tv[i].ciphertext)) {
-            mpz_ref_ct.get_bytes(ref_ct, true);
-        }
-        ref_ct.resize(strlen(tv[i].ciphertext)/2);
+        phantom_vector<uint8_t> key         = cstring_to_hex(tv[i].key);
+        phantom_vector<uint8_t> pt          = cstring_to_hex(tv[i].plaintext);
+        phantom_vector<uint8_t> iv          = cstring_to_hex(tv[i].iv);
+        phantom_vector<uint8_t> aad         = cstring_to_hex(tv[i].aad);
+        phantom_vector<uint8_t> ref_ct      = cstring_to_hex(tv[i].ciphertext);
+        phantom_vector<uint8_t> ref_authtag = cstring_to_hex(tv[i].authtag);
 
         phantom_vector<uint8_t> ct(pt.size());
         phantom_vector<uint8_t> rt(pt.size());
