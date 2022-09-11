@@ -264,11 +264,8 @@ public:
 
     pkc_e get_scheme() override { return m_scheme;}
     size_t get_set() override { return m_set; }
-    const std::string& get_set_name() override
-    {
-        static const std::string sets[] = { "LightSaber", "Saber", "FireSaber" };
-        return sets[m_set];
-    }
+    const std::string& get_set_name() override { return m_sets[m_set]; }
+    const phantom_vector<std::string>& get_set_names() { return m_sets; }
 
     virtual phantom_vector<uint8_t>& sk() { return m_sk; }
     virtual size_t n() { return m_params.n; }
@@ -467,6 +464,26 @@ private:
 
     const pkc_e  m_scheme;
     const size_t m_set;
+
+    const phantom_vector<std::string> m_sets = {
+        "secp192r1",
+        "secp224r1",
+        "secp256r1",
+        "secp384r1",
+        "secp521r1",
+        "sect163r2",
+        "sect233r1",
+        "sect283r1",
+        "sect409r1",
+        "sect571r1",
+        "sect163k1",
+        "sect233k1",
+        "sect283k1",
+        "sect409rk1",
+        "sect571k1",
+        "curve25519",
+        "curve448"
+    };
 
     /// The DLP IBE parameter sets
     ecdh_set_t<T> m_params;

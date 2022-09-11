@@ -35,11 +35,8 @@ public:
 
     pkc_e get_scheme() override { return m_scheme;}
     size_t get_set() override { return m_set; }
-    const std::string& get_set_name() override
-    {
-        static const std::string sets[] = { "LightSaber", "Saber", "FireSaber" };
-        return sets[m_set];
-    }
+    const std::string& get_set_name() override { return m_sets[m_set]; }
+    const phantom_vector<std::string>& get_set_names() { return m_sets; }
 
     phantom_vector<uint8_t>& pk() { return m_pk; }
     phantom_vector<uint8_t>& sk() { return m_sk; }
@@ -51,6 +48,8 @@ public:
 private:
     const pkc_e  m_scheme;
     const size_t m_set;
+
+    const phantom_vector<std::string> m_sets = { "LightSaber", "Saber", "FireSaber" };
 
     std::unique_ptr<saber_indcpa> m_saber_pke;
     std::unique_ptr<crypto::hash> m_hash;

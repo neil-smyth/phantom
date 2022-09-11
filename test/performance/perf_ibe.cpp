@@ -38,15 +38,19 @@ json perf_ibe::run(phantom::pkc_e pkc_type, size_t duration_us)
     std::unique_ptr<csprng> rng = std::unique_ptr<csprng>(csprng::make(0, &random_seed::seed_cb));
     json ibe_performance = json::array();
 
-    for (size_t i=0; i < 2; i++) {
+    pkc ibe_dlp_a(pkc_type);
+    pkc ibe_dlp_b(pkc_type);
+
+    std::unique_ptr<user_ctx> ctx_pkg;
+
+    size_t param_set = 0;
+    do {
 
         uint32_t total_us = 0, keygen_us = 0, extract_us = 0, encrypt_us = 0, decrypt_us = 0;
         uint32_t ct_len = 0;
 
         // Create an instance of a DLP-IBE Private Key Generator
-        pkc ibe_dlp_a(pkc_type);
-        pkc ibe_dlp_b(pkc_type);
-        std::unique_ptr<user_ctx> ctx_pkg = ibe_dlp_a.create_ctx(i);
+        ctx_pkg = ibe_dlp_a.create_ctx(param_set);
 
         size_t n = ibe_dlp_a.get_msg_len(ctx_pkg);
 
@@ -68,8 +72,8 @@ json perf_ibe::run(phantom::pkc_e pkc_type, size_t duration_us)
         phantom_vector<uint8_t> master_key;
         ibe_dlp_a.get_private_key(ctx_pkg, master_key);
 
-        std::unique_ptr<user_ctx> ctx_client = ibe_dlp_a.create_ctx(i);
-        std::unique_ptr<user_ctx> ctx_server = ibe_dlp_b.create_ctx(i);
+        std::unique_ptr<user_ctx> ctx_client = ibe_dlp_a.create_ctx(param_set);
+        std::unique_ptr<user_ctx> ctx_server = ibe_dlp_b.create_ctx(param_set);
 
         num_iter = 0;
         do {
@@ -122,7 +126,6 @@ json perf_ibe::run(phantom::pkc_e pkc_type, size_t duration_us)
 
         json ibe_metrics = {
             {"parameter_set", ctx_client->get_set_name()},
-            {"iterations", num_iter},
             {"master_key_length", master_key.size()},
             {"public_key_length", public_key.size()},
             {"id_length", 16},
@@ -139,7 +142,9 @@ json perf_ibe::run(phantom::pkc_e pkc_type, size_t duration_us)
         };
 
         ibe_performance.push_back(ibe_metrics);
-    }
+
+        param_set++;
+    } while (param_set < ctx_pkg->get_set_names().size());
 
     json ibe_header = {
         {"type", "IBE"},

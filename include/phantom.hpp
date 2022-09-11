@@ -54,6 +54,7 @@ public:
     virtual pkc_e get_scheme() = 0;
     virtual size_t get_set() = 0;
     virtual const std::string& get_set_name() = 0;
+    virtual const phantom_vector<std::string>& get_set_names() = 0;
 };
 
 // Forward declaration of the scheme interface class

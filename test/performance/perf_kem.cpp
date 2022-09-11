@@ -39,7 +39,13 @@ json perf_kem::run(phantom::pkc_e pkc_type, size_t duration_us)
     std::unique_ptr<csprng> rng = std::unique_ptr<csprng>(csprng::make(0, &random_seed::seed_cb));
     json kem_performance = json::array();
 
-    for (size_t i=0; i < 3; i++) {
+    pkc kem_a(pkc_type);
+    pkc kem_b(pkc_type);
+    std::unique_ptr<user_ctx> ctx_a;
+    std::unique_ptr<user_ctx> ctx_b;
+
+    size_t param_set = 0;
+    do {
 
         uint32_t total_us = 0, keygen_us = 0, encap_us = 0, decap_us = 0;
         uint32_t ct_len = 0;
@@ -48,10 +54,8 @@ json perf_kem::run(phantom::pkc_e pkc_type, size_t duration_us)
 
         size_t num_iter = 0;
 
-        pkc kem_a(pkc_type);
-        pkc kem_b(pkc_type);
-        std::unique_ptr<user_ctx> ctx_a = kem_a.create_ctx(i);
-        std::unique_ptr<user_ctx> ctx_b = kem_b.create_ctx(i);
+        ctx_a = kem_a.create_ctx(param_set);
+        ctx_b = kem_b.create_ctx(param_set);
 
         size_t n = kem_a.get_msg_len(ctx_a);
 
@@ -117,7 +121,6 @@ json perf_kem::run(phantom::pkc_e pkc_type, size_t duration_us)
 
         json kem_metrics = {
             {"parameter_set", ctx_a->get_set_name()},
-            {"iterations", num_iter},
             {"private_key_length", private_key_len},
             {"public_key_length", public_key_len},
             {"plaintext_length", n},
@@ -131,7 +134,9 @@ json perf_kem::run(phantom::pkc_e pkc_type, size_t duration_us)
         };
 
         kem_performance.push_back(kem_metrics);
-    }
+
+        param_set++;
+    } while (param_set < ctx_a->get_set_names().size());
 
     json kem_header = {
         {"type", "KEM"},

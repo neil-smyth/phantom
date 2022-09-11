@@ -96,11 +96,8 @@ public:
 
     pkc_e get_scheme() override { return m_scheme;}
     size_t get_set() override { return m_set; }
-    const std::string& get_set_name() override
-    {
-        static const std::string sets[] = { "512", "1024", "1536", "2048", "3096", "4096" };
-        return sets[m_set];
-    }
+    const std::string& get_set_name() override { return m_sets[m_set]; }
+    const phantom_vector<std::string>& get_set_names() { return m_sets; }
 
     virtual core::mod_config<T>& mod() { return m_mod; }
     virtual core::mod_config<T>& pmod() { return m_pmod; }
@@ -225,6 +222,8 @@ public:
 private:
     const pkc_e  m_scheme;
     const size_t m_set;
+
+    const phantom_vector<std::string> m_sets = { "512", "1024", "1536", "2048", "3096", "4096" };
 
     std::unique_ptr<phantom::rsa::rsa_cryptosystem<T>> m_rsa_pke;
 

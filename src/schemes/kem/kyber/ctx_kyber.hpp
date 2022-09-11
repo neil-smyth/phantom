@@ -32,11 +32,8 @@ public:
 
     pkc_e get_scheme() override { return m_scheme;}
     size_t get_set() override { return m_set; }
-    const std::string& get_set_name() override
-    {
-        static const std::string sets[] = { "Light", "Normal", "Paranoid" };
-        return sets[m_set];
-    }
+    const std::string& get_set_name() override { return m_sets[m_set]; }
+    const phantom_vector<std::string>& get_set_names() { return m_sets; }
 
     phantom_vector<int16_t>& s() { return m_s; }
     phantom_vector<int16_t>& t() { return m_t; }
@@ -48,6 +45,8 @@ public:
 private:
     const pkc_e  m_scheme;
     const size_t m_set;
+
+    const phantom_vector<std::string> m_sets = { "Light", "Normal", "Paranoid" };
 
     std::unique_ptr<kyber_indcpa> m_kyber_pke;
 
