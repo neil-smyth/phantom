@@ -7,12 +7,13 @@
  * 'LICENSE', which is part of this source code package.                     *
  *****************************************************************************/
 
-#include <chrono>
+#include <chrono>  // NOLINT
 #include <fstream>
 #include <iomanip>
 #include <iostream>
 #include "test/performance/perf_ibe.hpp"
 #include "test/performance/perf_kem.hpp"
+#include "test/performance/perf_key_exchange.hpp"
 #include "./phantom.hpp"
 #include <nlohmann/json.hpp>
 
@@ -38,9 +39,10 @@ int main(int argc, char *argv[])
         {"tests", json::array()}
     };
 
-    metrics["tests"].push_back(perf_ibe::run(phantom::PKC_IBE_DLP,   test_duration));
+    metrics["tests"].push_back(perf_ibe::run(phantom::PKC_IBE_DLP, test_duration));
     metrics["tests"].push_back(perf_kem::run(phantom::PKC_KEM_SABER, test_duration));
     metrics["tests"].push_back(perf_kem::run(phantom::PKC_KEM_KYBER, test_duration));
+    metrics["tests"].push_back(perf_key_exchange::run(phantom::PKC_KEY_ECDH, test_duration));
 
     std::ofstream o("phantom_metrics.json");
     o << metrics.dump(2) << std::endl;
