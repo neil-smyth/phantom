@@ -10,6 +10,7 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
 #include "./phantom.hpp"
 #include "./phantom_memory.hpp"
@@ -29,8 +30,13 @@ public:
     }
     virtual ~ctx_kyber() {}
 
-    virtual pkc_e get_scheme() { return m_scheme;}
-    virtual size_t get_set() { return m_set; }
+    pkc_e get_scheme() override { return m_scheme;}
+    size_t get_set() override { return m_set; }
+    const std::string& get_set_name() override
+    {
+        static const std::string sets[] = { "Light", "Normal", "Paranoid" };
+        return sets[m_set];
+    }
 
     phantom_vector<int16_t>& s() { return m_s; }
     phantom_vector<int16_t>& t() { return m_t; }

@@ -11,6 +11,7 @@
 
 #include <limits>
 #include <memory>
+#include <string>
 
 #include "./phantom.hpp"
 #include "./phantom_memory.hpp"
@@ -93,8 +94,14 @@ public:
         return (get_mod_bits() + 7) >> 3;
     }
 
-    virtual pkc_e get_scheme() { return m_scheme;}
-    virtual size_t get_set() { return m_set; }
+    pkc_e get_scheme() override { return m_scheme;}
+    size_t get_set() override { return m_set; }
+    const std::string& get_set_name() override
+    {
+        static const std::string sets[] = { "512", "1024", "1536", "2048", "3096", "4096" };
+        return sets[m_set];
+    }
+
     virtual core::mod_config<T>& mod() { return m_mod; }
     virtual core::mod_config<T>& pmod() { return m_pmod; }
     virtual core::mod_config<T>& qmod() { return m_qmod; }

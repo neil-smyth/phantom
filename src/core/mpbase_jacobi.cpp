@@ -84,7 +84,7 @@ public:
      * @param n Length of the data arrays
      * @return Returns n1 if n1==n2, otherwise returns n1 with carry compensation
      */
-    static int add_signed_n(T* out, const T *in1, int n1, const T *in2, int n2, size_t n)
+    static size_t add_signed_n(T* out, const T *in1, size_t n1, const T *in2, size_t n2, size_t n)
     {
         assert(n1 >= n && n2 >= n);
         assert(n1 >= n2);

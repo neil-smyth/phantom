@@ -82,8 +82,13 @@ public:
     /// The Falcon parameter sets
     static const falcon_set_t m_params[2];
 
-    virtual pkc_e get_scheme() { return m_scheme;}
-    virtual size_t get_set() { return m_set; }
+    pkc_e get_scheme() override { return m_scheme;}
+    size_t get_set() override { return m_set; }
+    const std::string& get_set_name() override
+    {
+        static const std::string sets[] = { "512", "1024" };
+        return sets[m_set];
+    }
 
     phantom_vector<int32_t>& f() { return m_f; }
     phantom_vector<int32_t>& g() { return m_g; }

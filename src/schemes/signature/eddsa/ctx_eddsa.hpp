@@ -11,6 +11,7 @@
 
 #include <limits>
 #include <memory>
+#include <string>
 
 #include "./phantom.hpp"
 #include "./phantom_memory.hpp"
@@ -113,8 +114,13 @@ public:
         return core::bits_log2<T>::value();
     }
 
-    virtual pkc_e get_scheme() { return m_scheme;}
-    virtual size_t get_set() { return m_set; }
+    pkc_e get_scheme() override { return m_scheme;}
+    size_t get_set() override { return m_set; }
+    const std::string& get_set_name() override
+    {
+        static const std::string sets[] = { "Ed25519", "Ed448" };
+        return sets[m_set];
+    }
 
     virtual phantom_vector<uint8_t>& sk() { return m_sk; }
     virtual core::mpz<T>& s() { return m_s; }

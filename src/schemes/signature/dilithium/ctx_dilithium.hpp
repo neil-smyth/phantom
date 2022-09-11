@@ -53,8 +53,13 @@ public:
     }
     virtual ~ctx_dilithium() {}
 
-    virtual pkc_e get_scheme() { return m_scheme;}
-    virtual size_t get_set() { return m_set; }
+    pkc_e get_scheme() override { return m_scheme;}
+    size_t get_set() override { return m_set; }
+    const std::string& get_set_name() override
+    {
+        static const std::string sets[] = { "I", "II", "III", "IV", "V" };
+        return sets[m_set];
+    }
 
     dilithium* get_dilithium() { return m_dilithium.get(); }
     const reduction_dilithium& get_reduction() { return m_reduction; }

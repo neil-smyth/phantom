@@ -27,23 +27,6 @@ int main(int argc, char *argv[])
 {
     std::cout << "DLP-IBE Test" << std::endl;
 
-    mpz<uint32_t> tdx(0);
-    mpz<uint32_t> tdy(1);
-    mpz<uint32_t> tdz(1);
-    mpz<uint32_t> res = tdx + tdy - uint32_t(2) - tdz;
-    uint8_t value = res;
-    if (value != 0xfe) { exit(-1); }
-    int32_t ivalue = res;
-    if (ivalue != -2) { exit(-1); }
-    double dvalue = res;
-    if (dvalue != -2.0) { exit(-1); }
-    float fvalue = res;
-    if (fvalue != -2.0) { exit(-1); }
-    uint32_t mvalue = tdy * res;
-    if (mvalue != static_cast<uint32_t>(-2)) { exit(-1); }
-    uint32_t svalue = res * res;
-    if (svalue != static_cast<uint32_t>(4)) { exit(-1); }
-
     for (size_t i=0; i < 2; i++) {
 
         stopwatch sw_keygen, sw_extract, sw_encrypt, sw_decrypt;
@@ -59,6 +42,7 @@ int main(int argc, char *argv[])
         sw_keygen.start();
         ibe_dlp_a.keygen(ctx_pkg);
         sw_keygen.stop();
+        keygen_us  += sw_keygen.elapsed_us();
 
         // Obtain the IBE public key
         phantom_vector<uint8_t> public_key;
@@ -111,15 +95,14 @@ int main(int argc, char *argv[])
                 }
             }
 
-            keygen_us  += sw_keygen.elapsed_us();
             extract_us += sw_extract.elapsed_us();
             encrypt_us += sw_encrypt.elapsed_us();
             decrypt_us += sw_decrypt.elapsed_us();
         }
 
         std::cout << "DLP " << ((0 == i)? "Light" : (1 == i)? "Normal" : "Paranoid") << std::endl;
-        std::cout << "keygen time  = " << static_cast<float>(keygen_us)/(NUM_ITER) << " us, "
-                  << (NUM_ITER*1000000.0f)/static_cast<float>(keygen_us) << " per sec" << std::endl;
+        std::cout << "keygen time  = " << static_cast<float>(keygen_us) << " us, "
+                  << (1000000.0f)/static_cast<float>(keygen_us) << " per sec" << std::endl;
         std::cout << "extract time = " << static_cast<float>(extract_us)/(NUM_ITER) << " us, "
                   << (NUM_ITER*1000000.0f)/static_cast<float>(extract_us) << " per sec" << std::endl;
         std::cout << "encrypt time = " << static_cast<float>(encrypt_us)/(NUM_ITER) << " us, "

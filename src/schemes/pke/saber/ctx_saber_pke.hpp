@@ -10,6 +10,7 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
 #include "./phantom.hpp"
 #include "./phantom_memory.hpp"
@@ -30,8 +31,13 @@ public:
     }
     virtual ~ctx_saber_pke() {}
 
-    virtual pkc_e get_scheme() { return m_scheme;}
-    virtual size_t get_set() { return m_set; }
+    pkc_e get_scheme() override { return m_scheme;}
+    size_t get_set() override { return m_set; }
+    const std::string& get_set_name() override
+    {
+        static const std::string sets[] = { "LightSaber", "Saber", "FireSaber" };
+        return sets[m_set];
+    }
 
     phantom_vector<uint8_t>& pk() { return m_pk; }
     phantom_vector<uint8_t>& sk() { return m_sk; }
