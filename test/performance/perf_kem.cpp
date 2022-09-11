@@ -122,11 +122,11 @@ json perf_kem::run(phantom::pkc_e pkc_type, size_t duration_us)
             {"public_key_length", public_key_len},
             {"plaintext_length", n},
             {"ciphertext_length", ct_len},
-            {"keygen_us", keygen_us},
-            {"keygen_per_sec", (1000000.0f)/static_cast<float>(keygen_us)},
-            {"encap_us", (num_iter*1000000.0f)/static_cast<float>(encap_us)},
+            {"keygen_us", static_cast<float>(keygen_us)/num_iter},
+            {"keygen_per_sec", static_cast<uint32_t>((num_iter*1000000.0f)/static_cast<float>(keygen_us))},
+            {"encap_us", static_cast<float>(encap_us)/num_iter},
             {"encap_sec", static_cast<uint32_t>((num_iter*1000000.0f)/static_cast<float>(encap_us))},
-            {"decap_us", (num_iter*1000000.0f)/static_cast<float>(decap_us)},
+            {"decap_us", static_cast<float>(decap_us)/num_iter},
             {"decap_per_sec", static_cast<uint32_t>((num_iter*1000000.0f)/static_cast<float>(decap_us))}
         };
 

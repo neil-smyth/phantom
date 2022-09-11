@@ -130,11 +130,11 @@ json perf_ibe::run(phantom::pkc_e pkc_type, size_t duration_us)
             {"ciphertext_length", ct_len},
             {"keygen_us", keygen_us},
             {"keygen_per_sec", (1000000.0f)/static_cast<float>(keygen_us)},
-            {"extract_us", (num_iter*1000000.0f)/static_cast<float>(extract_us)},
+            {"extract_us", static_cast<float>(extract_us)/num_iter},
             {"extract_per_sec", static_cast<uint32_t>((num_iter*1000000.0f)/static_cast<float>(extract_us))},
-            {"encrypt_us", (num_iter*1000000.0f)/static_cast<float>(encrypt_us)},
+            {"encrypt_us", static_cast<float>(encrypt_us)/num_iter},
             {"encrypt_per_sec", static_cast<uint32_t>((num_iter*1000000.0f)/static_cast<float>(encrypt_us))},
-            {"decrypt_us", (num_iter*1000000.0f)/static_cast<float>(decrypt_us)},
+            {"decrypt_us", static_cast<float>(decrypt_us)/num_iter},
             {"decrypt_per_sec", static_cast<uint32_t>((num_iter*1000000.0f)/static_cast<float>(decrypt_us))}
         };
 
