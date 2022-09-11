@@ -341,6 +341,9 @@ add_test(KAT_AES_GCM ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kat_aes_gcm)
 add_test(KAT_AES_CTR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kat_aes_ctr)
 
 
-add_executable(perf_metrics performance/perf_ibe.cpp performance/main.cpp performance/perf_metrics.cpp) 
+add_executable(perf_metrics
+    performance/main.cpp
+    performance/perf_ibe.cpp
+    performance/perf_kem.cpp )
 target_link_libraries(perf_metrics phantom_static)
 add_test(PERF_METRICS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/perf_metrics)

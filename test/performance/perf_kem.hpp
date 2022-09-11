@@ -7,19 +7,16 @@
  * 'LICENSE', which is part of this source code package.                     *
  *****************************************************************************/
 
-#include "./phantom_types.hpp"
+#pragma once
+
 #include "test/performance/perf_metrics.hpp"
-#include "test/performance/perf_ibe.hpp"
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
 
 
-perf_metrics* perf_metrics::make(phantom::pkc_e pkc_type)
+class perf_kem
 {
-    switch (pkc_type)
-    {
-        case phantom::PKC_IBE_DLP: return new perf_ibe();
-        default:                   throw new std::runtime_error("Error! Unknown performance metrics test");
-    }
-}
+public:
+    static json run(phantom::pkc_e pkc_type, size_t duration_us);
+};

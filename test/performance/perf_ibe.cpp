@@ -23,18 +23,16 @@
 #include <nlohmann/json.hpp>
 
 
-using json = nlohmann::json;
-
 using namespace phantom;    // NOLINT
 using namespace utilities;  // NOLINT
 using namespace core;       // NOLINT
 
+using json = nlohmann::json;
 
-json perf_ibe::run(size_t duration_us)
+
+json perf_ibe::run(phantom::pkc_e pkc_type, size_t duration_us)
 {
-    std::cout << "  PKC :: IBE :: DLP :: " << duration_us << " us" << std::endl;
-
-    pkc_e pkc_type = PKC_IBE_DLP;
+    std::cout << "  PKC :: IBE :: DLP" << std::endl;
 
     stopwatch sw_total, sw_keygen, sw_extract, sw_encrypt, sw_decrypt;
     std::unique_ptr<csprng> rng = std::unique_ptr<csprng>(csprng::make(0, &random_seed::seed_cb));

@@ -15,8 +15,8 @@
 using json = nlohmann::json;
 
 
-class perf_ibe : public perf_metrics
+class perf_ibe
 {
 public:
-    json run(size_t duration_us) override;
+    static json run(phantom::pkc_e pkc_type, size_t duration_us);
 };
