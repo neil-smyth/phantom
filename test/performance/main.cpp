@@ -15,6 +15,7 @@
 #include "test/performance/perf_kem.hpp"
 #include "test/performance/perf_key_exchange.hpp"
 #include "test/performance/perf_pke.hpp"
+#include "test/performance/perf_sig.hpp"
 #include "./phantom.hpp"
 #include <nlohmann/json.hpp>
 
@@ -23,7 +24,7 @@ using json = nlohmann::json;
 
 int main(int argc, char *argv[])
 {
-    size_t test_duration = 3000000;
+    size_t test_duration = 1000000;
 
     std::cout << "Phantom performance" << std::endl << std::endl;
 
@@ -50,13 +51,18 @@ int main(int argc, char *argv[])
             {"testcases", json::array()}
         };
 
-        test["testcases"].push_back(perf_ibe::run(phantom::PKC_IBE_DLP, test_duration, word_size, masking));
+        /*test["testcases"].push_back(perf_ibe::run(phantom::PKC_IBE_DLP, test_duration, word_size, masking));
         test["testcases"].push_back(perf_kem::run(phantom::PKC_KEM_SABER, test_duration, word_size, masking));
         test["testcases"].push_back(perf_kem::run(phantom::PKC_KEM_KYBER, test_duration, word_size, masking));
         test["testcases"].push_back(perf_key_exchange::run(phantom::PKC_KEY_ECDH, test_duration, word_size, masking));
         test["testcases"].push_back(perf_pke::run(phantom::PKC_PKE_KYBER, test_duration, word_size, masking));
         test["testcases"].push_back(perf_pke::run(phantom::PKC_PKE_SABER, test_duration, word_size, masking));
-        test["testcases"].push_back(perf_pke::run(phantom::PKC_PKE_RSAES_OAEP, test_duration, word_size, masking));
+        test["testcases"].push_back(perf_pke::run(phantom::PKC_PKE_RSAES_OAEP, test_duration, word_size, masking));*/
+        test["testcases"].push_back(perf_sig::run(phantom::PKC_SIG_DILITHIUM, test_duration, word_size, masking));
+        test["testcases"].push_back(perf_sig::run(phantom::PKC_SIG_FALCON, test_duration, word_size, masking));
+        test["testcases"].push_back(perf_sig::run(phantom::PKC_SIG_ECDSA, test_duration, word_size, masking));
+        test["testcases"].push_back(perf_sig::run(phantom::PKC_SIG_EDDSA, test_duration, word_size, masking));
+        test["testcases"].push_back(perf_sig::run(phantom::PKC_SIG_RSASSA_PSS, test_duration, word_size, masking));
 
         metrics["tests"].push_back(test);
 

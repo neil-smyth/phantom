@@ -39,7 +39,7 @@ json perf_pke::run(phantom::pkc_e pkc_type, size_t duration_us, cpu_word_size_e 
         case PKC_PKE_KYBER:      name = "SABRE"; break;
         case PKC_PKE_SABER:      name = "Kyber"; break;
         case PKC_PKE_RSAES_OAEP: name = "RSAES-OAEP"; break;
-        default:                 throw new std::runtime_error("Error! Invalid KEM scheme");
+        default:                 throw new std::runtime_error("Error! Invalid public key encryption scheme");
     }
 
     std::cout << "  PKC :: PKE :: " << name << ":: " << static_cast<int>(size_hint) << "-bit :: " <<

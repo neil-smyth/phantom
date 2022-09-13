@@ -256,7 +256,7 @@ bool dilithium_signature::set_public_key(std::unique_ptr<user_ctx>& ctx, const p
     ctx_dilithium& myctx = dynamic_cast<ctx_dilithium&>(*ctx.get());
 
     size_t   n      = myctx.get_dilithium()->get_params()->n;
-    size_t   k      = myctx.get_dilithium()->get_params()->n;
+    size_t   k      = myctx.get_dilithium()->get_params()->k;
     uint32_t d      = myctx.get_dilithium()->get_params()->d;
     uint32_t q_bits = myctx.get_dilithium()->get_params()->q_bits;
 
@@ -279,7 +279,7 @@ bool dilithium_signature::get_public_key(std::unique_ptr<user_ctx>& ctx, phantom
     ctx_dilithium& myctx = dynamic_cast<ctx_dilithium&>(*ctx.get());
 
     size_t   n      = myctx.get_dilithium()->get_params()->n;
-    size_t   k      = myctx.get_dilithium()->get_params()->n;
+    size_t   k      = myctx.get_dilithium()->get_params()->k;
     uint32_t d      = myctx.get_dilithium()->get_params()->d;
     uint32_t q_bits = myctx.get_dilithium()->get_params()->q_bits;
 
@@ -303,8 +303,8 @@ bool dilithium_signature::set_private_key(std::unique_ptr<user_ctx>& ctx, const 
     ctx_dilithium& myctx = dynamic_cast<ctx_dilithium&>(*ctx.get());
 
     size_t   n        = myctx.get_dilithium()->get_params()->n;
-    size_t   l        = myctx.get_dilithium()->get_params()->n;
-    size_t   k        = myctx.get_dilithium()->get_params()->n;
+    size_t   l        = myctx.get_dilithium()->get_params()->l;
+    size_t   k        = myctx.get_dilithium()->get_params()->k;
     uint32_t q_bits   = myctx.get_dilithium()->get_params()->q_bits;
     uint32_t eta_bits = myctx.get_dilithium()->get_params()->eta_bits;
 
@@ -343,8 +343,8 @@ bool dilithium_signature::get_private_key(std::unique_ptr<user_ctx>& ctx, phanto
     ctx_dilithium& myctx = dynamic_cast<ctx_dilithium&>(*ctx.get());
 
     size_t   n        = myctx.get_dilithium()->get_params()->n;
-    size_t   l        = myctx.get_dilithium()->get_params()->n;
-    size_t   k        = myctx.get_dilithium()->get_params()->n;
+    size_t   l        = myctx.get_dilithium()->get_params()->l;
+    size_t   k        = myctx.get_dilithium()->get_params()->k;
     uint32_t q_bits   = myctx.get_dilithium()->get_params()->q_bits;
     uint32_t eta_bits = myctx.get_dilithium()->get_params()->eta_bits;
 

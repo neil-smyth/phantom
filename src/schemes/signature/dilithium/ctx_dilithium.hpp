@@ -96,7 +96,7 @@ private:
     std::shared_ptr<csprng>        m_prng;
     std::unique_ptr<ntt_dilithium> m_ntt;
 
-    const phantom_vector<std::string> m_sets = { "I", "II", "III", "IV", "V" };
+    const phantom_vector<std::string> m_sets = { "I", "II", "III", "IV" };
 };
 
 }  // namespace schemes
