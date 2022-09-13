@@ -25,14 +25,16 @@ using namespace core;       // NOLINT
 
 using json = nlohmann::json;
 
-json perf_key_exchange::run(phantom::pkc_e pkc_type, size_t duration_us)
+json perf_key_exchange::run(phantom::pkc_e pkc_type, size_t duration_us, cpu_word_size_e size_hint, bool masking)
 {
     std::cout << "  PKC :: KEY :: ";
     switch (pkc_type)
     {
-        case PKC_KEY_ECDH: std::cout << "ECDH" << std::endl; break;
+        case PKC_KEY_ECDH: std::cout << "ECDH"; break;
         default:           throw new std::runtime_error("Error! Invalid key exchange scheme");
     }
+    std::cout << ":: " << static_cast<int>(size_hint) << "-bit :: " <<
+        (masking ? "masked" : "unmasked") << std::endl;
 
     stopwatch sw_total, sw_init, sw_final;
     std::unique_ptr<csprng> rng = std::unique_ptr<csprng>(csprng::make(0, &random_seed::seed_cb));
@@ -51,8 +53,8 @@ json perf_key_exchange::run(phantom::pkc_e pkc_type, size_t duration_us)
 
         size_t num_iter = 0;
 
-        ctx_a = key_a.create_ctx(param_set);
-        ctx_b = key_b.create_ctx(param_set);
+        ctx_a = key_a.create_ctx(param_set, size_hint, masking);
+        ctx_b = key_b.create_ctx(param_set, size_hint, masking);
 
         key_a.key_exchange_setup(ctx_a);
         key_b.key_exchange_setup(ctx_b);

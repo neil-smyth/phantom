@@ -25,15 +25,17 @@ using namespace core;       // NOLINT
 
 using json = nlohmann::json;
 
-json perf_kem::run(phantom::pkc_e pkc_type, size_t duration_us)
+json perf_kem::run(phantom::pkc_e pkc_type, size_t duration_us, cpu_word_size_e size_hint, bool masking)
 {
     std::cout << "  PKC :: KEM :: ";
     switch (pkc_type)
     {
-        case PKC_KEM_SABER: std::cout << "SABRE" << std::endl; break;
-        case PKC_KEM_KYBER: std::cout << "Kyber" << std::endl; break;
+        case PKC_KEM_SABER: std::cout << "SABRE"; break;
+        case PKC_KEM_KYBER: std::cout << "Kyber"; break;
         default:            throw new std::runtime_error("Error! Invalid KEM scheme");
     }
+    std::cout << ":: " << static_cast<int>(size_hint) << "-bit :: " <<
+        (masking ? "masked" : "unmasked") << std::endl;
 
     stopwatch sw_total, sw_keygen, sw_encap, sw_decap;
     std::unique_ptr<csprng> rng = std::unique_ptr<csprng>(csprng::make(0, &random_seed::seed_cb));
@@ -54,8 +56,8 @@ json perf_kem::run(phantom::pkc_e pkc_type, size_t duration_us)
 
         size_t num_iter = 0;
 
-        ctx_a = kem_a.create_ctx(param_set);
-        ctx_b = kem_b.create_ctx(param_set);
+        ctx_a = kem_a.create_ctx(param_set, size_hint, masking);
+        ctx_b = kem_b.create_ctx(param_set, size_hint, masking);
 
         size_t n = kem_a.get_msg_len(ctx_a);
 

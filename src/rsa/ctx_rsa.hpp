@@ -55,10 +55,10 @@ template<class T>
 class ctx_rsa_tmpl : public ctx_rsa
 {
 public:
-    ctx_rsa_tmpl(size_t set, bool masking) : m_scheme(PKC_PKE_RSAES_OAEP), m_set(set)
+    ctx_rsa_tmpl(uint32_t min_exp_bits, size_t set, bool masking) : m_scheme(PKC_PKE_RSAES_OAEP), m_set(set)
     {
         m_rsa_pke = std::unique_ptr<phantom::rsa::rsa_cryptosystem<T>>(
-            new phantom::rsa::rsa_cryptosystem<T>(core::scalar_coding_e::SCALAR_BINARY, masking));
+            new phantom::rsa::rsa_cryptosystem<T>(min_exp_bits, core::scalar_coding_e::SCALAR_BINARY, masking));
 
         if (!set_hash(static_cast<hash_alg_e>((set >> 8) & 0x1f))) {
             throw std::runtime_error("Hash is unknown");
@@ -78,12 +78,11 @@ public:
     {
         switch (m_set & 0xff)
         {
-            case 0 : return 512;
-            case 1 : return 1024;
-            case 2 : return 1536;
-            case 3 : return 2048;
-            case 4 : return 3072;
-            case 5 : return 4096;
+            case 0 : return 1024;
+            case 1 : return 1536;
+            case 2 : return 2048;
+            case 3 : return 3072;
+            case 4 : return 4096;
         }
 
         return 0;
@@ -223,7 +222,7 @@ private:
     const pkc_e  m_scheme;
     const size_t m_set;
 
-    const phantom_vector<std::string> m_sets = { "512", "1024", "1536", "2048", "3096", "4096" };
+    const phantom_vector<std::string> m_sets = { "1024", "1536", "2048", "3096", "4096" };
 
     std::unique_ptr<phantom::rsa::rsa_cryptosystem<T>> m_rsa_pke;
 

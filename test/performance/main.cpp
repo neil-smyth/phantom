@@ -14,6 +14,7 @@
 #include "test/performance/perf_ibe.hpp"
 #include "test/performance/perf_kem.hpp"
 #include "test/performance/perf_key_exchange.hpp"
+#include "test/performance/perf_pke.hpp"
 #include "./phantom.hpp"
 #include <nlohmann/json.hpp>
 
@@ -31,6 +32,9 @@ int main(int argc, char *argv[])
     std::stringstream timestamp;
     timestamp << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d %X");
 
+    phantom::cpu_word_size_e word_size = NATIVE_CPU_WORD_SIZE;
+    bool                     masking   = true;
+
     json metrics = {
         {"version", phantom::build_info::version()},
         {"build_date", phantom::build_info::build_date()},
@@ -39,10 +43,25 @@ int main(int argc, char *argv[])
         {"tests", json::array()}
     };
 
-    metrics["tests"].push_back(perf_ibe::run(phantom::PKC_IBE_DLP, test_duration));
-    metrics["tests"].push_back(perf_kem::run(phantom::PKC_KEM_SABER, test_duration));
-    metrics["tests"].push_back(perf_kem::run(phantom::PKC_KEM_KYBER, test_duration));
-    metrics["tests"].push_back(perf_key_exchange::run(phantom::PKC_KEY_ECDH, test_duration));
+    do {
+        json test = {
+            {"word_size", static_cast<int>(word_size)},
+            {"masking", masking},
+            {"testcases", json::array()}
+        };
+
+        test["testcases"].push_back(perf_ibe::run(phantom::PKC_IBE_DLP, test_duration, word_size, masking));
+        test["testcases"].push_back(perf_kem::run(phantom::PKC_KEM_SABER, test_duration, word_size, masking));
+        test["testcases"].push_back(perf_kem::run(phantom::PKC_KEM_KYBER, test_duration, word_size, masking));
+        test["testcases"].push_back(perf_key_exchange::run(phantom::PKC_KEY_ECDH, test_duration, word_size, masking));
+        test["testcases"].push_back(perf_pke::run(phantom::PKC_PKE_KYBER, test_duration, word_size, masking));
+        test["testcases"].push_back(perf_pke::run(phantom::PKC_PKE_SABER, test_duration, word_size, masking));
+        test["testcases"].push_back(perf_pke::run(phantom::PKC_PKE_RSAES_OAEP, test_duration, word_size, masking));
+
+        metrics["tests"].push_back(test);
+
+        masking = !masking;
+    } while (!masking);
 
     std::ofstream o("phantom_metrics.json");
     o << metrics.dump(2) << std::endl;

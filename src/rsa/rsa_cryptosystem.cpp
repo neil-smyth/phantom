@@ -25,8 +25,8 @@ namespace rsa {
 
 
 template<typename T>
-rsa_cryptosystem<T>::rsa_cryptosystem(core::scalar_coding_e coding, bool masking)
-    : m_e_2_16("10000", 16),
+rsa_cryptosystem<T>::rsa_cryptosystem(uint32_t min_exp_bits, core::scalar_coding_e coding, bool masking)
+    : m_e_low_limit(static_cast<T>((1 << min_exp_bits) - 1)),
       m_e_2_256("100000000", 16),
       m_inv_sqrt2("b504f333f9df16e717f7ce02303e69cd2d040bb5b7bd8e638f26d2ef9cadb727", 16),
       m_coding_type(masking ? core::scalar_coding_e::SCALAR_MONT_LADDER : coding),
@@ -285,7 +285,7 @@ bool rsa_cryptosystem<T>::get_private_key(ctx_rsa_tmpl<T>& ctx, phantom_vector<u
 template<typename T>
 bool rsa_cryptosystem<T>::keygen_sp800_56b(core::mpz<T>& p, core::mpz<T>& q, const core::mpz<T>& e, size_t nbits)
 {
-    if (e.cmp(m_e_2_16) <= 0 || e.cmp(m_e_2_256) >= 0 || e.is_zero() || !(e[0] & 0x1)) {
+    if (e.cmp(m_e_low_limit) < 0 || e.cmp(m_e_2_256) >= 0 || e.is_zero() || !(e[0] & 0x1)) {
         p = core::mpz<T>();
         q = core::mpz<T>();
         return false;
@@ -572,16 +572,16 @@ template<typename T>
 bool rsa_cryptosystem<T>::gen_probable_prime(core::mpz<T>& prime, core::mpz<T>& xpout,
     core::mpz<T>& p1, core::mpz<T>& p2, const core::mpz<T>& e, size_t nbits)
 {
-    const size_t min_bitlen = nbits >=4096 ? 201 :
-                                nbits >=3072 ? 171 :
-                                nbits >=2048 ? 141 :
-                                nbits >=1024 ? 101 :
-                                                56;
-    const size_t max_bitlen = nbits >=4096 ? 2030 :
-                                nbits >=3072 ? 1518 :
-                                nbits >=2048 ? 1007 :
-                                nbits >=1024 ? 496 :
-                                                246;
+    const size_t min_bitlen = nbits >= 4096 ? 201 :
+                              nbits >= 3072 ? 171 :
+                              nbits >= 2048 ? 141 :
+                              nbits >= 1024 ? 101 :
+                                              56;
+    const size_t max_bitlen = nbits >= 4096 ? 2030 :
+                              nbits >= 3072 ? 1518 :
+                              nbits >= 2048 ? 1007 :
+                              nbits >= 1024 ? 496 :
+                                              246;
 
     // Generate odd integers Xp1 and Xp2 of length bitlen1 and bitlen2 respectively
     const size_t bitlen_bytes = (min_bitlen + 7) >> 3;

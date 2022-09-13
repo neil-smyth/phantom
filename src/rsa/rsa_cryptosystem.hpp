@@ -60,8 +60,8 @@ protected:
     /// S ahred pointer to a CSPRNG
     std::shared_ptr<csprng> m_prng;
 
-    /// 2^16 value used in an exponent range check by SP800 56B
-    const core::mpz<T> m_e_2_16;
+    /// Lowest permissable value used in an exponent range check by SP800 56B
+    const core::mpz<T> m_e_low_limit;
 
     /// 2^256 value used in an exponent range check by SP800 56B
     const core::mpz<T> m_e_2_256;
@@ -80,7 +80,8 @@ protected:
 
 public:
     /// Class constructor
-    rsa_cryptosystem(core::scalar_coding_e coding = core::scalar_coding_e::SCALAR_BINARY,
+    rsa_cryptosystem(uint32_t min_exp_bits,
+                     core::scalar_coding_e coding = core::scalar_coding_e::SCALAR_BINARY,
                      bool masking = true);
 
     /// Class destructor

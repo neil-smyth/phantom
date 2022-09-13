@@ -25,24 +25,23 @@ namespace schemes {
 template<typename T>
 using rsa_oaep = phantom::rsa::rsa_cryptosystem_oaep<T>;
 
-const phantom::rsa::rsa_set_t rsaes_oaep_pke::m_params[17] = {
-    {0, 512},
-    {1, 1024},
-    {2, 2048},
-    {3, 3072},
-    {4, 4096},
-    {5, 5120},
-    {6, 6144},
-    {7, 7168},
-    {8, 8192},
-    {9, 9216},
-    {10, 10240},
-    {11, 11264},
-    {12, 12288},
-    {13, 13312},
-    {14, 14336},
-    {15, 15360},
-    {16, 16384},
+const phantom::rsa::rsa_set_t rsaes_oaep_pke::m_params[16] = {
+    {0, 1024},
+    {1, 2048},
+    {2, 3072},
+    {3, 4096},
+    {4, 5120},
+    {5, 6144},
+    {6, 7168},
+    {7, 8192},
+    {8, 9216},
+    {9, 10240},
+    {10, 11264},
+    {11, 12288},
+    {12, 13312},
+    {13, 14336},
+    {14, 15360},
+    {15, 16384},
 };
 
 size_t rsaes_oaep_pke::bits_2_set(security_strength_e bits)
@@ -82,10 +81,16 @@ std::unique_ptr<user_ctx> rsaes_oaep_pke::create_ctx(security_strength_e bits,
     user_ctx* ctx;
     switch (size_hint)
     {
-        case CPU_WORD_SIZE_16: ctx = new phantom::rsa::ctx_rsa_tmpl<uint16_t>(bits_2_set(bits), masking); break;
-        case CPU_WORD_SIZE_32: ctx = new phantom::rsa::ctx_rsa_tmpl<uint32_t>(bits_2_set(bits), masking); break;
+        case CPU_WORD_SIZE_16: {
+            ctx = new phantom::rsa::ctx_rsa_tmpl<uint16_t>(2, bits_2_set(bits), masking);
+        } break;
+        case CPU_WORD_SIZE_32: {
+            ctx = new phantom::rsa::ctx_rsa_tmpl<uint32_t>(2, bits_2_set(bits), masking);
+        } break;
 #if defined(IS_64BIT)
-        case CPU_WORD_SIZE_64: ctx = new phantom::rsa::ctx_rsa_tmpl<uint64_t>(bits_2_set(bits), masking); break;
+        case CPU_WORD_SIZE_64: {
+            ctx = new phantom::rsa::ctx_rsa_tmpl<uint64_t>(2, bits_2_set(bits), masking);
+        } break;
 #endif
         default: throw std::invalid_argument("size_hint set is out of range");;
     }
@@ -93,6 +98,7 @@ std::unique_ptr<user_ctx> rsaes_oaep_pke::create_ctx(security_strength_e bits,
     if ((ctx->get_set() & 0xff) > 5) {
         throw std::invalid_argument("Parameter set is out of range");
     }
+
     return std::unique_ptr<user_ctx>(ctx);
 }
 
@@ -103,10 +109,10 @@ std::unique_ptr<user_ctx> rsaes_oaep_pke::create_ctx(size_t set,
     user_ctx* ctx;
     switch (size_hint)
     {
-        case CPU_WORD_SIZE_16: ctx = new phantom::rsa::ctx_rsa_tmpl<uint16_t>(set, masking); break;
-        case CPU_WORD_SIZE_32: ctx = new phantom::rsa::ctx_rsa_tmpl<uint32_t>(set, masking); break;
+        case CPU_WORD_SIZE_16: ctx = new phantom::rsa::ctx_rsa_tmpl<uint16_t>(2, set, masking); break;
+        case CPU_WORD_SIZE_32: ctx = new phantom::rsa::ctx_rsa_tmpl<uint32_t>(2, set, masking); break;
 #if defined(IS_64BIT)
-        case CPU_WORD_SIZE_64: ctx = new phantom::rsa::ctx_rsa_tmpl<uint64_t>(set, masking); break;
+        case CPU_WORD_SIZE_64: ctx = new phantom::rsa::ctx_rsa_tmpl<uint64_t>(2, set, masking); break;
 #endif
         default: throw std::invalid_argument("size_hint set is out of range");;
     }
@@ -128,17 +134,20 @@ bool rsaes_oaep_pke::keygen(std::unique_ptr<user_ctx>& ctx)
         case 16:
         {
             phantom::rsa::ctx_rsa_tmpl<uint16_t>& ctx = dynamic_cast<phantom::rsa::ctx_rsa_tmpl<uint16_t>&>(myctx);
+            ctx.e() = core::mpz<uint16_t>("3", 10);
             return ctx.pke()->keygen(ctx);
         } break;
         case 32:
         {
             phantom::rsa::ctx_rsa_tmpl<uint32_t>& ctx = dynamic_cast<phantom::rsa::ctx_rsa_tmpl<uint32_t>&>(myctx);
+            ctx.e() = core::mpz<uint32_t>("3", 10);
             return ctx.pke()->keygen(ctx);
         } break;
 #if defined(IS_64BIT)
         case 64:
         {
             phantom::rsa::ctx_rsa_tmpl<uint64_t>& ctx = dynamic_cast<phantom::rsa::ctx_rsa_tmpl<uint64_t>&>(myctx);
+            ctx.e() = core::mpz<uint64_t>("3", 10);
             return ctx.pke()->keygen(ctx);
         } break;
 #endif

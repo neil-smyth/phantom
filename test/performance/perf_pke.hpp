@@ -15,7 +15,7 @@
 using json = nlohmann::json;
 
 
-class perf_key_exchange
+class perf_pke
 {
 public:
     static json run(phantom::pkc_e pkc_type, size_t duration_us, phantom::cpu_word_size_e size_hint, bool masking);
