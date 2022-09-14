@@ -345,7 +345,7 @@ add_executable(perf_metrics
     performance/main.cpp
     performance/perf_ibe.cpp
     performance/perf_kem.cpp
-    performance/perf_key_exchange.cpp
+    performance/perf_kex.cpp
     performance/perf_pke.cpp
     performance/perf_sig.cpp )
 target_link_libraries(perf_metrics phantom_static)

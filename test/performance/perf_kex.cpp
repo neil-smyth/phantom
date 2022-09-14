@@ -7,7 +7,7 @@
  * 'LICENSE', which is part of this source code package.                     *
  *****************************************************************************/
 
-#include "test/performance/perf_key_exchange.hpp"
+#include "test/performance/perf_kex.hpp"
 #include <algorithm>
 #include <cstdlib>
 #include <iomanip>
@@ -25,7 +25,7 @@ using namespace core;       // NOLINT
 
 using json = nlohmann::json;
 
-json perf_key_exchange::run(phantom::pkc_e pkc_type, size_t duration_us, cpu_word_size_e size_hint, bool masking)
+json perf_kex::run(phantom::pkc_e pkc_type, size_t duration_us, cpu_word_size_e size_hint, bool masking)
 {
     std::cout << "  PKC :: KEY :: ";
     switch (pkc_type)

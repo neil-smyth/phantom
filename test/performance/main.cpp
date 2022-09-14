@@ -13,7 +13,7 @@
 #include <iostream>
 #include "test/performance/perf_ibe.hpp"
 #include "test/performance/perf_kem.hpp"
-#include "test/performance/perf_key_exchange.hpp"
+#include "test/performance/perf_kex.hpp"
 #include "test/performance/perf_pke.hpp"
 #include "test/performance/perf_sig.hpp"
 #include "./phantom.hpp"
@@ -51,13 +51,13 @@ int main(int argc, char *argv[])
             {"testcases", json::array()}
         };
 
-        /*test["testcases"].push_back(perf_ibe::run(phantom::PKC_IBE_DLP, test_duration, word_size, masking));
+        test["testcases"].push_back(perf_ibe::run(phantom::PKC_IBE_DLP, test_duration, word_size, masking));
         test["testcases"].push_back(perf_kem::run(phantom::PKC_KEM_SABER, test_duration, word_size, masking));
         test["testcases"].push_back(perf_kem::run(phantom::PKC_KEM_KYBER, test_duration, word_size, masking));
-        test["testcases"].push_back(perf_key_exchange::run(phantom::PKC_KEY_ECDH, test_duration, word_size, masking));
+        test["testcases"].push_back(perf_kex::run(phantom::PKC_KEY_ECDH, test_duration, word_size, masking));
         test["testcases"].push_back(perf_pke::run(phantom::PKC_PKE_KYBER, test_duration, word_size, masking));
         test["testcases"].push_back(perf_pke::run(phantom::PKC_PKE_SABER, test_duration, word_size, masking));
-        test["testcases"].push_back(perf_pke::run(phantom::PKC_PKE_RSAES_OAEP, test_duration, word_size, masking));*/
+        test["testcases"].push_back(perf_pke::run(phantom::PKC_PKE_RSAES_OAEP, test_duration, word_size, masking));
         test["testcases"].push_back(perf_sig::run(phantom::PKC_SIG_DILITHIUM, test_duration, word_size, masking));
         test["testcases"].push_back(perf_sig::run(phantom::PKC_SIG_FALCON, test_duration, word_size, masking));
         test["testcases"].push_back(perf_sig::run(phantom::PKC_SIG_ECDSA, test_duration, word_size, masking));
