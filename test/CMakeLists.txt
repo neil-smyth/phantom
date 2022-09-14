@@ -347,6 +347,8 @@ add_executable(perf_metrics
     performance/perf_kem.cpp
     performance/perf_kex.cpp
     performance/perf_pke.cpp
-    performance/perf_sig.cpp )
+    performance/perf_sig.cpp
+    performance/perf_sha2.cpp
+    performance/perf_sha3.cpp )
 target_link_libraries(perf_metrics phantom_static)
 add_test(PERF_METRICS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/perf_metrics)

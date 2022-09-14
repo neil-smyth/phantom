@@ -16,6 +16,8 @@
 #include "test/performance/perf_kex.hpp"
 #include "test/performance/perf_pke.hpp"
 #include "test/performance/perf_sig.hpp"
+#include "test/performance/perf_sha2.hpp"
+#include "test/performance/perf_sha3.hpp"
 #include "./phantom.hpp"
 #include <nlohmann/json.hpp>
 
@@ -68,6 +70,17 @@ int main(int argc, char *argv[])
 
         masking = !masking;
     } while (!masking);
+
+    json hash_test = {
+            {"word_size", static_cast<int>(word_size)},
+            {"masking", masking},
+            {"testcases", json::array()}
+        };
+
+    hash_test["testcases"].push_back(perf_sha2::run(test_duration));
+    hash_test["testcases"].push_back(perf_sha3::run(test_duration));
+
+    metrics["tests"].push_back(hash_test);
 
     std::ofstream o("phantom_metrics.json");
     o << metrics.dump(2) << std::endl;
