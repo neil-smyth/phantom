@@ -84,7 +84,8 @@ json perf_sha3::run(size_t duration_us)
             {"message_length", 16},
             {"hash_length", hash->get_length()},
             {"hash_us", static_cast<float>(total_us) / static_cast<float>(num_iter)},
-            {"hash_per_sec", static_cast<uint32_t>((num_iter*1000000.0f)/static_cast<float>(total_us))}
+            {"hash_per_sec", static_cast<uint32_t>((num_iter*1000000.0f)/static_cast<float>(total_us))},
+            {"bytes_per_sec", static_cast<uint32_t>((16*num_iter*1000000.0f)/static_cast<float>(total_us))}
         };
 
         hash_performance.push_back(hash_metrics_16);
@@ -108,7 +109,8 @@ json perf_sha3::run(size_t duration_us)
             {"message_length", 512},
             {"hash_length", hash->get_length()},
             {"hash_us", static_cast<float>(total_us) / static_cast<float>(num_iter)},
-            {"hash_per_sec", static_cast<uint32_t>((num_iter*1000000.0f)/static_cast<float>(total_us))}
+            {"hash_per_sec", static_cast<uint32_t>((num_iter*1000000.0f)/static_cast<float>(total_us))},
+            {"bytes_per_sec", static_cast<uint32_t>((512*num_iter*1000000.0f)/static_cast<float>(total_us))}
         };
 
         hash_performance.push_back(hash_metrics_512);
@@ -132,7 +134,8 @@ json perf_sha3::run(size_t duration_us)
             {"message_length", 16384},
             {"hash_length", hash->get_length()},
             {"hash_us", static_cast<float>(total_us) / static_cast<float>(num_iter)},
-            {"hash_per_sec", static_cast<uint32_t>((num_iter*1000000.0f)/static_cast<float>(total_us))}
+            {"hash_per_sec", static_cast<uint32_t>((num_iter*1000000.0f)/static_cast<float>(total_us))},
+            {"bytes_per_sec", static_cast<uint32_t>((16384*num_iter*1000000.0f)/static_cast<float>(total_us))}
         };
 
         hash_performance.push_back(hash_metrics_16384);
