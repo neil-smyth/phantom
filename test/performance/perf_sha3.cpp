@@ -144,7 +144,6 @@ json perf_sha3::run(size_t duration_us)
     } while (hash_type < 4);
 
     json hash_header = {
-        {"type", "Hash"},
         {"scheme", "SHA3"},
         {"metrics", json::array()}
     };

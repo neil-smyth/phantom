@@ -145,7 +145,6 @@ json perf_sha2::run(size_t duration_us)
     } while (hash_type < 4);
 
     json hash_header = {
-        {"type", "Hash"},
         {"scheme", "SHA2"},
         {"metrics", json::array()}
     };

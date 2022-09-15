@@ -104,6 +104,7 @@ json perf_sig::run(phantom::pkc_e pkc_type, size_t duration_us, cpu_word_size_e 
             signature.sig_verify(ctx, m, s);
             sw_verify.stop();
 
+            keygen_us += sw_keygen.elapsed_us();
             sign_us   += sw_sign.elapsed_us();
             verify_us += sw_verify.elapsed_us();
 
@@ -139,7 +140,6 @@ json perf_sig::run(phantom::pkc_e pkc_type, size_t duration_us, cpu_word_size_e 
     } while (param_set < ctx->get_set_names().size());
 
     json sig_header = {
-        {"type", "Signature"},
         {"scheme", name},
         {"metrics", json::array()}
     };

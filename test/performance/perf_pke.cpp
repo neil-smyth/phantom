@@ -80,7 +80,7 @@ json perf_pke::run(phantom::pkc_e pkc_type, size_t duration_us, cpu_word_size_e 
             }
             sw_keygen.stop();
             keygen_us  += sw_keygen.elapsed_us();
-            num_iter++;
+            num_iter += 2;
         } while (keygen_us < duration_us);
         keygen_us /= num_iter;
 
@@ -149,7 +149,6 @@ json perf_pke::run(phantom::pkc_e pkc_type, size_t duration_us, cpu_word_size_e 
     } while (param_set < ctx_a->get_set_names().size());
 
     json pke_header = {
-        {"type", "Public Key Encryption"},
         {"scheme", name},
         {"metrics", json::array()}
     };

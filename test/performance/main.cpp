@@ -43,44 +43,47 @@ int main(int argc, char *argv[])
         {"build_date", phantom::build_info::build_date()},
         {"compiler", phantom::build_info::compiler()},
         {"timestamp", timestamp.str()},
-        {"tests", json::array()}
+        {"pkc", json::array()},
+        {"hashing", json::array()}
     };
 
     do {
         json test = {
             {"word_size", static_cast<int>(word_size)},
             {"masking", masking},
-            {"testcases", json::array()}
+            {"ibe", json::array()},
+            {"kem", json::array()},
+            {"kex", json::array()},
+            {"pke", json::array()},
+            {"sig", json::array()}
         };
 
-        test["testcases"].push_back(perf_ibe::run(phantom::PKC_IBE_DLP, test_duration, word_size, masking));
-        test["testcases"].push_back(perf_kem::run(phantom::PKC_KEM_SABER, test_duration, word_size, masking));
-        test["testcases"].push_back(perf_kem::run(phantom::PKC_KEM_KYBER, test_duration, word_size, masking));
-        test["testcases"].push_back(perf_kex::run(phantom::PKC_KEY_ECDH, test_duration, word_size, masking));
-        test["testcases"].push_back(perf_pke::run(phantom::PKC_PKE_KYBER, test_duration, word_size, masking));
-        test["testcases"].push_back(perf_pke::run(phantom::PKC_PKE_SABER, test_duration, word_size, masking));
-        test["testcases"].push_back(perf_pke::run(phantom::PKC_PKE_RSAES_OAEP, test_duration, word_size, masking));
-        test["testcases"].push_back(perf_sig::run(phantom::PKC_SIG_DILITHIUM, test_duration, word_size, masking));
-        test["testcases"].push_back(perf_sig::run(phantom::PKC_SIG_FALCON, test_duration, word_size, masking));
-        test["testcases"].push_back(perf_sig::run(phantom::PKC_SIG_ECDSA, test_duration, word_size, masking));
-        test["testcases"].push_back(perf_sig::run(phantom::PKC_SIG_EDDSA, test_duration, word_size, masking));
-        test["testcases"].push_back(perf_sig::run(phantom::PKC_SIG_RSASSA_PSS, test_duration, word_size, masking));
+        test["ibe"].push_back(perf_ibe::run(phantom::PKC_IBE_DLP, test_duration, word_size, masking));
+        test["kem"].push_back(perf_kem::run(phantom::PKC_KEM_SABER, test_duration, word_size, masking));
+        test["kem"].push_back(perf_kem::run(phantom::PKC_KEM_KYBER, test_duration, word_size, masking));
+        test["kex"].push_back(perf_kex::run(phantom::PKC_KEY_ECDH, test_duration, word_size, masking));
+        test["pke"].push_back(perf_pke::run(phantom::PKC_PKE_KYBER, test_duration, word_size, masking));
+        test["pke"].push_back(perf_pke::run(phantom::PKC_PKE_SABER, test_duration, word_size, masking));
+        test["pke"].push_back(perf_pke::run(phantom::PKC_PKE_RSAES_OAEP, test_duration, word_size, masking));
+        test["sig"].push_back(perf_sig::run(phantom::PKC_SIG_DILITHIUM, test_duration, word_size, masking));
+        test["sig"].push_back(perf_sig::run(phantom::PKC_SIG_FALCON, test_duration, word_size, masking));
+        test["sig"].push_back(perf_sig::run(phantom::PKC_SIG_ECDSA, test_duration, word_size, masking));
+        test["sig"].push_back(perf_sig::run(phantom::PKC_SIG_EDDSA, test_duration, word_size, masking));
+        test["sig"].push_back(perf_sig::run(phantom::PKC_SIG_RSASSA_PSS, test_duration, word_size, masking));
 
-        metrics["tests"].push_back(test);
+        metrics["pkc"].push_back(test);
 
         masking = !masking;
     } while (!masking);
 
-    json hash_test = {
-            {"word_size", static_cast<int>(word_size)},
-            {"masking", masking},
-            {"testcases", json::array()}
-        };
+    json hashing = {
+        {"sha2", json::array()},
+        {"sha3", json::array()}
+    };
 
-    hash_test["testcases"].push_back(perf_sha2::run(test_duration));
-    hash_test["testcases"].push_back(perf_sha3::run(test_duration));
-
-    metrics["tests"].push_back(hash_test);
+    hashing["sha2"].push_back(perf_sha2::run(test_duration));
+    hashing["sha3"].push_back(perf_sha3::run(test_duration));
+    metrics["hashing"].push_back(hashing);
 
     std::ofstream o("phantom_metrics.json");
     o << metrics.dump(2) << std::endl;

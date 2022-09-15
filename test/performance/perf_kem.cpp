@@ -141,7 +141,6 @@ json perf_kem::run(phantom::pkc_e pkc_type, size_t duration_us, cpu_word_size_e 
     } while (param_set < ctx_a->get_set_names().size());
 
     json kem_header = {
-        {"type", "KEM"},
         {"scheme", pkc_type == PKC_KEM_SABER ? "SABRE" : "Kyber"},
         {"metrics", json::array()}
     };

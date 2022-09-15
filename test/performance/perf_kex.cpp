@@ -117,7 +117,6 @@ json perf_kex::run(phantom::pkc_e pkc_type, size_t duration_us, cpu_word_size_e 
     } while (param_set < ctx_a->get_set_names().size());
 
     json key_exchange_header = {
-        {"type", "Key Exchange"},
         {"scheme", "ECDH"},
         {"metrics", json::array()}
     };
