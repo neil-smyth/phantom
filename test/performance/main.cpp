@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
         {"compiler", phantom::build_info::compiler()},
         {"timestamp", timestamp.str()},
         {"pkc", json::array()},
-        {"hashing", json::array()}
+        {"hashing", json::object()}
     };
 
     do {
@@ -77,13 +77,11 @@ int main(int argc, char *argv[])
     } while (!masking);
 
     json hashing = {
-        {"sha2", json::array()},
-        {"sha3", json::array()}
+        {"sha2", perf_sha2::run(test_duration)},
+        {"sha3", perf_sha3::run(test_duration)}
     };
 
-    hashing["sha2"].push_back(perf_sha2::run(test_duration));
-    hashing["sha3"].push_back(perf_sha3::run(test_duration));
-    metrics["hashing"].push_back(hashing);
+    metrics["hashing"] = hashing;
 
     std::ofstream o("phantom_metrics.json");
     o << metrics.dump(2) << std::endl;
