@@ -138,25 +138,15 @@ class SymKeyEncMetricsSchema(Schema):
     keygen_per_sec = fields.Float()
     message_length = fields.Integer()
 
-class SymKeyAuthEncMetricsSchema(Schema):
-    algorithm = fields.String()
-    decrypt_per_sec = fields.Integer()
-    encrypt_per_sec = fields.Integer()
-    key_length = fields.Integer()
-    msg_length = fields.Integer()
 
 class SymKeyEncSchema(Schema):
     key_length = fields.Integer()
     scheme = fields.String()
     metrics = fields.List(fields.Nested(SymKeyEncMetricsSchema))
 
-class SymKeyAuthEncSchema(Schema):
-    scheme = fields.String()
-    metrics = fields.List(fields.Nested(SymKeyEncMetricsSchema))
-
 class SymmetricKeySchema(Schema):
     encryption = fields.List(fields.Nested(SymKeyEncSchema))
-    auth_encryption = fields.List(fields.Nested(SymKeyAuthEncSchema))
+    auth_encryption = fields.List(fields.Nested(SymKeyEncSchema))
 
 class PhantomPerformanceSchema(Schema):
     build_date = fields.String()
@@ -220,13 +210,51 @@ df_symkey_aes = pd.DataFrame(dsymkey_aes.data, columns=['Key length (bytes)', 'M
 
 plot_symkey_aes = sns.catplot(kind="bar", x = 'Key length (bytes)', y = 'MB/sec', col = "Operation", hue='Message length (bytes)',
     data=df_symkey_aes, legend_out=False, height=8, aspect=3, col_wrap=1)
-ax = plot_symkey_aes.facet_axis(0, 0)
-for c in ax.containers:
-    labels = [f'{(v.get_height()):.1f}' for v in c]
-    ax.bar_label(c, labels=labels, label_type='edge')
+for ax in plot_symkey_aes.axes.ravel():
+    for c in ax.containers:
+        labels = [f'{(v.get_height()):.1f}' for v in c]
+        ax.bar_label(c, labels=labels, label_type='edge')
 sns.move_legend(plot_symkey_aes, "upper right")
 plot_symkey_aes.fig.suptitle('Symmetric Key - Encryption - AES-ECB')
 plt.savefig('aes_ecb.png')
+
+
+dsymkey_aes_ctr = plotData()
+for enc in dec["symmetric_key"]["encryption"]:
+    if enc["scheme"] == "AES-CTR":
+        for v in enc["metrics"]:
+            dsymkey_aes_ctr.append(enc["key_length"], v["encrypt_bytes_per_sec"] / (1024.0*1024.0), v["message_length"], "Encryption")
+            dsymkey_aes_ctr.append(enc["key_length"], v["decrypt_bytes_per_sec"] / (1024.0*1024.0), v["message_length"], "Decryption")
+df_symkey_aes_ctr = pd.DataFrame(dsymkey_aes_ctr.data, columns=['Key length (bytes)', 'MB/sec', 'Message length (bytes)', 'Operation'])
+
+plot_symkey_aes_ctr = sns.catplot(kind="bar", x = 'Key length (bytes)', y = 'MB/sec', col = "Operation", hue='Message length (bytes)',
+    data=df_symkey_aes_ctr, legend_out=False, height=8, aspect=3, col_wrap=1)
+for ax in plot_symkey_aes_ctr.axes.ravel():
+    for c in ax.containers:
+        labels = [f'{(v.get_height()):.1f}' for v in c]
+        ax.bar_label(c, labels=labels, label_type='edge')
+sns.move_legend(plot_symkey_aes_ctr, "upper right")
+plot_symkey_aes_ctr.fig.suptitle('Symmetric Key - Encryption - AES-ECB')
+plt.savefig('aes_ctr.png')
+
+
+dsymkey_aes_gcm = plotData()
+for enc in dec["symmetric_key"]["auth_encryption"]:
+    if enc["scheme"] == "AES-GCM":
+        for v in enc["metrics"]:
+            dsymkey_aes_gcm.append(enc["key_length"], v["encrypt_bytes_per_sec"] / (1024.0*1024.0), v["message_length"], "Encryption")
+            dsymkey_aes_gcm.append(enc["key_length"], v["decrypt_bytes_per_sec"] / (1024.0*1024.0), v["message_length"], "Decryption")
+df_symkey_aes_gcm = pd.DataFrame(dsymkey_aes_gcm.data, columns=['Key length (bytes)', 'MB/sec', 'Message length (bytes)', 'Operation'])
+
+plot_symkey_aes_gcm = sns.catplot(kind="bar", x = 'Key length (bytes)', y = 'MB/sec', col = "Operation", hue='Message length (bytes)',
+    data=df_symkey_aes_gcm, legend_out=False, height=8, aspect=3, col_wrap=1)
+for ax in plot_symkey_aes_gcm.axes.ravel():
+    for c in ax.containers:
+        labels = [f'{(v.get_height()):.1f}' for v in c]
+        ax.bar_label(c, labels=labels, label_type='edge')
+sns.move_legend(plot_symkey_aes_gcm, "upper right")
+plot_symkey_aes_gcm.fig.suptitle('Symmetric Key - Authenticated Encryption - AES-GCM')
+plt.savefig('aes_gcm.png')
 
 
 sns.set_palette("RdPu", 3)
@@ -344,16 +372,16 @@ plt.savefig('pke_rsa.png')
 
 sns.set_palette("RdPu", 3)
 dsig = plotData()
+dsig_keygen = plotData()
 for pkc in dec["pkc"]:
     if pkc["masking"] == True:
         for sig in pkc["sig"]:
             for metrics in sig["metrics"]:
-                dsig.append(metrics["parameter_set"], metrics["keygen_per_sec"], "Key Generation", sig["scheme"])
                 dsig.append(metrics["parameter_set"], metrics["sign_per_sec"], "Sign", sig["scheme"])
                 dsig.append(metrics["parameter_set"], metrics["verify_per_sec"], "Verify", sig["scheme"])
+                dsig_keygen.append(metrics["parameter_set"], metrics["keygen_per_sec"], "Key Generation", sig["scheme"])
 
 df_sig = pd.DataFrame(dsig.data, columns=['Parameter Set', 'Operations/sec', 'Operation', 'Scheme'])
-
 plot_sig = sns.catplot(kind="bar", x = 'Parameter Set', y = 'Operations/sec', col = 'Scheme', hue='Operation',
     data=df_sig, legend_out=False, height=5, aspect=1.5, col_wrap=1, sharex=False, sharey=False)
 for ax in plot_sig.axes.ravel():
@@ -363,6 +391,17 @@ for ax in plot_sig.axes.ravel():
 sns.move_legend(plot_sig, "upper right")
 plot_sig.fig.suptitle('Digital Signature')
 plt.savefig('sig.png')
+
+df_sig_keygen = pd.DataFrame(dsig_keygen.data, columns=['Parameter Set', 'KeyGen/sec', 'Operation', 'Scheme'])
+plot_sig_keygen = sns.catplot(kind="bar", x = 'Parameter Set', y = 'KeyGen/sec', col='Scheme', hue='Operation',
+    data=df_sig_keygen, legend_out=False, height=5, aspect=1.5, col_wrap=1, sharex=False, sharey=False)
+for ax in plot_sig_keygen.axes.ravel():
+    for c in ax.containers:
+        labels = [f'{(v.get_height() / 1000):.1f}K' for v in c]
+        ax.bar_label(c, labels=labels, label_type='edge')
+sns.move_legend(plot_sig_keygen, "upper right")
+plot_sig_keygen.fig.suptitle('Digital Signature')
+plt.savefig('sig_keygen.png')
 
 
 # Plot bytes per second for each algorithm with message lengths of 16, 512 and 16384 bytes
