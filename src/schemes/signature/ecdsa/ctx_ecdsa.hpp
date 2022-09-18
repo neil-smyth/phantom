@@ -11,6 +11,7 @@
 
 #include <limits>
 #include <memory>
+#include <string>
 
 #include "./phantom.hpp"
 #include "./phantom_memory.hpp"
@@ -151,8 +152,10 @@ public:
         return core::bits_log2<T>::value();
     }
 
-    virtual pkc_e get_scheme() { return m_scheme;}
-    virtual size_t get_set() { return m_set; }
+    pkc_e get_scheme() override { return m_scheme;}
+    size_t get_set() override { return m_set; }
+    const std::string& get_set_name() override { return m_sets[m_set]; }
+    const phantom_vector<std::string>& get_set_names() { return m_sets; }
 
     virtual phantom_vector<uint8_t>& sk() { return m_sk; }
     virtual phantom_vector<uint8_t>& pk() { return m_pk; }
@@ -373,6 +376,25 @@ private:
 
     const pkc_e  m_scheme;
     const size_t m_set;
+
+    const phantom_vector<std::string> m_sets = {
+        "P192",
+        "P224",
+        "P256",
+        "P384",
+        "P521"
+        /*
+        "B163",
+        "B233",
+        "B283",
+        "B409",
+        "B571",
+        "K163",
+        "K233",
+        "K283",
+        "K409",
+        "K571"*/
+    };
 
     /// The DLP IBE parameter sets
     ecdsa_set_t<T> m_params;

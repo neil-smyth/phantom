@@ -117,18 +117,18 @@ enum security_strength_e {
 
 /// An enumerated type to describe the word size of the CPU
 enum cpu_word_size_e {
-    CPU_WORD_SIZE_8 = 0,
-    CPU_WORD_SIZE_16,
-    CPU_WORD_SIZE_32,
-    CPU_WORD_SIZE_64,
+    CPU_WORD_SIZE_8 = 8,
+    CPU_WORD_SIZE_16 = 16,
+    CPU_WORD_SIZE_32 = 32,
+    CPU_WORD_SIZE_64 = 64,
 };
 
 /// The native machine word size
 #if defined (__x86_64) || defined(_WIN64)
 #define IS_64BIT
-#define NATIVE_CPU_WORD_SIZE    cpu_word_size_e::CPU_WORD_SIZE_64
+#define NATIVE_CPU_WORD_SIZE    phantom::cpu_word_size_e::CPU_WORD_SIZE_64
 #else
-#define NATIVE_CPU_WORD_SIZE    cpu_word_size_e::CPU_WORD_SIZE_32
+#define NATIVE_CPU_WORD_SIZE    phantom::cpu_word_size_e::CPU_WORD_SIZE_32
 #endif
 
 /// The public-key crypto types

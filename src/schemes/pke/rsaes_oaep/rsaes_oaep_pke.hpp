@@ -74,7 +74,7 @@ private:
     static size_t bits_2_set(security_strength_e bits);
 
     /// RSA parameter sets
-    static const phantom::rsa::rsa_set_t m_params[17];
+    static const phantom::rsa::rsa_set_t m_params[16];
 };
 
 }  // namespace schemes

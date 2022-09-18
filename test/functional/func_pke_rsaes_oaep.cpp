@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
 {
     std::cout << "RSA RSAES-OAEP Test" << std::endl;
 
-    for (size_t i=1; i < 4; i++) {
+    for (size_t i=0; i < 5; i++) {
 
         stopwatch sw_test, sw_keygen, sw_enc, sw_dec;
         uint32_t test_us = 0, keygen_us = 0, enc_us = 0, dec_us = 0;
@@ -32,7 +32,11 @@ int main(int argc, char *argv[])
         std::unique_ptr<user_ctx> ctx_a = dut_a.create_ctx(i);
         std::unique_ptr<user_ctx> ctx_b = dut_b.create_ctx(i);
 
-        std::cout << ((0 == i)? "512-bit" : (1 == i)? "1024-bit" : (2 == i)? "1536-bit" : "2048-bit") << std::endl;
+        std::cout << ((0 == i)? "1024-bit" :
+                      (1 == i)? "1536-bit" :
+                      (2 == i)? "2048-bit" :
+                      (3 == i)? "3072-bit" :
+                                "4096-bit") << std::endl;
 
         sw_keygen.start();
         if (!dut_a.keygen(ctx_a)) {

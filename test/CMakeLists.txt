@@ -339,3 +339,18 @@ add_test(KAT_SHAKE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kat_shake)
 add_test(KAT_AES_ECB ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kat_aes_ecb)
 add_test(KAT_AES_GCM ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kat_aes_gcm)
 add_test(KAT_AES_CTR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kat_aes_ctr)
+
+
+add_executable(perf_metrics
+    performance/main.cpp
+    performance/perf_ibe.cpp
+    performance/perf_kem.cpp
+    performance/perf_kex.cpp
+    performance/perf_pke.cpp
+    performance/perf_sig.cpp
+    performance/perf_sha2.cpp
+    performance/perf_sha3.cpp
+    performance/perf_shake.cpp
+    performance/perf_aes.cpp )
+target_link_libraries(perf_metrics phantom_static)
+add_test(PERF_METRICS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/perf_metrics)

@@ -48,6 +48,8 @@ class ctx_ibe_dlp : public user_ctx
     using ntt_dlp_ibe       = core::ntt_binary<reduction_dlp_ibe, uint32_t>;
     using gaussian_dlp_ibe  = sampling::gaussian<int32_t, uint64_t>;
 
+    const phantom_vector<std::string> m_sets = { "Light", "Normal" };
+
 public:
     explicit ctx_ibe_dlp(size_t set) :
         m_scheme(PKC_IBE_DLP),
@@ -84,8 +86,10 @@ public:
     /// The DLP IBE parameter sets
     static const ibe_dlp_set_t m_params[2];
 
-    virtual pkc_e get_scheme() { return m_scheme;}
-    virtual size_t get_set() { return m_set; }
+    pkc_e get_scheme() override { return m_scheme;}
+    size_t get_set() override { return m_set; }
+    const std::string& get_set_name() override { return m_sets[m_set]; }
+    const phantom_vector<std::string>& get_set_names() { return m_sets; }
 
     phantom_vector<int32_t>& f() { return m_f; }
     phantom_vector<int32_t>& g() { return m_g; }
