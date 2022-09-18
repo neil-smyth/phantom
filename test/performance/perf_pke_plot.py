@@ -132,6 +132,32 @@ class HashingSchema(Schema):
     sha2 = fields.Nested(HashAlgorithmSchema)
     sha3 = fields.Nested(HashAlgorithmSchema)
 
+class SymKeyEncMetricsSchema(Schema):
+    decrypt_bytes_per_sec = fields.Integer()
+    encrypt_bytes_per_sec = fields.Integer()
+    keygen_per_sec = fields.Float()
+    message_length = fields.Integer()
+
+class SymKeyAuthEncMetricsSchema(Schema):
+    algorithm = fields.String()
+    decrypt_per_sec = fields.Integer()
+    encrypt_per_sec = fields.Integer()
+    key_length = fields.Integer()
+    msg_length = fields.Integer()
+
+class SymKeyEncSchema(Schema):
+    key_length = fields.Integer()
+    scheme = fields.String()
+    metrics = fields.List(fields.Nested(SymKeyEncMetricsSchema))
+
+class SymKeyAuthEncSchema(Schema):
+    scheme = fields.String()
+    metrics = fields.List(fields.Nested(SymKeyEncMetricsSchema))
+
+class SymmetricKeySchema(Schema):
+    encryption = fields.List(fields.Nested(SymKeyEncSchema))
+    auth_encryption = fields.List(fields.Nested(SymKeyAuthEncSchema))
+
 class PhantomPerformanceSchema(Schema):
     build_date = fields.String()
     compiler = fields.String()
@@ -139,6 +165,7 @@ class PhantomPerformanceSchema(Schema):
     timestamp = fields.String()
     pkc = fields.List(fields.Nested(PKCSchema))
     hashing = fields.Nested(HashingSchema)
+    symmetric_key = fields.Nested(SymmetricKeySchema)
 
 # Opening JSON file
 f = open('./phantom_metrics.json')
@@ -156,22 +183,22 @@ class plotData:
     data = []
     def __init__(self):
         self.data = []
-    def append(self, x, y, z):
-        v = [x,y,z]
+    def append(self, w, x, y, z):
+        v = [w,x,y,z]
         self.data.append(v)
 
-import matplotlib
-print('matplotlib: {}'.format(matplotlib.__version__))
+
+sns.set_palette("RdPu", 3)
 
 dh = plotData()
 for h in dec["hashing"]["sha2"]["metrics"]:
-    dh.append(h["algorithm"], h["bytes_per_sec"] / (1024.0*1024.0), h["message_length"])
+    dh.append(h["algorithm"], h["bytes_per_sec"] / (1024.0*1024.0), h["message_length"], None)
 for h in dec["hashing"]["sha3"]["metrics"]:
-    dh.append(h["algorithm"], h["bytes_per_sec"] / (1024.0*1024.0), h["message_length"])
-df_hash = pd.DataFrame(dh.data, columns=['Hash', 'MB/sec', 'Message length (bytes)'])
+    dh.append(h["algorithm"], h["bytes_per_sec"] / (1024.0*1024.0), h["message_length"], None)
+df_hash = pd.DataFrame(dh.data, columns=['Hash', 'MB/sec', 'Message length (bytes)', None])
 
 plot_hash = sns.catplot(kind="bar", x = 'Hash', y = 'MB/sec', hue='Message length (bytes)',
-    data=df_hash, palette=['purple', 'steelblue', 'orange'], legend_out=False, height=5, aspect=3)
+    data=df_hash, legend_out=False, height=5, aspect=3)
 ax = plot_hash.facet_axis(0, 0)
 for c in ax.containers:
     labels = [f'{(v.get_height()):.1f}' for v in c]
@@ -181,18 +208,41 @@ plot_hash.fig.suptitle('Hashing functions')
 plt.savefig('hash.png')
 
 
+sns.set_palette("RdPu", 11)
+
+dsymkey_aes = plotData()
+for enc in dec["symmetric_key"]["encryption"]:
+    if enc["scheme"] == "AES-ECB":
+        for v in enc["metrics"]:
+            dsymkey_aes.append(enc["key_length"], v["encrypt_bytes_per_sec"] / (1024.0*1024.0), v["message_length"], "Encryption")
+            dsymkey_aes.append(enc["key_length"], v["decrypt_bytes_per_sec"] / (1024.0*1024.0), v["message_length"], "Decryption")
+df_symkey_aes = pd.DataFrame(dsymkey_aes.data, columns=['Key length (bytes)', 'MB/sec', 'Message length (bytes)', 'Operation'])
+
+plot_symkey_aes = sns.catplot(kind="bar", x = 'Key length (bytes)', y = 'MB/sec', col = "Operation", hue='Message length (bytes)',
+    data=df_symkey_aes, legend_out=False, height=8, aspect=3, col_wrap=1)
+ax = plot_symkey_aes.facet_axis(0, 0)
+for c in ax.containers:
+    labels = [f'{(v.get_height()):.1f}' for v in c]
+    ax.bar_label(c, labels=labels, label_type='edge')
+sns.move_legend(plot_symkey_aes, "upper right")
+plot_symkey_aes.fig.suptitle('Symmetric Key - Encryption - AES-ECB')
+plt.savefig('aes_ecb.png')
+
+
+sns.set_palette("RdPu", 3)
+
 dibe = plotData()
 for pkc in dec["pkc"]:
     if pkc["masking"] == True:
         for ibe in pkc["ibe"]:
             for metrics in ibe["metrics"]:
-                dibe.append(metrics["parameter_set"], metrics["extract_per_sec"], "Extract")
-                dibe.append(metrics["parameter_set"], metrics["encrypt_per_sec"], "Encryption")
-                dibe.append(metrics["parameter_set"], metrics["decrypt_per_sec"], "Decryption")
-df_ibe = pd.DataFrame(dibe.data, columns=['Parameter Set', 'Operations/sec', 'Operation'])
+                dibe.append(metrics["parameter_set"], metrics["extract_per_sec"], "Extract", None)
+                dibe.append(metrics["parameter_set"], metrics["encrypt_per_sec"], "Encryption", None)
+                dibe.append(metrics["parameter_set"], metrics["decrypt_per_sec"], "Decryption", None)
+df_ibe = pd.DataFrame(dibe.data, columns=['Parameter Set', 'Operations/sec', 'Operation', None])
 
 plot_ibe = sns.catplot(kind="bar", x = 'Parameter Set', y = 'Operations/sec', hue='Operation',
-    data=df_ibe, palette=['purple', 'steelblue', 'orange'], legend_out=False, height=5, aspect=2)
+    data=df_ibe, legend_out=False, height=5, aspect=2)
 ax = plot_ibe.facet_axis(0, 0)
 for c in ax.containers:
     labels = [f'{(v.get_height() / 1000):.1f}K' for v in c]
@@ -202,6 +252,8 @@ plot_ibe.fig.suptitle('IBE - DLP')
 plt.savefig('ibe.png')
 
 
+sns.set_palette("RdPu", 3)
+
 dkem_sabre = plotData()
 dkem_kyber = plotData()
 for pkc in dec["pkc"]:
@@ -209,19 +261,19 @@ for pkc in dec["pkc"]:
         for kem in pkc["kem"]:
             for metrics in kem["metrics"]:
                 if kem["scheme"] == "SABRE":
-                    dkem_sabre.append(metrics["parameter_set"], metrics["keygen_per_sec"], "Key Generation")
-                    dkem_sabre.append(metrics["parameter_set"], metrics["encap_sec"], "Encapsulation")
-                    dkem_sabre.append(metrics["parameter_set"], metrics["decap_per_sec"], "Decapsulation")
+                    dkem_sabre.append(metrics["parameter_set"], metrics["keygen_per_sec"], "Key Generation", None)
+                    dkem_sabre.append(metrics["parameter_set"], metrics["encap_sec"], "Encapsulation", None)
+                    dkem_sabre.append(metrics["parameter_set"], metrics["decap_per_sec"], "Decapsulation", None)
                 elif kem["scheme"] == "Kyber":
-                    dkem_kyber.append(metrics["parameter_set"], metrics["keygen_per_sec"], "Key Generation")
-                    dkem_kyber.append(metrics["parameter_set"], metrics["encap_sec"], "Encapsulation")
-                    dkem_kyber.append(metrics["parameter_set"], metrics["decap_per_sec"], "Decapsulation")
+                    dkem_kyber.append(metrics["parameter_set"], metrics["keygen_per_sec"], "Key Generation", None)
+                    dkem_kyber.append(metrics["parameter_set"], metrics["encap_sec"], "Encapsulation", None)
+                    dkem_kyber.append(metrics["parameter_set"], metrics["decap_per_sec"], "Decapsulation", None)
 
-df_kem_sabre = pd.DataFrame(dkem_sabre.data, columns=['Parameter Set', 'Operations/sec', 'Operation'])
-df_kem_kyber = pd.DataFrame(dkem_kyber.data, columns=['Parameter Set', 'Operations/sec', 'Operation'])
+df_kem_sabre = pd.DataFrame(dkem_sabre.data, columns=['Parameter Set', 'Operations/sec', 'Operation', None])
+df_kem_kyber = pd.DataFrame(dkem_kyber.data, columns=['Parameter Set', 'Operations/sec', 'Operation', None])
 
 plot_kem_sabre = sns.catplot(kind="bar", x = 'Parameter Set', y = 'Operations/sec', hue='Operation',
-    data=df_kem_sabre, palette=['purple', 'steelblue', 'orange'], legend_out=False, height=5, aspect=1.5)
+    data=df_kem_sabre, legend_out=False, height=5, aspect=1.5)
 ax = plot_kem_sabre.facet_axis(0, 0)
 for c in ax.containers:
     labels = [f'{(v.get_height() / 1000):.1f}K' for v in c]
@@ -231,7 +283,7 @@ plot_kem_sabre.fig.suptitle('KEM - SABRE')
 plt.savefig('kem_sabre.png')
 
 plot_kem_kyber = sns.catplot(kind="bar", x = 'Parameter Set', y = 'Operations/sec', hue='Operation',
-    data=df_kem_kyber, palette=['purple', 'steelblue', 'orange'], legend_out=False, height=5, aspect=1.5)
+    data=df_kem_kyber, legend_out=False, height=5, aspect=1.5)
 ax = plot_kem_kyber.facet_axis(0, 0)
 for c in ax.containers:
     labels = [f'{(v.get_height() / 1000):.1f}K' for v in c]
@@ -241,19 +293,21 @@ plot_kem_kyber.fig.suptitle('KEM - Kyber')
 plt.savefig('kem_kyber.png')
 
 
+sns.set_palette("RdPu", 2)
+
 dkex_ecdh = plotData()
 for pkc in dec["pkc"]:
     if pkc["masking"] == True:
         for kex in pkc["kex"]:
             for metrics in kex["metrics"]:
                 if kex["scheme"] == "ECDH":
-                    dkex_ecdh.append(metrics["parameter_set"], metrics["init_per_sec"], "Setup")
-                    dkex_ecdh.append(metrics["parameter_set"], metrics["final_per_sec"], "Shared Secret")
+                    dkex_ecdh.append(metrics["parameter_set"], metrics["init_per_sec"], "Setup", None)
+                    dkex_ecdh.append(metrics["parameter_set"], metrics["final_per_sec"], "Shared Secret", None)
 
-df_kex_ecdh = pd.DataFrame(dkex_ecdh.data, columns=['Parameter Set', 'Operations/sec', 'Operation'])
+df_kex_ecdh = pd.DataFrame(dkex_ecdh.data, columns=['Parameter Set', 'Operations/sec', 'Operation', None])
 
 plot_kex_ecdh = sns.catplot(kind="bar", x = 'Parameter Set', y = 'Operations/sec', hue='Operation',
-    data=df_kex_ecdh, palette=['purple', 'steelblue', 'orange'], legend_out=False, height=5, aspect=5)
+    data=df_kex_ecdh, legend_out=False, height=5, aspect=5)
 ax = plot_kex_ecdh.facet_axis(0, 0)
 for c in ax.containers:
     labels = [f'{(v.get_height() / 1000):.1f}K' for v in c]
@@ -263,20 +317,22 @@ plot_kex_ecdh.fig.suptitle('Key Exchange - Elliptic-curve Diffie-Hellman')
 plt.savefig('kex_ecdh.png')
 
 
+sns.set_palette("RdPu", 3)
+
 dpke_rsa = plotData()
 for pkc in dec["pkc"]:
     if pkc["masking"] == True:
         for pke in pkc["pke"]:
             for metrics in pke["metrics"]:
                 if pke["scheme"] == "RSAES-OAEP":
-                    dpke_rsa.append(metrics["parameter_set"], metrics["keygen_per_sec"], "Key Generation")
-                    dpke_rsa.append(metrics["parameter_set"], metrics["encrypt_per_sec"], "Encryption")
-                    dpke_rsa.append(metrics["parameter_set"], metrics["decrypt_per_sec"], "Decryption")
+                    dpke_rsa.append(metrics["parameter_set"], metrics["keygen_per_sec"], "Key Generation", None)
+                    dpke_rsa.append(metrics["parameter_set"], metrics["encrypt_per_sec"], "Encryption", None)
+                    dpke_rsa.append(metrics["parameter_set"], metrics["decrypt_per_sec"], "Decryption", None)
 
-df_pke_rsa = pd.DataFrame(dpke_rsa.data, columns=['Parameter Set', 'Operations/sec', 'Operation'])
+df_pke_rsa = pd.DataFrame(dpke_rsa.data, columns=['Parameter Set', 'Operations/sec', 'Operation', None])
 
 plot_pke_rsa = sns.catplot(kind="bar", x = 'Parameter Set', y = 'Operations/sec', hue='Operation',
-    data=df_pke_rsa, palette=['purple', 'steelblue', 'orange'], legend_out=False, height=5, aspect=1.5)
+    data=df_pke_rsa, legend_out=False, height=5, aspect=1.5)
 ax = plot_pke_rsa.facet_axis(0, 0)
 for c in ax.containers:
     labels = [f'{(v.get_height() / 1000):.1f}K' for v in c]
@@ -286,91 +342,28 @@ plot_pke_rsa.fig.suptitle('Public Key Encryption - RSAES-OAEP')
 plt.savefig('pke_rsa.png')
 
 
-dsig_dilithium = plotData()
-dsig_falcon = plotData()
-dsig_ecdsa = plotData()
-dsig_eddsa = plotData()
-dsig_rsa = plotData()
+sns.set_palette("RdPu", 3)
+dsig = plotData()
 for pkc in dec["pkc"]:
     if pkc["masking"] == True:
         for sig in pkc["sig"]:
             for metrics in sig["metrics"]:
-                if sig["scheme"] == "RSASSA-PSS":
-                    dsig_rsa.append(metrics["parameter_set"], metrics["keygen_per_sec"], "Key Generation")
-                    dsig_rsa.append(metrics["parameter_set"], metrics["sign_per_sec"], "Sign")
-                    dsig_rsa.append(metrics["parameter_set"], metrics["verify_per_sec"], "Verify")
-                elif sig["scheme"] == "Dilithium":
-                    dsig_dilithium.append(metrics["parameter_set"], metrics["keygen_per_sec"], "Key Generation")
-                    dsig_dilithium.append(metrics["parameter_set"], metrics["sign_per_sec"], "Sign")
-                    dsig_dilithium.append(metrics["parameter_set"], metrics["verify_per_sec"], "Verify")
-                elif sig["scheme"] == "Falcon":
-                    dsig_falcon.append(metrics["parameter_set"], metrics["keygen_per_sec"], "Key Generation")
-                    dsig_falcon.append(metrics["parameter_set"], metrics["sign_per_sec"], "Sign")
-                    dsig_falcon.append(metrics["parameter_set"], metrics["verify_per_sec"], "Verify")
-                elif sig["scheme"] == "ECDSA":
-                    dsig_ecdsa.append(metrics["parameter_set"], metrics["keygen_per_sec"], "Key Generation")
-                    dsig_ecdsa.append(metrics["parameter_set"], metrics["sign_per_sec"], "Sign")
-                    dsig_ecdsa.append(metrics["parameter_set"], metrics["verify_per_sec"], "Verify")
-                elif sig["scheme"] == "EDDSA":
-                    dsig_eddsa.append(metrics["parameter_set"], metrics["keygen_per_sec"], "Key Generation")
-                    dsig_eddsa.append(metrics["parameter_set"], metrics["sign_per_sec"], "Sign")
-                    dsig_eddsa.append(metrics["parameter_set"], metrics["verify_per_sec"], "Verify")
+                dsig.append(metrics["parameter_set"], metrics["keygen_per_sec"], "Key Generation", sig["scheme"])
+                dsig.append(metrics["parameter_set"], metrics["sign_per_sec"], "Sign", sig["scheme"])
+                dsig.append(metrics["parameter_set"], metrics["verify_per_sec"], "Verify", sig["scheme"])
 
-df_sig_dilithium = pd.DataFrame(dsig_dilithium.data, columns=['Parameter Set', 'Operations/sec', 'Operation'])
-df_sig_falcon = pd.DataFrame(dsig_falcon.data, columns=['Parameter Set', 'Operations/sec', 'Operation'])
-df_sig_ecdsa = pd.DataFrame(dsig_ecdsa.data, columns=['Parameter Set', 'Operations/sec', 'Operation'])
-df_sig_eddsa = pd.DataFrame(dsig_eddsa.data, columns=['Parameter Set', 'Operations/sec', 'Operation'])
-df_sig_rsa = pd.DataFrame(dsig_rsa.data, columns=['Parameter Set', 'Operations/sec', 'Operation'])
+df_sig = pd.DataFrame(dsig.data, columns=['Parameter Set', 'Operations/sec', 'Operation', 'Scheme'])
 
-plot_sig_dilithium = sns.catplot(kind="bar", x = 'Parameter Set', y = 'Operations/sec', hue='Operation',
-    data=df_sig_dilithium, palette=['purple', 'steelblue', 'orange'], legend_out=False, height=5, aspect=1.5)
-ax = plot_sig_dilithium.facet_axis(0, 0)
-for c in ax.containers:
-    labels = [f'{(v.get_height() / 1000):.1f}K' for v in c]
-    ax.bar_label(c, labels=labels, label_type='edge')
-sns.move_legend(plot_sig_dilithium, "upper right")
-plot_sig_dilithium.fig.suptitle('Digital Signature - Dilithium')
-plt.savefig('sig_dilithium.png')
+plot_sig = sns.catplot(kind="bar", x = 'Parameter Set', y = 'Operations/sec', col = 'Scheme', hue='Operation',
+    data=df_sig, legend_out=False, height=5, aspect=1.5, col_wrap=1, sharex=False, sharey=False)
+for ax in plot_sig.axes.ravel():
+    for c in ax.containers:
+        labels = [f'{(v.get_height() / 1000):.1f}K' for v in c]
+        ax.bar_label(c, labels=labels, label_type='edge')
+sns.move_legend(plot_sig, "upper right")
+plot_sig.fig.suptitle('Digital Signature')
+plt.savefig('sig.png')
 
-plot_sig_falcon = sns.catplot(kind="bar", x = 'Parameter Set', y = 'Operations/sec', hue='Operation',
-    data=df_sig_falcon, palette=['purple', 'steelblue', 'orange'], legend_out=False, height=5, aspect=1.5)
-ax = plot_sig_falcon.facet_axis(0, 0)
-for c in ax.containers:
-    labels = [f'{(v.get_height() / 1000):.1f}K' for v in c]
-    ax.bar_label(c, labels=labels, label_type='edge')
-sns.move_legend(plot_sig_falcon, "upper right")
-plot_sig_falcon.fig.suptitle('Digital Signature - Falcon')
-plt.savefig('sig_falcon.png')
-
-plot_sig_ecdsa = sns.catplot(kind="bar", x = 'Parameter Set', y = 'Operations/sec', hue='Operation',
-    data=df_sig_ecdsa, palette=['purple', 'steelblue', 'orange'], legend_out=False, height=5, aspect=1.5)
-ax = plot_sig_ecdsa.facet_axis(0, 0)
-for c in ax.containers:
-    labels = [f'{(v.get_height() / 1000):.1f}K' for v in c]
-    ax.bar_label(c, labels=labels, label_type='edge')
-sns.move_legend(plot_sig_ecdsa, "upper right")
-plot_sig_ecdsa.fig.suptitle('Digital Signature - ECDSA')
-plt.savefig('sig_ecdsa.png')
-
-plot_sig_eddsa = sns.catplot(kind="bar", x = 'Parameter Set', y = 'Operations/sec', hue='Operation',
-    data=df_sig_eddsa, palette=['purple', 'steelblue', 'orange'], legend_out=False, height=5, aspect=1.5)
-ax = plot_sig_eddsa.facet_axis(0, 0)
-for c in ax.containers:
-    labels = [f'{(v.get_height() / 1000):.1f}K' for v in c]
-    ax.bar_label(c, labels=labels, label_type='edge')
-sns.move_legend(plot_sig_eddsa, "upper right")
-plot_sig_eddsa.fig.suptitle('Digital Signature - EDDSA')
-plt.savefig('sig_eddsa.png')
-
-plot_sig_rsa = sns.catplot(kind="bar", x = 'Parameter Set', y = 'Operations/sec', hue='Operation',
-    data=df_sig_rsa, palette=['purple', 'steelblue', 'orange'], legend_out=False, height=5, aspect=1.5)
-ax = plot_sig_rsa.facet_axis(0, 0)
-for c in ax.containers:
-    labels = [f'{(v.get_height() / 1000):.1f}K' for v in c]
-    ax.bar_label(c, labels=labels, label_type='edge')
-sns.move_legend(plot_sig_rsa, "upper right")
-plot_sig_rsa.fig.suptitle('Digital Signature - RSASSA-PSS')
-plt.savefig('sig_rsa.png')
 
 # Plot bytes per second for each algorithm with message lengths of 16, 512 and 16384 bytes
 

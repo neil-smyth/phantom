@@ -18,6 +18,7 @@
 #include "test/performance/perf_sig.hpp"
 #include "test/performance/perf_sha2.hpp"
 #include "test/performance/perf_sha3.hpp"
+#include "test/performance/perf_aes.hpp"
 #include "./phantom.hpp"
 #include <nlohmann/json.hpp>
 
@@ -44,7 +45,8 @@ int main(int argc, char *argv[])
         {"compiler", phantom::build_info::compiler()},
         {"timestamp", timestamp.str()},
         {"pkc", json::array()},
-        {"hashing", json::object()}
+        {"hashing", json::object()},
+        {"symmetric_key", json::object()}
     };
 
     do {
@@ -82,6 +84,18 @@ int main(int argc, char *argv[])
     };
 
     metrics["hashing"] = hashing;
+
+
+    json symmetric_key = {
+        {"encryption", json::array()},
+        {"auth_encryption", json::array()}
+    };
+
+    symmetric_key["encryption"].push_back(perf_aes::run(phantom::SYMKEY_AES_128_ENC, test_duration));
+    symmetric_key["encryption"].push_back(perf_aes::run(phantom::SYMKEY_AES_192_ENC, test_duration));
+    symmetric_key["encryption"].push_back(perf_aes::run(phantom::SYMKEY_AES_256_ENC, test_duration));
+
+    metrics["symmetric_key"] = symmetric_key;
 
     std::ofstream o("phantom_metrics.json");
     o << metrics.dump(2) << std::endl;

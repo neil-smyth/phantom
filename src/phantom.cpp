@@ -612,6 +612,11 @@ int32_t symmetric_key_cipher::encrypt_start(symmetric_key_ctx* ctx, const uint8_
 {
     switch (ctx->get_keylen())
     {
+        case SYMKEY_AES_128_ENC:
+        case SYMKEY_AES_192_ENC:
+        case SYMKEY_AES_256_ENC:
+        {
+        } break;
 #if defined(ENABLE_AES_CTR)
         case SYMKEY_AES_128_CTR:
         case SYMKEY_AES_192_CTR:
@@ -692,6 +697,11 @@ int32_t symmetric_key_cipher::decrypt_start(symmetric_key_ctx* ctx, const uint8_
 {
     switch (ctx->get_keylen())
     {
+        case SYMKEY_AES_128_DEC:
+        case SYMKEY_AES_192_DEC:
+        case SYMKEY_AES_256_DEC:
+        {
+        } break;
 #if defined(ENABLE_AES_CTR)
         case SYMKEY_AES_128_CTR:
         case SYMKEY_AES_192_CTR:
