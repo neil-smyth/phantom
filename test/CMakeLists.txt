@@ -350,6 +350,7 @@ add_executable(perf_metrics
     performance/perf_sig.cpp
     performance/perf_sha2.cpp
     performance/perf_sha3.cpp
+    performance/perf_shake.cpp
     performance/perf_aes.cpp )
 target_link_libraries(perf_metrics phantom_static)
 add_test(PERF_METRICS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/perf_metrics)

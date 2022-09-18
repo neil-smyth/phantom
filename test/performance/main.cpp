@@ -18,6 +18,7 @@
 #include "test/performance/perf_sig.hpp"
 #include "test/performance/perf_sha2.hpp"
 #include "test/performance/perf_sha3.hpp"
+#include "test/performance/perf_shake.hpp"
 #include "test/performance/perf_aes.hpp"
 #include "./phantom.hpp"
 #include <nlohmann/json.hpp>
@@ -46,6 +47,7 @@ int main(int argc, char *argv[])
         {"timestamp", timestamp.str()},
         {"pkc", json::array()},
         {"hashing", json::object()},
+        {"xof", json::object()},
         {"symmetric_key", json::object()}
     };
 
@@ -84,6 +86,12 @@ int main(int argc, char *argv[])
     };
 
     metrics["hashing"] = hashing;
+
+    json xof = {
+        {"shake", perf_shake::run(test_duration)}
+    };
+
+    metrics["xof"] = xof;
 
 
     json symmetric_key = {

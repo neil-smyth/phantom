@@ -124,13 +124,28 @@ class HashMetricsSchema(Schema):
     hash_per_sec = fields.Float()
     bytes_per_sec = fields.Float()
 
+class XOFMetricsSchema(Schema):
+    algorithm = fields.String()
+    message_length = fields.Integer()
+    xof_length = fields.Integer()
+    xof_us = fields.Float()
+    xof_per_sec = fields.Float()
+    bytes_per_sec = fields.Float()
+
 class HashAlgorithmSchema(Schema):
     scheme = fields.String()
     metrics = fields.List(fields.Nested(HashMetricsSchema))
 
+class XOFAlgorithmSchema(Schema):
+    scheme = fields.String()
+    metrics = fields.List(fields.Nested(XOFMetricsSchema))
+
 class HashingSchema(Schema):
     sha2 = fields.Nested(HashAlgorithmSchema)
     sha3 = fields.Nested(HashAlgorithmSchema)
+
+class XOFSchema(Schema):
+    shake = fields.Nested(XOFAlgorithmSchema)
 
 class SymKeyEncMetricsSchema(Schema):
     decrypt_bytes_per_sec = fields.Integer()
@@ -155,6 +170,7 @@ class PhantomPerformanceSchema(Schema):
     timestamp = fields.String()
     pkc = fields.List(fields.Nested(PKCSchema))
     hashing = fields.Nested(HashingSchema)
+    xof = fields.Nested(XOFSchema)
     symmetric_key = fields.Nested(SymmetricKeySchema)
 
 # Opening JSON file
@@ -185,6 +201,8 @@ for h in dec["hashing"]["sha2"]["metrics"]:
     dh.append(h["algorithm"], h["bytes_per_sec"] / (1024.0*1024.0), h["message_length"], "SHA-2")
 for h in dec["hashing"]["sha3"]["metrics"]:
     dh.append(h["algorithm"], h["bytes_per_sec"] / (1024.0*1024.0), h["message_length"], "SHA-3")
+for h in dec["xof"]["shake"]["metrics"]:
+    dh.append(h["algorithm"], h["bytes_per_sec"] / (1024.0*1024.0), h["message_length"], "SHAKE")
 df_hash = pd.DataFrame(dh.data, columns=['Hash', 'MB/sec', 'Message length (bytes)', 'Algorithm'])
 
 plot_hash = sns.catplot(kind="bar", x = 'Hash', y = 'MB/sec', col = 'Algorithm', hue='Message length (bytes)',
