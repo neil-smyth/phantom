@@ -8,8 +8,8 @@ import json
 from pprint import pprint
 import pandas as pd
 
-import matplotlib.rcsetup as rcsetup
-print(rcsetup.all_backends)
+#import matplotlib.rcsetup as rcsetup
+#print(rcsetup.all_backends)
 
 class PKESchema(Schema):
     ciphertext_length = fields.Integer()
@@ -178,27 +178,28 @@ class plotData:
         self.data.append(v)
 
 
-sns.set_palette("RdPu", 3)
+sns.set_style("darkgrid")
 
 dh = plotData()
 for h in dec["hashing"]["sha2"]["metrics"]:
-    dh.append(h["algorithm"], h["bytes_per_sec"] / (1024.0*1024.0), h["message_length"], None)
+    dh.append(h["algorithm"], h["bytes_per_sec"] / (1024.0*1024.0), h["message_length"], "SHA-2")
 for h in dec["hashing"]["sha3"]["metrics"]:
-    dh.append(h["algorithm"], h["bytes_per_sec"] / (1024.0*1024.0), h["message_length"], None)
-df_hash = pd.DataFrame(dh.data, columns=['Hash', 'MB/sec', 'Message length (bytes)', None])
+    dh.append(h["algorithm"], h["bytes_per_sec"] / (1024.0*1024.0), h["message_length"], "SHA-3")
+df_hash = pd.DataFrame(dh.data, columns=['Hash', 'MB/sec', 'Message length (bytes)', 'Algorithm'])
 
-plot_hash = sns.catplot(kind="bar", x = 'Hash', y = 'MB/sec', hue='Message length (bytes)',
-    data=df_hash, legend_out=False, height=5, aspect=3)
-ax = plot_hash.facet_axis(0, 0)
-for c in ax.containers:
-    labels = [f'{(v.get_height()):.1f}' for v in c]
-    ax.bar_label(c, labels=labels, label_type='edge')
-sns.move_legend(plot_hash, "upper right")
-plot_hash.fig.suptitle('Hashing functions')
-plt.savefig('hash.png')
+plot_hash = sns.catplot(kind="bar", x = 'Hash', y = 'MB/sec', col = 'Algorithm', hue='Message length (bytes)',
+    data=df_hash, legend_out=False, height=5, aspect=2, col_wrap=1, sharex=False, palette=sns.color_palette("GnBu_d", 3))
+for ax in plot_hash.axes.ravel():
+    for c in ax.containers:
+        labels = [f'{(v.get_height()):.1f}' for v in c]
+        ax.bar_label(c, labels=labels, label_type='edge')
+    
+sns.move_legend(plot_hash, "upper left", bbox_to_anchor=(.1, 0.95))
+plot_hash.set_titles("{col_name}", size=20)
+plot_hash.set(xlabel="")
+plt.subplots_adjust(hspace = 0.2)
+plt.savefig('hash.png', bbox_inches="tight")
 
-
-sns.set_palette("RdPu", 11)
 
 dsymkey_aes = plotData()
 for enc in dec["symmetric_key"]["encryption"]:
@@ -209,13 +210,15 @@ for enc in dec["symmetric_key"]["encryption"]:
 df_symkey_aes = pd.DataFrame(dsymkey_aes.data, columns=['Key length (bytes)', 'MB/sec', 'Message length (bytes)', 'Operation'])
 
 plot_symkey_aes = sns.catplot(kind="bar", x = 'Key length (bytes)', y = 'MB/sec', col = "Operation", hue='Message length (bytes)',
-    data=df_symkey_aes, legend_out=False, height=8, aspect=3, col_wrap=1)
+    data=df_symkey_aes, legend_out=False, height=8, aspect=3, col_wrap=1, sharex=False, palette=sns.color_palette("GnBu_d", 11))
 for ax in plot_symkey_aes.axes.ravel():
     for c in ax.containers:
         labels = [f'{(v.get_height()):.1f}' for v in c]
         ax.bar_label(c, labels=labels, label_type='edge')
-sns.move_legend(plot_symkey_aes, "upper right")
-plot_symkey_aes.fig.suptitle('Symmetric Key - Encryption - AES-ECB')
+sns.move_legend(plot_symkey_aes, "upper right", bbox_to_anchor=(.95, 0.75))
+plot_symkey_aes.set_titles("{col_name}", size=24)
+plot_symkey_aes.set(xlabel="Key length (bytes)")
+plt.subplots_adjust(hspace = 0.15)
 plt.savefig('aes_ecb.png')
 
 
@@ -228,13 +231,15 @@ for enc in dec["symmetric_key"]["encryption"]:
 df_symkey_aes_ctr = pd.DataFrame(dsymkey_aes_ctr.data, columns=['Key length (bytes)', 'MB/sec', 'Message length (bytes)', 'Operation'])
 
 plot_symkey_aes_ctr = sns.catplot(kind="bar", x = 'Key length (bytes)', y = 'MB/sec', col = "Operation", hue='Message length (bytes)',
-    data=df_symkey_aes_ctr, legend_out=False, height=8, aspect=3, col_wrap=1)
+    data=df_symkey_aes_ctr, legend_out=False, height=8, aspect=3, col_wrap=1, sharex=False, palette=sns.color_palette("GnBu_d", 11))
 for ax in plot_symkey_aes_ctr.axes.ravel():
     for c in ax.containers:
         labels = [f'{(v.get_height()):.1f}' for v in c]
         ax.bar_label(c, labels=labels, label_type='edge')
-sns.move_legend(plot_symkey_aes_ctr, "upper right")
-plot_symkey_aes_ctr.fig.suptitle('Symmetric Key - Encryption - AES-ECB')
+sns.move_legend(plot_symkey_aes_ctr, "upper right", bbox_to_anchor=(.95, 0.75))
+plot_symkey_aes_ctr.set_titles("{col_name}", size=24)
+plot_symkey_aes_ctr.set(xlabel="Key length (bytes)")
+plt.subplots_adjust(hspace = 0.15)
 plt.savefig('aes_ctr.png')
 
 
@@ -247,17 +252,17 @@ for enc in dec["symmetric_key"]["auth_encryption"]:
 df_symkey_aes_gcm = pd.DataFrame(dsymkey_aes_gcm.data, columns=['Key length (bytes)', 'MB/sec', 'Message length (bytes)', 'Operation'])
 
 plot_symkey_aes_gcm = sns.catplot(kind="bar", x = 'Key length (bytes)', y = 'MB/sec', col = "Operation", hue='Message length (bytes)',
-    data=df_symkey_aes_gcm, legend_out=False, height=8, aspect=3, col_wrap=1)
+    data=df_symkey_aes_gcm, legend_out=False, height=8, aspect=3, col_wrap=1, sharex=False, palette=sns.color_palette("GnBu_d", 11))
 for ax in plot_symkey_aes_gcm.axes.ravel():
     for c in ax.containers:
         labels = [f'{(v.get_height()):.1f}' for v in c]
         ax.bar_label(c, labels=labels, label_type='edge')
-sns.move_legend(plot_symkey_aes_gcm, "upper right")
-plot_symkey_aes_gcm.fig.suptitle('Symmetric Key - Authenticated Encryption - AES-GCM')
+sns.move_legend(plot_symkey_aes_gcm, "upper right", bbox_to_anchor=(.95, 0.75))
+plot_symkey_aes_gcm.set_titles("{col_name}", size=24)
+plot_symkey_aes_gcm.set(xlabel="Key length (bytes)")
+plt.subplots_adjust(hspace = 0.15)
 plt.savefig('aes_gcm.png')
 
-
-sns.set_palette("RdPu", 3)
 
 dibe = plotData()
 for pkc in dec["pkc"]:
@@ -270,138 +275,109 @@ for pkc in dec["pkc"]:
 df_ibe = pd.DataFrame(dibe.data, columns=['Parameter Set', 'Operations/sec', 'Operation', None])
 
 plot_ibe = sns.catplot(kind="bar", x = 'Parameter Set', y = 'Operations/sec', hue='Operation',
-    data=df_ibe, legend_out=False, height=5, aspect=2)
+    data=df_ibe, legend_out=False, height=5, aspect=2, palette=sns.color_palette("GnBu_d", 3))
 ax = plot_ibe.facet_axis(0, 0)
 for c in ax.containers:
     labels = [f'{(v.get_height() / 1000):.1f}K' for v in c]
     ax.bar_label(c, labels=labels, label_type='edge')
 sns.move_legend(plot_ibe, "upper right")
-plot_ibe.fig.suptitle('IBE - DLP')
 plt.savefig('ibe.png')
 
 
-sns.set_palette("RdPu", 3)
-
-dkem_sabre = plotData()
-dkem_kyber = plotData()
+dkem = plotData()
 for pkc in dec["pkc"]:
     if pkc["masking"] == True:
         for kem in pkc["kem"]:
             for metrics in kem["metrics"]:
-                if kem["scheme"] == "SABRE":
-                    dkem_sabre.append(metrics["parameter_set"], metrics["keygen_per_sec"], "Key Generation", None)
-                    dkem_sabre.append(metrics["parameter_set"], metrics["encap_sec"], "Encapsulation", None)
-                    dkem_sabre.append(metrics["parameter_set"], metrics["decap_per_sec"], "Decapsulation", None)
-                elif kem["scheme"] == "Kyber":
-                    dkem_kyber.append(metrics["parameter_set"], metrics["keygen_per_sec"], "Key Generation", None)
-                    dkem_kyber.append(metrics["parameter_set"], metrics["encap_sec"], "Encapsulation", None)
-                    dkem_kyber.append(metrics["parameter_set"], metrics["decap_per_sec"], "Decapsulation", None)
+                dkem.append(metrics["parameter_set"], metrics["keygen_per_sec"], "Key Generation", kem["scheme"])
+                dkem.append(metrics["parameter_set"], metrics["encap_sec"], "Encapsulation", kem["scheme"])
+                dkem.append(metrics["parameter_set"], metrics["decap_per_sec"], "Decapsulation", kem["scheme"])
 
-df_kem_sabre = pd.DataFrame(dkem_sabre.data, columns=['Parameter Set', 'Operations/sec', 'Operation', None])
-df_kem_kyber = pd.DataFrame(dkem_kyber.data, columns=['Parameter Set', 'Operations/sec', 'Operation', None])
+df_kem = pd.DataFrame(dkem.data, columns=['Parameter Set', 'Operations/sec', 'Operation', 'Scheme'])
 
-plot_kem_sabre = sns.catplot(kind="bar", x = 'Parameter Set', y = 'Operations/sec', hue='Operation',
-    data=df_kem_sabre, legend_out=False, height=5, aspect=1.5)
-ax = plot_kem_sabre.facet_axis(0, 0)
+plot_kem = sns.catplot(kind="bar", x = 'Parameter Set', y = 'Operations/sec', col = 'Scheme', hue='Operation',
+    data=df_kem, legend_out=False, height=5, aspect=1.5, col_wrap=1, sharex=False, palette=sns.color_palette("GnBu_d", 3))
+ax = plot_kem.facet_axis(0, 0)
 for c in ax.containers:
     labels = [f'{(v.get_height() / 1000):.1f}K' for v in c]
     ax.bar_label(c, labels=labels, label_type='edge')
-sns.move_legend(plot_kem_sabre, "upper right")
-plot_kem_sabre.fig.suptitle('KEM - SABRE')
-plt.savefig('kem_sabre.png')
-
-plot_kem_kyber = sns.catplot(kind="bar", x = 'Parameter Set', y = 'Operations/sec', hue='Operation',
-    data=df_kem_kyber, legend_out=False, height=5, aspect=1.5)
-ax = plot_kem_kyber.facet_axis(0, 0)
-for c in ax.containers:
-    labels = [f'{(v.get_height() / 1000):.1f}K' for v in c]
-    ax.bar_label(c, labels=labels, label_type='edge')
-sns.move_legend(plot_kem_kyber, "upper right")
-plot_kem_kyber.fig.suptitle('KEM - Kyber')
-plt.savefig('kem_kyber.png')
+sns.move_legend(plot_kem, "upper right", bbox_to_anchor=(.95, 0.95))
+plot_kem.set_titles("{col_name}", size=20)
+plot_kem.set(xlabel="Parameter Set")
+plt.subplots_adjust(hspace = 0.25)
+plt.savefig('kem.png')
 
 
-sns.set_palette("RdPu", 2)
-
-dkex_ecdh = plotData()
+dkex = plotData()
 for pkc in dec["pkc"]:
     if pkc["masking"] == True:
         for kex in pkc["kex"]:
             for metrics in kex["metrics"]:
                 if kex["scheme"] == "ECDH":
-                    dkex_ecdh.append(metrics["parameter_set"], metrics["init_per_sec"], "Setup", None)
-                    dkex_ecdh.append(metrics["parameter_set"], metrics["final_per_sec"], "Shared Secret", None)
+                    dkex.append(metrics["parameter_set"], metrics["init_per_sec"], "Setup", kex["scheme"])
+                    dkex.append(metrics["parameter_set"], metrics["final_per_sec"], "Shared Secret", kex["scheme"])
 
-df_kex_ecdh = pd.DataFrame(dkex_ecdh.data, columns=['Parameter Set', 'Operations/sec', 'Operation', None])
+df_kex = pd.DataFrame(dkex.data, columns=['Parameter Set', 'Operations/sec', 'Operation', 'Scheme'])
 
-plot_kex_ecdh = sns.catplot(kind="bar", x = 'Parameter Set', y = 'Operations/sec', hue='Operation',
-    data=df_kex_ecdh, legend_out=False, height=5, aspect=5)
-ax = plot_kex_ecdh.facet_axis(0, 0)
+plot_kex = sns.catplot(kind="bar", x = 'Parameter Set', y = 'Operations/sec', col = 'Scheme', hue='Operation',
+    data=df_kex, legend_out=False, height=5, aspect=5, col_wrap=1, sharex=False, palette=sns.color_palette("GnBu_d", 3))
+ax = plot_kex.facet_axis(0, 0)
 for c in ax.containers:
     labels = [f'{(v.get_height() / 1000):.1f}K' for v in c]
     ax.bar_label(c, labels=labels, label_type='edge')
-sns.move_legend(plot_kex_ecdh, "upper right")
-plot_kex_ecdh.fig.suptitle('Key Exchange - Elliptic-curve Diffie-Hellman')
-plt.savefig('kex_ecdh.png')
+sns.move_legend(plot_kex, "upper right")
+plot_kex.set_titles("{col_name}", size=20)
+plot_kex.set(xlabel="Parameter Set")
+plt.subplots_adjust(hspace = 0.25)
+plt.savefig('kex.png')
 
 
-sns.set_palette("RdPu", 3)
-
-dpke_rsa = plotData()
+dpke = plotData()
 for pkc in dec["pkc"]:
     if pkc["masking"] == True:
         for pke in pkc["pke"]:
             for metrics in pke["metrics"]:
                 if pke["scheme"] == "RSAES-OAEP":
-                    dpke_rsa.append(metrics["parameter_set"], metrics["keygen_per_sec"], "Key Generation", None)
-                    dpke_rsa.append(metrics["parameter_set"], metrics["encrypt_per_sec"], "Encryption", None)
-                    dpke_rsa.append(metrics["parameter_set"], metrics["decrypt_per_sec"], "Decryption", None)
+                    dpke.append(metrics["parameter_set"], metrics["keygen_per_sec"], "Key Generation", pke["scheme"])
+                    dpke.append(metrics["parameter_set"], metrics["encrypt_per_sec"], "Encryption", pke["scheme"])
+                    dpke.append(metrics["parameter_set"], metrics["decrypt_per_sec"], "Decryption", pke["scheme"])
 
-df_pke_rsa = pd.DataFrame(dpke_rsa.data, columns=['Parameter Set', 'Operations/sec', 'Operation', None])
+df_pke = pd.DataFrame(dpke.data, columns=['Parameter Set', 'Operations/sec', 'Operation', 'Scheme'])
 
-plot_pke_rsa = sns.catplot(kind="bar", x = 'Parameter Set', y = 'Operations/sec', hue='Operation',
-    data=df_pke_rsa, legend_out=False, height=5, aspect=1.5)
-ax = plot_pke_rsa.facet_axis(0, 0)
+plot_pke = sns.catplot(kind="bar", x = 'Parameter Set', y = 'Operations/sec', col = 'Scheme', hue='Operation',
+    data=df_pke, legend_out=False, height=5, aspect=1.5, col_wrap=1, sharex=False, palette=sns.color_palette("GnBu_d", 3))
+ax = plot_pke.facet_axis(0, 0)
 for c in ax.containers:
     labels = [f'{(v.get_height() / 1000):.1f}K' for v in c]
     ax.bar_label(c, labels=labels, label_type='edge')
-sns.move_legend(plot_pke_rsa, "upper right")
-plot_pke_rsa.fig.suptitle('Public Key Encryption - RSAES-OAEP')
-plt.savefig('pke_rsa.png')
+sns.move_legend(plot_pke, "upper right")
+plot_pke.set_titles("{col_name}", size=20)
+plot_pke.set(xlabel="Parameter Set")
+plt.subplots_adjust(hspace = 0.25)
+plt.savefig('pke.png')
 
 
-sns.set_palette("RdPu", 3)
 dsig = plotData()
-dsig_keygen = plotData()
 for pkc in dec["pkc"]:
     if pkc["masking"] == True:
         for sig in pkc["sig"]:
             for metrics in sig["metrics"]:
+                dsig.append(metrics["parameter_set"], metrics["keygen_per_sec"], "Key Generation", sig["scheme"])
                 dsig.append(metrics["parameter_set"], metrics["sign_per_sec"], "Sign", sig["scheme"])
                 dsig.append(metrics["parameter_set"], metrics["verify_per_sec"], "Verify", sig["scheme"])
-                dsig_keygen.append(metrics["parameter_set"], metrics["keygen_per_sec"], "Key Generation", sig["scheme"])
 
 df_sig = pd.DataFrame(dsig.data, columns=['Parameter Set', 'Operations/sec', 'Operation', 'Scheme'])
 plot_sig = sns.catplot(kind="bar", x = 'Parameter Set', y = 'Operations/sec', col = 'Scheme', hue='Operation',
-    data=df_sig, legend_out=False, height=5, aspect=1.5, col_wrap=1, sharex=False, sharey=False)
+    data=df_sig, legend_out=False, height=5, aspect=1.5, col_wrap=3, sharex=False, sharey=False, palette=sns.color_palette("GnBu_d", 3))
 for ax in plot_sig.axes.ravel():
     for c in ax.containers:
         labels = [f'{(v.get_height() / 1000):.1f}K' for v in c]
         ax.bar_label(c, labels=labels, label_type='edge')
-sns.move_legend(plot_sig, "upper right")
-plot_sig.fig.suptitle('Digital Signature')
+sns.move_legend(plot_sig, "upper right", bbox_to_anchor=(.85, 0.35))
+plot_sig.set_titles("{col_name}", size=20)
+plot_sig.set(xlabel="Parameter Set")
+plt.subplots_adjust(hspace = 0.25)
 plt.savefig('sig.png')
-
-df_sig_keygen = pd.DataFrame(dsig_keygen.data, columns=['Parameter Set', 'KeyGen/sec', 'Operation', 'Scheme'])
-plot_sig_keygen = sns.catplot(kind="bar", x = 'Parameter Set', y = 'KeyGen/sec', col='Scheme', hue='Operation',
-    data=df_sig_keygen, legend_out=False, height=5, aspect=1.5, col_wrap=1, sharex=False, sharey=False)
-for ax in plot_sig_keygen.axes.ravel():
-    for c in ax.containers:
-        labels = [f'{(v.get_height() / 1000):.1f}K' for v in c]
-        ax.bar_label(c, labels=labels, label_type='edge')
-sns.move_legend(plot_sig_keygen, "upper right")
-plot_sig_keygen.fig.suptitle('Digital Signature')
-plt.savefig('sig_keygen.png')
 
 
 # Plot bytes per second for each algorithm with message lengths of 16, 512 and 16384 bytes

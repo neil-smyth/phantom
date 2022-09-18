@@ -39,7 +39,7 @@ json perf_sig::run(phantom::pkc_e pkc_type, size_t duration_us, cpu_word_size_e 
         case PKC_SIG_DILITHIUM:  name = "Dilithium"; break;
         case PKC_SIG_FALCON:     name = "Falcon"; break;
         case PKC_SIG_ECDSA:      name = "ECDSA"; break;
-        case PKC_SIG_EDDSA:      name = "EDDSA"; break;
+        case PKC_SIG_EDDSA:      name = "EdDSA"; break;
         case PKC_SIG_RSASSA_PSS: name = "RSASSA-PSS"; break;
         default:                 throw new std::runtime_error("Error! Invalid digital signature scheme");
     }
