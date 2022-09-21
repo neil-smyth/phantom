@@ -108,6 +108,9 @@ int main(int argc, char *argv[])
     symmetric_key["auth_encryption"].push_back(perf_aes::run(phantom::SYMKEY_AES_128_GCM, test_duration));
     symmetric_key["auth_encryption"].push_back(perf_aes::run(phantom::SYMKEY_AES_192_GCM, test_duration));
     symmetric_key["auth_encryption"].push_back(perf_aes::run(phantom::SYMKEY_AES_256_GCM, test_duration));
+    symmetric_key["auth_encryption"].push_back(perf_aes::run(phantom::SYMKEY_AES_128_CCM, test_duration));
+    symmetric_key["auth_encryption"].push_back(perf_aes::run(phantom::SYMKEY_AES_192_CCM, test_duration));
+    symmetric_key["auth_encryption"].push_back(perf_aes::run(phantom::SYMKEY_AES_256_CCM, test_duration));
 
     metrics["symmetric_key"] = symmetric_key;
 
