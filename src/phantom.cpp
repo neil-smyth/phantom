@@ -631,7 +631,7 @@ int32_t symmetric_key_cipher::set_key(symmetric_key_ctx* ctx, const uint8_t *key
 }
 
 int32_t symmetric_key_cipher::encrypt_start(symmetric_key_ctx* ctx, const uint8_t *iv, size_t iv_len,
-    const uint8_t *authdata, size_t authdata_len)
+    const uint8_t *authdata, size_t authdata_len, size_t msg_len, size_t tag_len)
 {
     switch (ctx->get_keylen())
     {
@@ -658,7 +658,7 @@ int32_t symmetric_key_cipher::encrypt_start(symmetric_key_ctx* ctx, const uint8_
         case SYMKEY_AES_128_CCM:
         case SYMKEY_AES_192_CCM:
         case SYMKEY_AES_256_CCM: {
-            reinterpret_cast<crypto::aes_ccm*>(ctx)->encrypt_start(iv, iv_len, authdata, authdata_len);
+            reinterpret_cast<crypto::aes_ccm*>(ctx)->encrypt_start(iv, iv_len, authdata, authdata_len, msg_len, tag_len);
          } break;
 #endif
         default: return EXIT_FAILURE;
@@ -739,7 +739,7 @@ int32_t symmetric_key_cipher::encrypt_finish(symmetric_key_ctx* ctx, uint8_t *ta
 }
 
 int32_t symmetric_key_cipher::decrypt_start(symmetric_key_ctx* ctx, const uint8_t *iv, size_t iv_len,
-    const uint8_t *authdata, size_t authdata_len)
+    const uint8_t *authdata, size_t authdata_len, size_t msg_len, size_t tag_len)
 {
     switch (ctx->get_keylen())
     {
@@ -766,7 +766,7 @@ int32_t symmetric_key_cipher::decrypt_start(symmetric_key_ctx* ctx, const uint8_
         case SYMKEY_AES_128_CCM:
         case SYMKEY_AES_192_CCM:
         case SYMKEY_AES_256_CCM: {
-            reinterpret_cast<crypto::aes_ccm*>(ctx)->decrypt_start(iv, iv_len, authdata, authdata_len);
+            reinterpret_cast<crypto::aes_ccm*>(ctx)->decrypt_start(iv, iv_len, authdata, authdata_len, msg_len, tag_len);
         } break;
 #endif
         default:                 return EXIT_FAILURE;

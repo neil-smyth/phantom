@@ -57,10 +57,12 @@ public:
      * @param iv_len Length of IV
      * @param aad Additional authentication data
      * @param aad_len Length of additional authentication data
+     * @param msg_len Length of the plaintext message
+     * @param tag_len Length of the authentication tag
      * @return int32_t EXIT_SUCCESS on success, EXIT_FAILURE otherwise
      */
     virtual int32_t encrypt_start(const uint8_t *iv, size_t iv_len,
-        const uint8_t *aad, size_t aad_len);
+        const uint8_t *aad, size_t aad_len, size_t msg_len, size_t tag_len);
 
     /**
      * @brief Continue authenticated encryption with plaintext data.
@@ -94,10 +96,12 @@ public:
      * @param iv_len Length of IV
      * @param aad Additional authentication data
      * @param aad_len Length of additional authentication data
+     * @param msg_len Length of the plaintext message
+     * @param tag_len Length of the authentication tag
      * @return int32_t EXIT_SUCCESS on success, EXIT_FAILURE otherwise
      */
     virtual int32_t decrypt_start(const uint8_t *iv, size_t iv_len,
-        const uint8_t *aad, size_t aad_len);
+        const uint8_t *aad, size_t aad_len, size_t msg_len, size_t tag_len);
 
     /**
      * @brief Continue authenticated decryption with plaintext data.
