@@ -15,6 +15,8 @@ set(libsrc
     ${PROJECT_SOURCE_DIR}/aes_sw.hpp /
     ${PROJECT_SOURCE_DIR}/aes.cpp /
     ${PROJECT_SOURCE_DIR}/aes.hpp /
+    ${PROJECT_SOURCE_DIR}/aes_ccm.cpp /
+    ${PROJECT_SOURCE_DIR}/aes_ccm.hpp /
     ${PROJECT_SOURCE_DIR}/aes_ctr_drbg.cpp /
     ${PROJECT_SOURCE_DIR}/aes_ctr_drbg.hpp /
     ${PROJECT_SOURCE_DIR}/csprng.cpp /

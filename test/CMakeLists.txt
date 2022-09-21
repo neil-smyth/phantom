@@ -21,6 +21,14 @@ if (ENABLE_AES_GCM)
     target_link_libraries(func_aes_gcm phantom_static)
 endif (ENABLE_AES_GCM)
 
+if (ENABLE_AES_GCM)
+    add_executable(unit_aes_gcm unit/unit_aes_gcm.cpp) 
+    target_link_libraries(unit_aes_gcm phantom_static)
+
+    add_executable(func_aes_gcm functional/func_aes_gcm.cpp)
+    target_link_libraries(func_aes_gcm phantom_static)
+endif (ENABLE_AES_GCM)
+
 if (ENABLE_FPE_AES_FF1)
     add_executable(unit_ff1 unit/unit_ff1.cpp) 
     target_link_libraries(unit_ff1 phantom_static)
