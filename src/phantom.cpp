@@ -658,7 +658,8 @@ int32_t symmetric_key_cipher::encrypt_start(symmetric_key_ctx* ctx, const uint8_
         case SYMKEY_AES_128_CCM:
         case SYMKEY_AES_192_CCM:
         case SYMKEY_AES_256_CCM: {
-            reinterpret_cast<crypto::aes_ccm*>(ctx)->encrypt_start(iv, iv_len, authdata, authdata_len, msg_len, tag_len);
+            reinterpret_cast<crypto::aes_ccm*>(ctx)->encrypt_start(iv, iv_len, authdata, authdata_len,
+                                                                   msg_len, tag_len);
          } break;
 #endif
         default: return EXIT_FAILURE;
@@ -766,7 +767,8 @@ int32_t symmetric_key_cipher::decrypt_start(symmetric_key_ctx* ctx, const uint8_
         case SYMKEY_AES_128_CCM:
         case SYMKEY_AES_192_CCM:
         case SYMKEY_AES_256_CCM: {
-            reinterpret_cast<crypto::aes_ccm*>(ctx)->decrypt_start(iv, iv_len, authdata, authdata_len, msg_len, tag_len);
+            reinterpret_cast<crypto::aes_ccm*>(ctx)->decrypt_start(iv, iv_len, authdata, authdata_len,
+                                                                   msg_len, tag_len);
         } break;
 #endif
         default:                 return EXIT_FAILURE;
