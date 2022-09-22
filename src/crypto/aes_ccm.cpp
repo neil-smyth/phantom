@@ -63,18 +63,43 @@ int32_t aes_ccm::encrypt_start(const uint8_t *iv, size_t iv_len,
         phantom_vector<uint8_t> auth_block(16);
         m_aes->encrypt(auth_block.data(), m_b);
 
-        size_t use_len = (aad_len < 14) ? aad_len : 14;
+        // Calculate the structure of the B1 block
+        size_t use_len;
+        size_t num_a_enc_bytes;
+        size_t num_prefix_bytes;
 
-        for (size_t i=0; i < 2; i++) {
-            m_b[i] = (aad_len >> 8*(1-i));
+        if (aad_len < 65280) {
+            use_len = (aad_len < 14) ? aad_len : 14;
+            num_prefix_bytes = 0;
+            num_a_enc_bytes = 2;
+        }
+        else {
+            num_prefix_bytes = 2;
+            m_b[0] = 0xff;
+            if (aad_len < 0x100000000) {
+                use_len = (aad_len < 10) ? aad_len : 10;
+                num_a_enc_bytes = 6;
+                m_b[1] = 0xfe;
+            }
+            else {
+                use_len = (aad_len < 6) ? aad_len : 6;
+                num_a_enc_bytes = 10;
+                m_b[1] = 0xff;
+            }
+        }
+
+        // Create B1 with optional prefix bytes and a additional authentication data
+        for (size_t i=num_prefix_bytes; i < num_a_enc_bytes; i++) {
+            m_b[i] = (aad_len >> 8*(num_a_enc_bytes-1-i));
         }
         for (size_t i=0; i < use_len; i++) {
-            m_b[2+i] = aad[i];
+            m_b[num_a_enc_bytes+i] = aad[i];
         }
-        for (size_t i=2+use_len; i < 16; i++) {
+        for (size_t i=num_a_enc_bytes+use_len; i < 16; i++) {
             m_b[i] = 0;
         }
 
+        // XOR the B1 block with the previous encrypted B0 block
         for (size_t i=0; i < 16; i++) {
             m_b[i] ^= auth_block[i];
         }
@@ -86,9 +111,11 @@ int32_t aes_ccm::encrypt_start(const uint8_t *iv, size_t iv_len,
             m_b[i] = auth_block[i];
         }
 
+        // Adjust the AAD length and data data pointer
         aad_len -= use_len;
         aad += use_len;
 
+        // Create all of the B blocks, encrypt and XOR them
         while (aad_len > 0) {
             use_len = (aad_len < 16) ? aad_len : 16;
 
@@ -114,6 +141,7 @@ int32_t aes_ccm::encrypt_start(const uint8_t *iv, size_t iv_len,
             aad += use_len;
         }
 
+        // Create the initial counter block
         m_ctr[0] = (m_q - 1);  // Flag octet
         for (size_t i=0; i < iv_len; i++) {
             m_ctr[i+1] = iv[i];
