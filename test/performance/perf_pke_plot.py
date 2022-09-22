@@ -282,6 +282,27 @@ plt.subplots_adjust(hspace = 0.15)
 plt.savefig('aes_gcm.png')
 
 
+dsymkey_aes_ccm = plotData()
+for enc in dec["symmetric_key"]["auth_encryption"]:
+    if enc["scheme"] == "AES-CCM":
+        for v in enc["metrics"]:
+            dsymkey_aes_ccm.append(enc["key_length"], v["encrypt_bytes_per_sec"] / (1024.0*1024.0), v["message_length"], "Encryption")
+            dsymkey_aes_ccm.append(enc["key_length"], v["decrypt_bytes_per_sec"] / (1024.0*1024.0), v["message_length"], "Decryption")
+df_symkey_aes_ccm = pd.DataFrame(dsymkey_aes_ccm.data, columns=['Key length (bytes)', 'MB/sec', 'Message length (bytes)', 'Operation'])
+
+plot_symkey_aes_ccm = sns.catplot(kind="bar", x = 'Key length (bytes)', y = 'MB/sec', col = "Operation", hue='Message length (bytes)',
+    data=df_symkey_aes_ccm, legend_out=False, height=8, aspect=3, col_wrap=1, sharex=False, palette=sns.color_palette("GnBu_d", 11))
+for ax in plot_symkey_aes_ccm.axes.ravel():
+    for c in ax.containers:
+        labels = [f'{(v.get_height()):.1f}' for v in c]
+        ax.bar_label(c, labels=labels, label_type='edge')
+sns.move_legend(plot_symkey_aes_ccm, "upper right", bbox_to_anchor=(.95, 0.75))
+plot_symkey_aes_ccm.set_titles("{col_name}", size=24)
+plot_symkey_aes_ccm.set(xlabel="Key length (bytes)")
+plt.subplots_adjust(hspace = 0.15)
+plt.savefig('aes_ccm.png')
+
+
 dibe = plotData()
 for pkc in dec["pkc"]:
     if pkc["masking"] == True:

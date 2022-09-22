@@ -19,24 +19,24 @@ namespace crypto {
 
 /**
  * @ingroup symmetric
- * @brief AES Galois Counter Mode authenticated encryption
+ * @brief AES CTR mode with CBC-MAC authenticated encryption
  */
-class aes_gcm : public symmetric_key_auth_enc, public aligned_base<DEFAULT_MEM_ALIGNMENT>
+class aes_ccm : public symmetric_key_auth_enc, public aligned_base<DEFAULT_MEM_ALIGNMENT>
 {
 public:
     /**
-     * @brief Destroy the aes_gcm object, erasing all memory
+     * @brief Destroy the aes_ccm object, erasing all memory
      * 
      */
-    virtual ~aes_gcm();
+    virtual ~aes_ccm();
 
     /**
      * @brief Factory method to create an AES-GCM object supporting the specified key length
      * 
      * @param key_len AES-key length
-     * @return aes_gcm* Pointer to an aes_gcm object
+     * @return aes_ccm* Pointer to an aes_ccm object
      */
-    static aes_gcm* make(aes_keylen_e key_len);
+    static aes_ccm* make(aes_keylen_e key_len);
 
     /**
      * @brief Set the key
@@ -62,7 +62,7 @@ public:
      * @return int32_t EXIT_SUCCESS on success, EXIT_FAILURE otherwise
      */
     virtual int32_t encrypt_start(const uint8_t *iv, size_t iv_len,
-        const uint8_t *aad, size_t aad_len, size_t msg_len = 0, size_t tag_len = 0);
+        const uint8_t *aad, size_t aad_len, size_t msg_len, size_t tag_len);
 
     /**
      * @brief Continue authenticated encryption with plaintext data.
@@ -101,7 +101,7 @@ public:
      * @return int32_t EXIT_SUCCESS on success, EXIT_FAILURE otherwise
      */
     virtual int32_t decrypt_start(const uint8_t *iv, size_t iv_len,
-        const uint8_t *aad, size_t aad_len, size_t msg_len = 0, size_t tag_len = 0);
+        const uint8_t *aad, size_t aad_len, size_t msg_len, size_t tag_len);
 
     /**
      * @brief Continue authenticated decryption with plaintext data.
@@ -126,68 +126,38 @@ public:
     /// @}
 
 protected:
-    /**
-     * @brief Construct a new aes_gcm object, hidden ctor as factory method is used
-     * 
-     * @param key_len Length of AES key encoded as an aes_keylen_e
-     */
-    explicit aes_gcm(aes_keylen_e key_len);
+    explicit aes_ccm(aes_keylen_e key_len);
 
-    /**
-     * @brief XOR two 16 byte input blocks
-     * 
-     * @param out The output block of bytes
-     * @param in1 Input 1
-     * @param in2 Input 2
-     */
-    static inline void xor_block_16(uint8_t *out, const uint8_t *in1, const uint8_t *in2);
+    /// A nonce struct for AES-CTR
+    struct taes_ctr_nonce_ctr {
+        uint8_t m_nonce[4];
+        uint8_t m_iv[8];
+        uint8_t m_ctr[4];
+    };
 
-    /**
-     * @brief XOR two variable length input blocks
-     * 
-     * @param out The output block of bytes
-     * @param in1 Input 1
-     * @param in2 Input 2
-     * @param n Length of input 1 and input 2
-     */
-    static inline void xor_block(uint8_t *out, const uint8_t *in1, const uint8_t *in2, size_t n);
+    /// A union for an AES-CTR
+    union taes_ctr_iv {
+        taes_ctr_nonce_ctr components;
+        uint8_t            data[16];
+    };
 
-    /**
-     * @brief GCM multiplication of a 16 byte array
-     * 
-     * @param out Output
-     * @param in Input
-     */
-    void gcm_mult(uint8_t* out, const uint8_t* in);
+    /// A union for access to bytes within a 32-bit word
+    union u {
+        uint8_t b[4];
+        uint32_t w;
+    };
 
-    /**
-     * @brief Perform an AES_GCM authenticated encryption update
-     * 
-     * @param out Output byte array
-     * @param in Input byte array
-     * @param len Length of the input byte array
-     * @param encrypt_flag True if encryption, false if decryption
-     * @return int32_t 
-     */
-    int32_t update(uint8_t *out, const uint8_t *in, size_t len, bool encrypt_flag);
-
-    /// The AES encryption object
     std::unique_ptr<aes_encrypt> m_aes;
+    uint8_t m_ctr[16];
+    uint8_t m_b[16];
 
-    /// Authentication data
-    phantom_vector<uint8_t> m_auth_data;
+    /// The length of nonce
+    size_t m_iv_len;
 
-    /// Key related material used for the GCM multiplication
-    alignas(DEFAULT_MEM_ALIGNMENT) uint64_t m_hh[16], m_hl[16];
+    /// Length of the message used in the 1st CBC-MAC block
+    uint64_t m_q;
 
-    /// GCM multiplication constants
-    alignas(DEFAULT_MEM_ALIGNMENT) static const uint64_t m_last4[16];
-
-    /// The initialization vector (IV)
-    alignas(DEFAULT_MEM_ALIGNMENT) uint8_t m_iv[16];
-
-    /// The encrypted base IV
-    alignas(DEFAULT_MEM_ALIGNMENT) uint8_t m_iv_enc[16];
+    uint8_t m_S0[16];
 
     /// Authentication buffer (updates during the authenticated encryption process)
     alignas(DEFAULT_MEM_ALIGNMENT) uint8_t m_authbuf[16];

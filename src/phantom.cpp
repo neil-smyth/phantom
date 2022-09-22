@@ -25,6 +25,7 @@
 #include "crypto/aes.hpp"
 #include "crypto/aes_ctr.hpp"
 #include "crypto/aes_gcm.hpp"
+#include "crypto/aes_ccm.hpp"
 #include "crypto/fpe.hpp"
 #include "crypto/xof_sha3.hpp"
 #include "crypto/shamirs_secret_sharing.hpp"
@@ -527,6 +528,11 @@ symmetric_key_ctx* symmetric_key_cipher::make(symmetric_key_type_e key_len)
         case SYMKEY_AES_192_GCM: obj = crypto::aes_gcm::make(aes_keylen_e::AES_192); break;
         case SYMKEY_AES_256_GCM: obj = crypto::aes_gcm::make(aes_keylen_e::AES_256); break;
 #endif
+#if defined(ENABLE_AES_CCM)
+        case SYMKEY_AES_128_CCM: obj = crypto::aes_ccm::make(aes_keylen_e::AES_128); break;
+        case SYMKEY_AES_192_CCM: obj = crypto::aes_ccm::make(aes_keylen_e::AES_192); break;
+        case SYMKEY_AES_256_CCM: obj = crypto::aes_ccm::make(aes_keylen_e::AES_256); break;
+#endif
         default: return nullptr;
     }
 
@@ -602,13 +608,30 @@ int32_t symmetric_key_cipher::set_key(symmetric_key_ctx* ctx, const uint8_t *key
             }
         } break;
 #endif
+#if defined(ENABLE_AES_CCM)
+        case SYMKEY_AES_128_CCM: {
+            if (key_len_bytes == 16) {
+                return reinterpret_cast<crypto::aes_ccm*>(ctx)->set_key(key, 16);
+            }
+        } break;
+        case SYMKEY_AES_192_CCM: {
+            if (key_len_bytes == 24) {
+                return reinterpret_cast<crypto::aes_ccm*>(ctx)->set_key(key, 24);
+            }
+        } break;
+        case SYMKEY_AES_256_CCM: {
+            if (key_len_bytes == 32) {
+                return reinterpret_cast<crypto::aes_ccm*>(ctx)->set_key(key, 32);
+            }
+        } break;
+#endif
         default: {}
     }
     return EXIT_FAILURE;
 }
 
 int32_t symmetric_key_cipher::encrypt_start(symmetric_key_ctx* ctx, const uint8_t *iv, size_t iv_len,
-    const uint8_t *authdata, size_t authdata_len)
+    const uint8_t *authdata, size_t authdata_len, size_t msg_len, size_t tag_len)
 {
     switch (ctx->get_keylen())
     {
@@ -629,6 +652,13 @@ int32_t symmetric_key_cipher::encrypt_start(symmetric_key_ctx* ctx, const uint8_
         case SYMKEY_AES_192_GCM:
         case SYMKEY_AES_256_GCM: {
             reinterpret_cast<crypto::aes_gcm*>(ctx)->encrypt_start(iv, iv_len, authdata, authdata_len);
+         } break;
+#endif
+#if defined(ENABLE_AES_GCM)
+        case SYMKEY_AES_128_CCM:
+        case SYMKEY_AES_192_CCM:
+        case SYMKEY_AES_256_CCM: {
+            reinterpret_cast<crypto::aes_ccm*>(ctx)->encrypt_start(iv, iv_len, authdata, authdata_len, msg_len, tag_len);
          } break;
 #endif
         default: return EXIT_FAILURE;
@@ -671,6 +701,14 @@ int32_t symmetric_key_cipher::encrypt(symmetric_key_ctx* ctx, uint8_t *out, cons
             reinterpret_cast<crypto::aes_gcm*>(ctx)->encrypt_update(out, in, len);
         } break;
 #endif
+#if defined(ENABLE_AES_CCM)
+        case SYMKEY_AES_128_CCM:
+        case SYMKEY_AES_192_CCM:
+        case SYMKEY_AES_256_CCM:
+        {
+            reinterpret_cast<crypto::aes_ccm*>(ctx)->encrypt_update(out, in, len);
+        } break;
+#endif
         default: return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;
@@ -688,12 +726,20 @@ int32_t symmetric_key_cipher::encrypt_finish(symmetric_key_ctx* ctx, uint8_t *ta
             return reinterpret_cast<crypto::aes_gcm*>(ctx)->encrypt_finish(tag, tag_len);
         } break;
 #endif
+#if defined(ENABLE_AES_CCM)
+        case SYMKEY_AES_128_CCM:
+        case SYMKEY_AES_192_CCM:
+        case SYMKEY_AES_256_CCM:
+        {
+            return reinterpret_cast<crypto::aes_ccm*>(ctx)->encrypt_finish(tag, tag_len);
+        } break;
+#endif
         default: return EXIT_FAILURE;
     }
 }
 
 int32_t symmetric_key_cipher::decrypt_start(symmetric_key_ctx* ctx, const uint8_t *iv, size_t iv_len,
-    const uint8_t *authdata, size_t authdata_len)
+    const uint8_t *authdata, size_t authdata_len, size_t msg_len, size_t tag_len)
 {
     switch (ctx->get_keylen())
     {
@@ -714,6 +760,13 @@ int32_t symmetric_key_cipher::decrypt_start(symmetric_key_ctx* ctx, const uint8_
         case SYMKEY_AES_192_GCM:
         case SYMKEY_AES_256_GCM: {
             reinterpret_cast<crypto::aes_gcm*>(ctx)->decrypt_start(iv, iv_len, authdata, authdata_len);
+        } break;
+#endif
+#if defined(ENABLE_AES_CCM)
+        case SYMKEY_AES_128_CCM:
+        case SYMKEY_AES_192_CCM:
+        case SYMKEY_AES_256_CCM: {
+            reinterpret_cast<crypto::aes_ccm*>(ctx)->decrypt_start(iv, iv_len, authdata, authdata_len, msg_len, tag_len);
         } break;
 #endif
         default:                 return EXIT_FAILURE;
@@ -755,6 +808,14 @@ int32_t symmetric_key_cipher::decrypt(symmetric_key_ctx* ctx, uint8_t *out, cons
             reinterpret_cast<crypto::aes_gcm*>(ctx)->decrypt_update(out, in, len);
         } break;
 #endif
+#if defined(ENABLE_AES_CCM)
+        case SYMKEY_AES_128_CCM:
+        case SYMKEY_AES_192_CCM:
+        case SYMKEY_AES_256_CCM:
+        {
+            reinterpret_cast<crypto::aes_ccm*>(ctx)->decrypt_update(out, in, len);
+        } break;
+#endif
         default: return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;
@@ -770,6 +831,14 @@ int32_t symmetric_key_cipher::decrypt_finish(symmetric_key_ctx* ctx, uint8_t *ta
         case SYMKEY_AES_256_GCM:
         {
             return reinterpret_cast<crypto::aes_gcm*>(ctx)->decrypt_finish(tag, tag_len);
+        } break;
+#endif
+#if defined(ENABLE_AES_CCM)
+        case SYMKEY_AES_128_CCM:
+        case SYMKEY_AES_192_CCM:
+        case SYMKEY_AES_256_CCM:
+        {
+            return reinterpret_cast<crypto::aes_ccm*>(ctx)->decrypt_finish(tag, tag_len);
         } break;
 #endif
         default: return EXIT_FAILURE;

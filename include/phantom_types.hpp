@@ -194,7 +194,10 @@ enum symmetric_key_type_e {
     SYMKEY_AES_256_CTR,
     SYMKEY_AES_128_GCM,
     SYMKEY_AES_192_GCM,
-    SYMKEY_AES_256_GCM
+    SYMKEY_AES_256_GCM,
+    SYMKEY_AES_128_CCM,
+    SYMKEY_AES_192_CCM,
+    SYMKEY_AES_256_CCM
 };
 
 /// An enumerated type for hashing functions

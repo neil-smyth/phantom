@@ -21,6 +21,14 @@ if (ENABLE_AES_GCM)
     target_link_libraries(func_aes_gcm phantom_static)
 endif (ENABLE_AES_GCM)
 
+if (ENABLE_AES_CCM)
+    add_executable(unit_aes_ccm unit/unit_aes_ccm.cpp) 
+    target_link_libraries(unit_aes_ccm phantom_static)
+
+    add_executable(func_aes_ccm functional/func_aes_ccm.cpp)
+    target_link_libraries(func_aes_ccm phantom_static)
+endif (ENABLE_AES_CCM)
+
 if (ENABLE_FPE_AES_FF1)
     add_executable(unit_ff1 unit/unit_ff1.cpp) 
     target_link_libraries(unit_ff1 phantom_static)
@@ -123,6 +131,9 @@ target_link_libraries(kat_aes_ecb phantom_static)
 add_executable(kat_aes_gcm kat/kat_aes_gcm.cpp) 
 target_link_libraries(kat_aes_gcm phantom_static)
 
+add_executable(kat_aes_ccm kat/kat_aes_ccm.cpp) 
+target_link_libraries(kat_aes_ccm phantom_static)
+
 add_executable(kat_aes_ctr kat/kat_aes_ctr.cpp) 
 target_link_libraries(kat_aes_ctr phantom_static)
 
@@ -141,6 +152,10 @@ if (ENABLE_AES_GCM)
     add_test(UNIT_AES_GCM ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/unit_aes_gcm)
     add_test(FUNC_AES_GCM ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/func_aes_gcm)
 endif (ENABLE_AES_GCM)
+if (ENABLE_AES_CCM)
+    add_test(UNIT_AES_CCM ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/unit_aes_ccm)
+    add_test(FUNC_AES_CCM ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/func_aes_ccm)
+endif (ENABLE_AES_CCM)
 if (ENABLE_FPE_AES_FF1)
     add_test(UNIT_FF1 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/unit_ff1)
     add_test(FUNC_FF1 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/func_ff1)
@@ -338,6 +353,7 @@ add_test(KAT_SHA3 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kat_sha3)
 add_test(KAT_SHAKE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kat_shake)
 add_test(KAT_AES_ECB ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kat_aes_ecb)
 add_test(KAT_AES_GCM ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kat_aes_gcm)
+add_test(KAT_AES_CCM ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kat_aes_ccm)
 add_test(KAT_AES_CTR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kat_aes_ctr)
 
 

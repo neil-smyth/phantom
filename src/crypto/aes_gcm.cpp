@@ -164,7 +164,7 @@ void aes_gcm::xor_block(uint8_t *out, const uint8_t *in1, const uint8_t *in2, si
 }
 
 int32_t aes_gcm::encrypt_start(const uint8_t *iv, size_t iv_len,
-    const uint8_t *aad, size_t aad_len)
+    const uint8_t *aad, size_t aad_len, size_t msg_len, size_t tag_len)
 {
     const uint8_t *p;
     alignas(DEFAULT_MEM_ALIGNMENT) uint8_t work_buf[16];
@@ -302,7 +302,7 @@ int32_t aes_gcm::encrypt_finish(uint8_t *tag, size_t tag_len)
 }
 
 int32_t aes_gcm::decrypt_start(const uint8_t *iv, size_t iv_len,
-    const uint8_t *aad, size_t aad_len)
+    const uint8_t *aad, size_t aad_len, size_t msg_len, size_t tag_len)
 {
     return encrypt_start(iv, iv_len, aad, aad_len);
 }
