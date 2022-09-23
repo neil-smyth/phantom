@@ -32,12 +32,6 @@ namespace phantom {
 namespace rsa {
 
 
-/// Definitions for the Kyber parameters
-struct rsa_set_t {
-    uint16_t set;
-    uint16_t n_bits;
-};
-
 /// An enumerated type for RSA return codes
 enum rsacode_e {
     RSA_OK = 0,

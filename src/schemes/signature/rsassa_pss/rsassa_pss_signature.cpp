@@ -21,24 +21,23 @@ namespace schemes {
 template <typename T>
 using rsa_ssa_pss = phantom::rsa::rsa_cryptosystem_rsassa_pss<T>;
 
-const phantom::rsa::rsa_set_t rsassa_pss_signature::m_params[17] = {
-    {0, 512},
-    {1, 1024},
-    {2, 2048},
-    {3, 3072},
-    {4, 4096},
-    {5, 5120},
-    {6, 6144},
-    {7, 7168},
-    {8, 8192},
-    {9, 9216},
-    {10, 10240},
-    {11, 11264},
-    {12, 12288},
-    {13, 13312},
-    {14, 14336},
-    {15, 15360},
-    {16, 16384},
+const phantom::rsa::rsa_set_t rsassa_pss_signature::m_params[16] = {
+    {0,  HASH_SHA2_224, 1024,  "65537"},
+    {1,  HASH_SHA2_224, 2048,  "65537"},
+    {2,  HASH_SHA2_256, 3072,  "65537"},
+    {3,  HASH_SHA2_256, 4096,  "65537"},
+    {4,  HASH_SHA2_256, 5120,  "65537"},
+    {5,  HASH_SHA2_256, 6144,  "65537"},
+    {6,  HASH_SHA2_256, 7168,  "65537"},
+    {7,  HASH_SHA2_384, 8192,  "65537"},
+    {8,  HASH_SHA2_384, 9216,  "65537"},
+    {9,  HASH_SHA2_384, 10240, "65537"},
+    {10, HASH_SHA2_384, 11264, "65537"},
+    {11, HASH_SHA2_384, 12288, "65537"},
+    {12, HASH_SHA2_384, 13312, "65537"},
+    {13, HASH_SHA2_384, 14336, "65537"},
+    {14, HASH_SHA2_512, 15360, "65537"},
+    {15, HASH_SHA2_512, 16384, "65537"},
 };
 
 size_t rsassa_pss_signature::bits_2_set(security_strength_e bits)
@@ -48,13 +47,13 @@ size_t rsassa_pss_signature::bits_2_set(security_strength_e bits)
     switch (bits)
     {
         case SECURITY_STRENGTH_60:
-        case SECURITY_STRENGTH_80:
-        case SECURITY_STRENGTH_96:  set = 0; break;
+        case SECURITY_STRENGTH_80:  set = 0; break;
+        case SECURITY_STRENGTH_96:  set = 1; break;
 
-        case SECURITY_STRENGTH_112:
-        case SECURITY_STRENGTH_128: set = 1; break;
+        case SECURITY_STRENGTH_112: set = 2; break;
+        case SECURITY_STRENGTH_128: set = 3; break;
 
-        case SECURITY_STRENGTH_160: set = 2; break;
+        case SECURITY_STRENGTH_160: set = 4; break;
 
         default: throw std::invalid_argument("Security strength is invalid");
     }
@@ -75,41 +74,27 @@ std::unique_ptr<user_ctx> rsassa_pss_signature::create_ctx(security_strength_e b
                                                            cpu_word_size_e size_hint,
                                                            bool masking) const
 {
-    user_ctx* ctx;
-    switch (size_hint)
-    {
-        case CPU_WORD_SIZE_16: {
-            ctx = new phantom::rsa::ctx_rsa_tmpl<uint16_t>(16, bits_2_set(bits), masking);
-        } break;
-        case CPU_WORD_SIZE_32: {
-            ctx = new phantom::rsa::ctx_rsa_tmpl<uint32_t>(16, bits_2_set(bits), masking);
-        } break;
-#if defined(IS_64BIT)
-        case CPU_WORD_SIZE_64: {
-            ctx = new phantom::rsa::ctx_rsa_tmpl<uint64_t>(16, bits_2_set(bits), masking);
-        } break;
-#endif
-        default: throw std::invalid_argument("size_hint set is out of range");
-    }
-
-    if ((ctx->get_set() & 0xff) > 5) {
-        throw std::invalid_argument("Parameter set is out of range");
-    }
-
-    return std::unique_ptr<user_ctx>(ctx);
+    size_t set = bits_2_set(bits);
+    return create_ctx(set, size_hint, masking);
 }
 
 std::unique_ptr<user_ctx> rsassa_pss_signature::create_ctx(size_t set,
                                                            cpu_word_size_e size_hint,
                                                            bool masking) const
 {
+    // Obtain the hash from the parameter set
+    hash_alg_e hash = static_cast<hash_alg_e>((set >> 8) & 0x1f);
+
     user_ctx* ctx;
     switch (size_hint)
     {
-        case CPU_WORD_SIZE_16: ctx = new phantom::rsa::ctx_rsa_tmpl<uint16_t>(16, set, masking); break;
-        case CPU_WORD_SIZE_32: ctx = new phantom::rsa::ctx_rsa_tmpl<uint32_t>(16, set, masking); break;
+        case CPU_WORD_SIZE_16:
+            ctx = new phantom::rsa::ctx_rsa_tmpl<uint16_t>(PKC_SIG_RSASSA_PSS, hash, 16, set, &m_params[0], 16, masking); break;
+        case CPU_WORD_SIZE_32:
+            ctx = new phantom::rsa::ctx_rsa_tmpl<uint32_t>(PKC_SIG_RSASSA_PSS, hash, 16, set, &m_params[0], 16, masking); break;
 #if defined(IS_64BIT)
-        case CPU_WORD_SIZE_64: ctx = new phantom::rsa::ctx_rsa_tmpl<uint64_t>(16, set, masking); break;
+        case CPU_WORD_SIZE_64:
+            ctx = new phantom::rsa::ctx_rsa_tmpl<uint64_t>(PKC_SIG_RSASSA_PSS, hash, 16, set, &m_params[0], 16, masking); break;
 #endif
         default: throw std::invalid_argument("size_hint set is out of range");
     }

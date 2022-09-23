@@ -329,9 +329,9 @@ bool rsa_cryptosystem<T>::mgf1(crypto::hash* h, phantom_vector<uint8_t>& mask, s
     for (uint32_t counter=0; counter < ((masklen + hlen - 1) / hlen) - 1; counter++) {
 
         uint8_t ctr[4] = { uint8_t((counter >>  0) & 0xff),
-                            uint8_t((counter >>  8) & 0xff),
-                            uint8_t((counter >> 16) & 0xff),
-                            uint8_t((counter >> 24) & 0xff) };
+                           uint8_t((counter >>  8) & 0xff),
+                           uint8_t((counter >> 16) & 0xff),
+                           uint8_t((counter >> 24) & 0xff) };
 
         h->init(hblocklen);
         h->update(seed.data(), seed.size());
@@ -397,12 +397,10 @@ rsacode_e rsa_cryptosystem<T>::exponentiation(core::mpz<T>& r, core::mpz<T>& b, 
 
     // Square-and-multiply
     rsacode_e rsacode;
-    /*
     if (core::SCALAR_MONT_LADDER == m_coding_type) {
         rsacode = montgomery_ladder(r, b, bitgen, num_bits, w, sub_offset, cfg);
     }
-    else */
-    {
+    else {
         rsacode = square_and_multiply(r, b, bitgen, num_bits, w, sub_offset, cfg);
     }
 
@@ -445,7 +443,7 @@ rsacode_e rsa_cryptosystem<T>::square_and_multiply(core::mpz<T>& r, const core::
 
             // Determine the value to be multiplied
             core::mpz<T>* mpz_b = subtract ? m_base_pre[sub_idx].get()
-                                            : m_base_pre[pre_idx].get();
+                                           : m_base_pre[pre_idx].get();
 
             r.mul_mod(*mpz_b, cfg);
         }
@@ -477,15 +475,10 @@ rsacode_e rsa_cryptosystem<T>::montgomery_ladder(core::mpz<T>& r, const core::mp
     }
 
     // Set the initial value according to the encoding - it is guaranteed to be positive non-zero
-    if (core::REDUCTION_MONTGOMERY == cfg.reduction) {
-        r = cfg.mont_R2;
-    }
-    else {
-        r.set(T(1));
-    }
+    r.set(*m_base_pre[0].get());
 
     core::mpz<T> b1;
-    b1.set(b);
+    b1.set(*m_base_pre[0].get());
     b1.square_mod(cfg);
 
     // Set pointers
@@ -526,7 +519,7 @@ bool rsa_cryptosystem<T>::rsa_public_exponentiation(ctx_rsa_tmpl<T>& ctx, core::
 template<typename T>
 bool rsa_cryptosystem<T>::rsa_private_exponentiation(ctx_rsa_tmpl<T>& ctx, core::mpz<T> c, core::mpz<T>& m)
 {
-    if (false) {
+    if (ctx.exp1().is_zero() || ctx.exp2().is_zero()) {
         if (RSA_OK != exponentiation(m, c, ctx.d(), ctx.mod())) {
             return false;
         }
