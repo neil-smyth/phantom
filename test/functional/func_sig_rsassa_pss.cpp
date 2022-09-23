@@ -33,11 +33,12 @@ int main(int argc, char *argv[])
         uint32_t keygen_us = 0, sign_us = 0, verify_us = 0;
 
         pkc rsa(PKC_SIG_RSASSA_PSS);
-        std::unique_ptr<user_ctx> ctx = rsa.create_ctx(i);
+        std::unique_ptr<user_ctx> ctx_sign   = rsa.create_ctx(i, NATIVE_CPU_WORD_SIZE, true);
+        std::unique_ptr<user_ctx> ctx_verify = rsa.create_ctx(i, NATIVE_CPU_WORD_SIZE, false);
 
         for (size_t j=0; j < NUM_ITER; j++) {
             sw_keygen.start();
-            if (!rsa.keygen(ctx)) {
+            if (!rsa.keygen(ctx_sign)) {
                 std::cerr << "KeyGen failed" << std::endl;
                 return EXIT_FAILURE;
             }
@@ -45,14 +46,18 @@ int main(int argc, char *argv[])
 
             phantom_vector<uint8_t> s;
             sw_sign.start();
-            if (!rsa.sig_sign(ctx, m, s)) {
+            if (!rsa.sig_sign(ctx_sign, m, s)) {
                 std::cerr << "Signing failed" << std::endl;
                 return EXIT_FAILURE;
             }
             sw_sign.stop();
 
+            phantom_vector<uint8_t> pk;
+            rsa.get_public_key(ctx_sign, pk);
+            rsa.set_public_key(ctx_verify, pk);
+
             sw_verify.start();
-            bool verified = rsa.sig_verify(ctx, m, s);
+            bool verified = rsa.sig_verify(ctx_verify, m, s);
             sw_verify.stop();
 
             keygen_us += sw_keygen.elapsed_us();
@@ -65,7 +70,7 @@ int main(int argc, char *argv[])
             }
         }
 
-        std::cout << "RSASSA-PSS-" << ((0 == i)? "512" : (1 == i)? "1024" : (2 == i)? "2048" : "3072") << std::endl;
+        std::cout << "RSASSA-PSS-" << ctx_sign->get_set_name() << std::endl;
         std::cerr << "keygen time = " << static_cast<float>(keygen_us)/(NUM_ITER)
             << " us, "  << (NUM_ITER*1000000.0f)/static_cast<float>(keygen_us)
                 << " per sec" << std::endl;

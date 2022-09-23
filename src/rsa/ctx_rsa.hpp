@@ -23,6 +23,14 @@
 namespace phantom {
 namespace rsa {
 
+/// Definitions for the RSA parameters
+struct rsa_set_t {
+    uint16_t    set;
+    hash_alg_e  hash;
+    uint16_t    n_bits;
+    const char* e;
+};
+
 /// A class describing the Kyber user context
 class ctx_rsa : public user_ctx
 {
@@ -55,12 +63,19 @@ template<class T>
 class ctx_rsa_tmpl : public ctx_rsa
 {
 public:
-    ctx_rsa_tmpl(uint32_t min_exp_bits, size_t set, bool masking) : m_scheme(PKC_PKE_RSAES_OAEP), m_set(set)
+    ctx_rsa_tmpl(pkc_e scheme, hash_alg_e hash, uint32_t min_exp_bits, size_t set,
+                 const phantom::rsa::rsa_set_t *params, size_t num_params, bool masking)
+     : m_scheme(scheme), m_set(set)
     {
+        m_params = phantom_vector<phantom::rsa::rsa_set_t>(params, params + num_params);
+        for (phantom::rsa::rsa_set_t p : m_params) {
+            m_sets.push_back(std::to_string(p.n_bits));
+        }
+
         m_rsa_pke = std::unique_ptr<phantom::rsa::rsa_cryptosystem<T>>(
             new phantom::rsa::rsa_cryptosystem<T>(min_exp_bits, core::scalar_coding_e::SCALAR_BINARY, masking));
 
-        if (!set_hash(static_cast<hash_alg_e>((set >> 8) & 0x1f))) {
+        if (!set_hash(hash)) {
             throw std::runtime_error("Hash is unknown");
         }
     }
@@ -222,7 +237,9 @@ private:
     const pkc_e  m_scheme;
     const size_t m_set;
 
-    const phantom_vector<std::string> m_sets = { "1024", "1536", "2048", "3096", "4096" };
+    phantom_vector<phantom::rsa::rsa_set_t> m_params;
+
+    phantom_vector<std::string> m_sets;
 
     std::unique_ptr<phantom::rsa::rsa_cryptosystem<T>> m_rsa_pke;
 

@@ -29,14 +29,10 @@ int main(int argc, char *argv[])
 
         pkc dut_a(PKC_PKE_RSAES_OAEP);
         pkc dut_b(PKC_PKE_RSAES_OAEP);
-        std::unique_ptr<user_ctx> ctx_a = dut_a.create_ctx(i);
-        std::unique_ptr<user_ctx> ctx_b = dut_b.create_ctx(i);
+        std::unique_ptr<user_ctx> ctx_a = dut_a.create_ctx(i, NATIVE_CPU_WORD_SIZE, false);
+        std::unique_ptr<user_ctx> ctx_b = dut_b.create_ctx(i, NATIVE_CPU_WORD_SIZE, true);
 
-        std::cout << ((0 == i)? "1024-bit" :
-                      (1 == i)? "1536-bit" :
-                      (2 == i)? "2048-bit" :
-                      (3 == i)? "3072-bit" :
-                                "4096-bit") << std::endl;
+        std::cout << ctx_a->get_set_name() << " bits" << std::endl;
 
         sw_keygen.start();
         if (!dut_a.keygen(ctx_a)) {
@@ -54,6 +50,10 @@ int main(int argc, char *argv[])
         std::cout << "keygen time     = " << static_cast<float>(keygen_us)/(2)
             << " us, " << (2*1000000.0f)/static_cast<float>(keygen_us) << " per sec" << std::endl;
 
+        phantom_vector<uint8_t> pk;
+        dut_b.get_public_key(ctx_b, pk);
+        dut_a.set_public_key(ctx_a, pk);
+
         sw_test.start();
 
         size_t num_iter = 0;
@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
             sw_enc.stop();
 
             sw_dec.start();
-            bool ready = dut_a.pke_decrypt(ctx_a, ct, pt2);
+            bool ready = dut_b.pke_decrypt(ctx_b, ct, pt2);
             if (!ready) {
                 std::cerr << "Decryption failed" << std::endl;
                 return EXIT_FAILURE;
