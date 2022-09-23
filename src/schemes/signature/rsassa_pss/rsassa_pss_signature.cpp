@@ -89,12 +89,18 @@ std::unique_ptr<user_ctx> rsassa_pss_signature::create_ctx(size_t set,
     switch (size_hint)
     {
         case CPU_WORD_SIZE_16:
-            ctx = new phantom::rsa::ctx_rsa_tmpl<uint16_t>(PKC_SIG_RSASSA_PSS, hash, 16, set, &m_params[0], 16, masking); break;
+            ctx = new phantom::rsa::ctx_rsa_tmpl<uint16_t>(PKC_SIG_RSASSA_PSS, hash, 16,
+                                                           set, &m_params[0], 16, masking);
+            break;
         case CPU_WORD_SIZE_32:
-            ctx = new phantom::rsa::ctx_rsa_tmpl<uint32_t>(PKC_SIG_RSASSA_PSS, hash, 16, set, &m_params[0], 16, masking); break;
+            ctx = new phantom::rsa::ctx_rsa_tmpl<uint32_t>(PKC_SIG_RSASSA_PSS, hash, 16,
+                                                           set, &m_params[0], 16, masking);
+            break;
 #if defined(IS_64BIT)
         case CPU_WORD_SIZE_64:
-            ctx = new phantom::rsa::ctx_rsa_tmpl<uint64_t>(PKC_SIG_RSASSA_PSS, hash, 16, set, &m_params[0], 16, masking); break;
+            ctx = new phantom::rsa::ctx_rsa_tmpl<uint64_t>(PKC_SIG_RSASSA_PSS, hash, 16,
+                                                           set, &m_params[0], 16, masking);
+            break;
 #endif
         default: throw std::invalid_argument("size_hint set is out of range");
     }
