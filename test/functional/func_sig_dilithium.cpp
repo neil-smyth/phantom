@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
 
     phantom_vector<uint8_t> m(128);
 
-    for (size_t i=0; i < 4; i++) {
+    for (size_t i=0; i < 3; i++) {
 
         stopwatch sw_keygen, sw_sign, sw_verify;
         uint32_t keygen_us = 0, sign_us = 0, verify_us = 0;
@@ -61,8 +61,7 @@ int main(int argc, char *argv[])
             }
         }
 
-        std::cout << "DILITHIUM " << ((0 == i)? "0" : (1 == i)? "I" :
-                                      (2 == i)? "II" : (3 == i)? "III" : "IV") << std::endl;
+        std::cout << "DILITHIUM " << ctx->get_set_name() << std::endl;
         std::cerr << "keygen time = " << static_cast<float>(keygen_us)/(NUM_ITER)
             << " us, "  << (NUM_ITER*1000000.0f)/static_cast<float>(keygen_us) << " per sec" << std::endl;
         std::cerr << "sign time   = " << static_cast<float>(sign_us)/(NUM_ITER)

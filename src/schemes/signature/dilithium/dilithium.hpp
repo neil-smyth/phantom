@@ -74,10 +74,6 @@ public:
     /// Division of an input argument by q
     static inline uint32_t barrett_division(const uint32_t& x, size_t k, const uint32_t& m, const uint32_t& q);
 
-    /// Rounding based on the Dilithium Decompose() function
-    static inline uint32_t round_alpha(const uint32_t a, uint32_t& a0, uint32_t q,
-        uint32_t alpha_q, uint32_t alpha_m, uint32_t alpha_k);
-
     // Dilithium HighBits()
     void high_bits(uint8_t * _RESTRICT_ out, const uint32_t * _RESTRICT_ in, size_t n, size_t k) const;
 
@@ -93,7 +89,7 @@ public:
 
     /// Dilithium MakeHint()
     uint32_t make_hint(int32_t *_RESTRICT_ h, const int32_t *_RESTRICT_ r,
-        const int32_t *_RESTRICT_ z, size_t n, size_t k) const;
+        const uint8_t *_RESTRICT_ z, size_t n, size_t k) const;
 
     /// Dilithium Power2Round()
     void pwr_2_round(int32_t * _RESTRICT_ y, int32_t * _RESTRICT_ x, uint32_t q,
@@ -101,14 +97,27 @@ public:
 
     /// Dilithium ExpandMask()
     void expand_mask(const uint8_t *mu, uint32_t kappa,
-        uint32_t gamma_1, uint32_t q, size_t l, size_t n, int32_t *y, const uint8_t *K);
+        uint32_t gamma_1, uint32_t gamma_1_bits, uint32_t q, size_t l, size_t n, int32_t *y, const uint8_t *K);
 
     /// Dilithium H()
     void h_function(int32_t *c, const uint8_t *mu, const uint8_t *w1, size_t n, size_t k);
 
-    /// Dilithium Decompose()
-    void decompose(int32_t * _RESTRICT_ t1, uint8_t * _RESTRICT_ t0, const int32_t * _RESTRICT_ in, size_t n,
-        size_t k, uint32_t alpha, uint32_t q) const;
+    /// Dilithium Decompose() of n x k blocks
+    void decompose_blocks(int32_t * _RESTRICT_ t1, int32_t * _RESTRICT_ t0, const int32_t * _RESTRICT_ in, size_t n,
+        size_t k, uint32_t q) const;
+    
+    static inline int32_t decompose_2_r1(int32_t r);
+    static inline int32_t decompose_35_r1(int32_t r);
+
+    size_t rej_uniform(int32_t *a, size_t len, const uint8_t *buf, size_t buflen, uint32_t q);
+
+    /// Decompose() for Dilithium 2
+    static inline void decompose_2(int32_t * _RESTRICT_ t1, int32_t _RESTRICT_ *t0,
+        int32_t in, int32_t q, int32_t gamma_2);
+    
+    /// Decompose() for Dilithium 3 & 5
+    static inline void decompose_35(int32_t * _RESTRICT_ t1, int32_t _RESTRICT_ *t0,
+        int32_t in, int32_t q, int32_t gamma_2);
 
     /// A random oracle
     void oracle(size_t n, size_t weight_of_c, int32_t *c,
@@ -126,7 +135,7 @@ protected:
     size_t m_set;
 
     /// The Dilithium parameter sets
-    static const dilithium_set_t m_params[4];
+    static const dilithium_set_t m_params[3];
 
     /// A SHAKE object
     std::unique_ptr<crypto::xof_sha3> m_xof;

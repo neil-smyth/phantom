@@ -50,6 +50,8 @@ public:
         }
         m_ntt          = std::unique_ptr<ntt_dilithium>(ntt32);
         m_prng         = std::shared_ptr<csprng>(csprng::make(0x10000000, random_seed::seed_cb));
+        
+        m_is_deterministic = true;
     }
     virtual ~ctx_dilithium() {}
 
@@ -75,12 +77,15 @@ public:
     phantom_vector<uint32_t>& ntt_t0() { return m_ntt_t0; }
     phantom_vector<uint32_t>& ntt_t1() { return m_ntt_t1; }
 
+    bool is_deterministic() { return m_is_deterministic; }
+
 private:
+    alignas(DEFAULT_MEM_ALIGNMENT) uint8_t m_rho[32];  ///< ρ - a 256-bit random number
+    alignas(DEFAULT_MEM_ALIGNMENT) uint8_t m_K[32];    ///< K - a 256-bit random number
+    alignas(DEFAULT_MEM_ALIGNMENT) uint8_t m_tr[48];   ///< tr - a 384-bit random number
+
     const pkc_e              m_scheme;  ///< The crypto scheme associated with this user
     const size_t             m_set;     ///< The parameter set associated with this user
-    alignas(DEFAULT_MEM_ALIGNMENT) uint8_t      m_rho[32];  ///< ρ - a 256-bit random number
-    alignas(DEFAULT_MEM_ALIGNMENT) uint8_t      m_K[32];    ///< K - a 256-bit random number
-    alignas(DEFAULT_MEM_ALIGNMENT) uint8_t      m_tr[48];   ///< tr - a 384-bit random number
     phantom_vector<int32_t>  m_s1;      ///< The Dilithium s1 private key component
     phantom_vector<int32_t>  m_s2;      ///< The Dilithium s2 private key component
     phantom_vector<int32_t>  m_t;       ///< The Dilithium t key component
@@ -95,6 +100,8 @@ private:
     const reduction_dilithium      m_reduction;
     std::shared_ptr<csprng>        m_prng;
     std::unique_ptr<ntt_dilithium> m_ntt;
+
+    bool m_is_deterministic;
 
     const phantom_vector<std::string> m_sets = { "I", "II", "III", "IV" };
 };

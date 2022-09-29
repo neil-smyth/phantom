@@ -71,18 +71,6 @@ float bit_manipulation::log2(float x)
     return y - 124.22551499f
              - 1.498030302f * mx.f
              - 1.72587999f / (0.3520887068f + mx.f);
-    /*union u32 {
-        float    f;
-        uint32_t i;
-    };
-
-    u32 fx, ix;
-    fx.f = x;
-    ix.i = (fx.i & 0x007FFFFF) | 0x3F000000;
-
-    float y  = fx.i * 1.1920928955078125e-7F;
-
-    return y - 124.22551499f - (1.498030302f * ix.f) - (1.72587999f / (0.3520887068f + ix.f));*/
 }
 
 

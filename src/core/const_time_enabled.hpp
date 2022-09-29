@@ -34,19 +34,7 @@ public:
         for (size_t i=n; i--;) {
             not_equal |= in1[i] ^ in2[i];
         }
-        not_equal = (-not_equal) >> (std::numeric_limits<T>::digits - 1);
         return not_equal;
-    }
-
-    /// Compare two arrays in constant-time, returns 0 if equal, otherwise returns 1
-    static T cmp_array_equal(volatile const T *in1, volatile const T *in2, size_t n)
-    {
-        volatile T not_equal = 0;
-        for (size_t i=n; i--;) {
-            not_equal |= in1[i] ^ in2[i];
-        }
-        not_equal = (-not_equal) >> (std::numeric_limits<T>::digits - 1);
-        return not_equal ^ 1;
     }
 
     /// Returns 1 if a is less than b, 0 otherwise
