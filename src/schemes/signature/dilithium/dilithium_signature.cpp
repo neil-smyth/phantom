@@ -565,14 +565,11 @@ bool dilithium_signature::sign(const std::unique_ptr<user_ctx>& ctx,
     }
     LOG_DEBUG_ARRAY("rho_prime", rho_prime.data(), 64);
 
-#define OUT_OF_SCOPE_MATRIX_A
-#if defined(OUT_OF_SCOPE_MATRIX_A)
     phantom_vector<int32_t> matrixA(n * k * l);
     int32_t *A = matrixA.data();
 
     // Create the matrix A outside of the rejection loop
     expand_A(myctx, myctx.rho(), q, q_bits, A, n, k, l);
-#endif
 
 restart:
 
@@ -582,12 +579,7 @@ restart:
     LOG_DEBUG_ARRAY("y", y, l*n);
 
     // w = Ay
-#if !defined(OUT_OF_SCOPE_MATRIX_A)
-    create_rand_product(myctx, myctx.rho(), q, q_bits, w, y, n_bits, k, l, (reinterpret_cast<uint32_t*>(c)));
-    LOG_DEBUG_ARRAY("create_rand_product() rho", myctx.rho(), 32);
-#else
     create_A_product(myctx, w, A, y, q, n, n_bits, k, l, (reinterpret_cast<uint32_t*>(c)));
-#endif
     LOG_DEBUG_ARRAY("create_rand_product() w = Ay", w, k*n);
 
     // Generate the high order representation of w
