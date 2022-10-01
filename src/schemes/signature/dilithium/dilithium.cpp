@@ -22,15 +22,15 @@ namespace schemes {
 
 const dilithium_set_t dilithium::m_params[3] = {
     {
-        0, 8380417, 4236238847, 23, 128, 256, 8, 4, 4, 13, 39, 131072, 18, 95232, 2, 2, 20, 78, 80, 7,
+        0, 8380417, 4236238847, 23, 128, 256, 8, 4, 4, 13, 39, 131072, 17, 95232, 2, 2, 20, 78, 80, 7,
         1753, 731434, 4193792, 2365951
     },
     {
-        1, 8380417, 4236238847, 23, 128, 256, 8, 6, 5, 13, 49, 524288, 20, 261888, 4, 3, 20, 196, 55, 6,
+        1, 8380417, 4236238847, 23, 128, 256, 8, 6, 5, 13, 49, 524288, 19, 261888, 4, 3, 20, 196, 55, 6,
         1753, 731434, 4193792, 2365951
     },
     {
-        2, 8380417, 4236238847, 23, 128, 256, 8, 8, 7, 13, 60, 524288, 20, 261888, 2, 2, 20, 120, 75, 7,
+        2, 8380417, 4236238847, 23, 128, 256, 8, 8, 7, 13, 60, 524288, 19, 261888, 2, 2, 20, 120, 75, 7,
         1753, 731434, 4193792, 2365951
     }
 };
@@ -49,17 +49,16 @@ dilithium::~dilithium()
 {
 }
 
-void dilithium::oracle(size_t n, size_t weight_of_c, int32_t *c,
-    const uint8_t *seed) const
+void dilithium::oracle(size_t n, size_t weight_of_c, int32_t *c, const uint8_t *seed) const
 {
-    size_t i, b,pos;
-    uint8_t buf[136];
+    size_t   i, b, pos;
     uint64_t signs = 0;
+    phantom_vector<uint8_t> buf(136);
 
     m_xof->init(32);
     m_xof->absorb(seed, 32);
     m_xof->final();
-    m_xof->squeeze(buf, 136);
+    m_xof->squeeze(buf.data(), 136);
 
     signs = 0;
     for (i = 0; i < 8; ++i) {
@@ -67,13 +66,12 @@ void dilithium::oracle(size_t n, size_t weight_of_c, int32_t *c,
     }
     pos = 8;
 
-    for (i = 0; i < n; ++i) {
-        c[i] = 0;
-    }
+    std::fill(c, c + n, 0);
+
     for (i = n - weight_of_c; i < n; ++i) {
         do {
             if (pos >= 136) {
-                m_xof->squeeze(buf, 136);
+                m_xof->squeeze(buf.data(), 136);
                 pos = 0;
             }
 
@@ -106,67 +104,40 @@ uint32_t dilithium::barrett_division(const uint32_t& x, size_t k, const uint32_t
 
 void dilithium::high_bits(uint8_t * _RESTRICT_ out, const uint32_t * _RESTRICT_ in, size_t n, size_t k) const
 {
-    uint32_t q         = m_params[m_set].q;
     uint32_t gamma_2   = m_params[m_set].gamma_2;
 
-    if (gamma_2 == (q-1)/32) {
+    if (261888 == gamma_2) {
         for (size_t i=0; i < k*n; i++) {
-            out[i] = decompose_35_r1(in[i]);
+            out[i] = decompose_high_261888(in[i]);
         }
     }
     else {
         for (size_t i=0; i < k*n; i++) {
-            out[i] = decompose_2_r1(in[i]);
+            out[i] = decompose_high_95232(in[i]);
         }
     }
 }
 
 void dilithium::low_bits(int32_t * _RESTRICT_ out, const int32_t * _RESTRICT_ in, size_t n, size_t k) const
 {
-    uint32_t q         = m_params[m_set].q;
     uint32_t gamma_2   = m_params[m_set].gamma_2;
     int32_t  r1, r0;
 
-    if (gamma_2 == (q-1)/32) {
+    if (261888 == gamma_2) {
         for (size_t i=0; i < k*n; i++) {
-            decompose_35(&r1, &r0, in[i], q, gamma_2);
+            decompose_261888(&r1, &r0, in[i]);
             out[i] = r0;
         }
     }
     else {
         for (size_t i=0; i < k*n; i++) {
-            decompose_2(&r1, &r0, in[i], q, gamma_2);
+            decompose_95232(&r1, &r0, in[i]);
             out[i] = r0;
         }
     }
 }
 
-// Truncate the input ring polynomial by d bits and compute the residual.
-// NOTE: in MUST be in the range 0 to q-1 inclusive
-void dilithium::decompose_blocks(uint8_t * _RESTRICT_ t1, int32_t * _RESTRICT_ t0, const int32_t * _RESTRICT_ in, size_t n,
-    size_t k, uint32_t q) const
-{
-    size_t i;
-    uint32_t gamma_2   = m_params[m_set].gamma_2;
-    int32_t r1, r0;
-
-    if (gamma_2 == (q-1)/32) {
-        for (i=0; i < k*n; i++) {
-            decompose_35(&r1, &r0, in[i], q, gamma_2);
-            t1[i] = r1;
-            t0[i] = r0;
-        }
-    }
-    else {
-        for (i=0; i < k*n; i++) {
-            decompose_2(&r1, &r0, in[i], q, gamma_2);
-            t1[i] = r1;
-            t0[i] = r0;
-        }
-    }
-}
-
-int32_t dilithium::decompose_2_r1(int32_t r)
+int32_t dilithium::decompose_high_95232(int32_t r)
 {
     int32_t r1;
     r1  = (r + 127) >> 7;
@@ -175,7 +146,7 @@ int32_t dilithium::decompose_2_r1(int32_t r)
     return r1;
 }
 
-int32_t dilithium::decompose_35_r1(int32_t r)
+int32_t dilithium::decompose_high_261888(int32_t r)
 {
     int32_t r1;
     r1  = (r + 127) >> 7;
@@ -184,43 +155,69 @@ int32_t dilithium::decompose_35_r1(int32_t r)
     return r1;
 }
 
-void dilithium::decompose_2(int32_t * _RESTRICT_ t1, int32_t _RESTRICT_ *t0, int32_t in, int32_t q, int32_t gamma_2)
+void dilithium::decompose_95232(int32_t * _RESTRICT_ t1, int32_t _RESTRICT_ *t0, int32_t in)
 {
-    *t1 = decompose_2_r1(in);
+    *t1 = decompose_high_95232(in);
 
-    *t0  = in - *t1 * 2 * gamma_2;
-    *t0 -= (((q-1)/2 - *t0) >> 31) & q;
+    *t0  = in - *t1 * 2 * 95232;
+    *t0 -= ((4190208 - *t0) >> 31) & 8380417;
 }
 
-void dilithium::decompose_35(int32_t * _RESTRICT_ t1, int32_t _RESTRICT_ *t0, int32_t in, int32_t q, int32_t gamma_2)
+void dilithium::decompose_261888(int32_t * _RESTRICT_ t1, int32_t _RESTRICT_ *t0, int32_t in)
 {
-    *t1 = decompose_35_r1(in);
+    *t1 = decompose_high_261888(in);
 
-    *t0  = in - *t1 * 2 * gamma_2;
-    *t0 -= (((q-1)/2 - *t0) >> 31) & q;
+    *t0  = in - *t1 * 2 * 261888;
+    *t0 -= ((4190208 - *t0) >> 31) & 8380417;
 }
 
-size_t dilithium::rej_uniform(int32_t *a,
-                              size_t len,
-                              const uint8_t *buf,
-                              size_t buflen,
-                              uint32_t q)
+size_t dilithium::reject_uniform(int32_t *s, size_t len, const uint8_t *buf, size_t buflen, uint32_t q)
 {
-  size_t ctr, pos;
-  uint32_t t;
+    size_t ctr, pos;
 
-  ctr = pos = 0;
-  while (ctr < len && pos + 3 <= buflen) {
-    t  = buf[pos++];
-    t |= static_cast<uint32_t>(buf[pos++]) << 8;
-    t |= static_cast<uint32_t>(buf[pos++]) << 16;
-    t &= 0x7FFFFF;
+    ctr = pos = 0;
+    while (ctr < len && pos + 3 <= buflen) {
+        uint32_t t;
+        t  = buf[pos++];
+        t |= static_cast<uint32_t>(buf[pos++]) << 8;
+        t |= static_cast<uint32_t>(buf[pos++]) << 16;
+        t &= 0x7FFFFF;
 
-    if (t < q)
-      a[ctr++] = t;
-  }
+        if (t < q) {
+            s[ctr++] = t;
+        }
+    }
 
-  return ctr;
+    return ctr;
+}
+
+size_t dilithium::reject_eta(int32_t *s, size_t len, int32_t eta, const uint8_t *buf, size_t eta_blockbytes)
+{
+    uint32_t ctr, pos;
+    ctr = pos = 0;
+    while (ctr < len && pos < eta_blockbytes) {
+        uint32_t t0 = buf[pos] & 0x0F;
+        uint32_t t1 = buf[pos++] >> 4;
+
+        if (2 == eta) {
+            if (t0 < 15) {
+                t0 = t0 - (205*t0 >> 10)*5;
+                s[ctr++] = 2 - t0;
+            }
+            if (t1 < 15 && ctr < len) {
+                t1 = t1 - (205*t1 >> 10)*5;
+                s[ctr++] = 2 - t1;
+            }
+        }
+        else {
+            if (t0 < 9)
+                s[ctr++] = 4 - t0;
+            if (t1 < 9 && ctr < len)
+                s[ctr++] = 4 - t1;
+        }
+    }
+
+    return ctr;
 }
 
 // As per Algorithm 5, find the HighOrderBits of r and r + z given reduction
@@ -235,7 +232,7 @@ uint32_t dilithium::make_hint(int32_t *_RESTRICT_ h, const int32_t *_RESTRICT_ r
     LOG_DEBUG_ARRAY("MAKE_HINT: r + z", z, k*n);
 
     for (size_t i=0; i < k*n; i++) {
-        h[i] = r[i] > gamma_2 || r[i] < -gamma_2 || (r[i] == -gamma_2 && z[i] != 0);
+        h[i] = r[i] > gamma_2 || r[i] < -gamma_2 || (r[i] == -gamma_2 && 0 != z[i]);
         sum += h[i];
     }
 
@@ -264,33 +261,36 @@ uint32_t dilithium::check_hint_ones(const int32_t *h, size_t k, size_t n) const
 void dilithium::use_hint(uint8_t * _RESTRICT_ z, const int32_t * _RESTRICT_ h, const int32_t * _RESTRICT_ r,
     size_t n, size_t k) const
 {
-    uint32_t q         = m_params[m_set].q;
     uint32_t gamma_2   = m_params[m_set].gamma_2;
-    int32_t  r1, r0;
+    int32_t  r1, r0, op;
 
-    for (size_t i=0; i < k*n; i++) {
-        if (gamma_2 == (q-1)/32) {
-            decompose_35(&r1, &r0, r[i], q, gamma_2);
-        }
-        else {
-            decompose_2(&r1, &r0, r[i], q, gamma_2);
-        }
+    if (261888 == gamma_2) {
+        for (size_t i=0; i < k*n; i++) {
+            decompose_261888(&r1, &r0, r[i]);
 
-        if (h[i] == 0) {
-            z[i] = r1;
-        }
-        else {
-            if (gamma_2 == (q - 1) / 32) {
-                if (r0 > 0)
-                    z[i] = (r1 + 1) & 15;
-                else
-                    z[i] = (r1 - 1) & 15;
+            if (0 == h[i]) {
+                z[i] = r1;
             }
             else {
-                if (r0 > 0)
+                op = (r0 > 0) ? 1 : -1;
+                z[i] = (r1 + op) & 15;
+            }
+        }
+    }
+    else {
+        for (size_t i=0; i < k*n; i++) {
+            decompose_95232(&r1, &r0, r[i]);
+
+            if (0 == h[i]) {
+                z[i] = r1;
+            }
+            else {
+                if (r0 > 0) {
                     z[i] = (r1 == 43) ?  0 : r1 + 1;
-                else
+                }
+                else {
                     z[i] = (r1 ==  0) ? 43 : r1 - 1;
+                }
             }
         }
     }
@@ -316,8 +316,6 @@ void dilithium::expand_mask(const uint8_t *mu, uint32_t kappa,
     int32_t samples[4];
     uint8_t seed[10];
 
-    //kappa *= l;
-
     for (size_t i=0; i < l; i++) {
 
         uint8_t kappa_bytes[2] = {static_cast<uint8_t>(kappa & 0xFF), static_cast<uint8_t>(kappa >> 8)};
@@ -334,46 +332,41 @@ void dilithium::expand_mask(const uint8_t *mu, uint32_t kappa,
         size_t j = 0;
         while (j < n) {
             // Create 5 bytes from which two gamma_1_bits samples are generated
-            if (20 == gamma_1_bits) {
+            if (19 == gamma_1_bits) {
                 m_xof->squeeze(seed, 10);
                 samples[0] = ((static_cast<uint32_t>(seed[2]) & 0xf) << 16) |
-                             ((static_cast<uint32_t>(seed[1])      ) <<  8) |
-                             ((static_cast<uint32_t>(seed[0])      )      );
-                samples[1] = ((static_cast<uint32_t>(seed[4])      ) << 12) |
-                             ((static_cast<uint32_t>(seed[3])      ) <<  4) |
-                             ((static_cast<uint32_t>(seed[2])      ) >>  4);
+                             ((static_cast<uint32_t>(seed[1]))       <<  8) |
+                             ((static_cast<uint32_t>(seed[0])));
+                samples[1] = ((static_cast<uint32_t>(seed[4]))       << 12) |
+                             ((static_cast<uint32_t>(seed[3]))       <<  4) |
+                             ((static_cast<uint32_t>(seed[2]))       >>  4);
                 samples[2] = ((static_cast<uint32_t>(seed[7]) & 0xf) << 16) |
-                             ((static_cast<uint32_t>(seed[6])      ) <<  8) |
-                             ((static_cast<uint32_t>(seed[5])      )      );
-                samples[3] = ((static_cast<uint32_t>(seed[9])      ) << 12) |
-                             ((static_cast<uint32_t>(seed[8])      ) <<  4) |
-                             ((static_cast<uint32_t>(seed[7])      ) >>  4);
-                
-                out[j++] = gamma_1 - samples[0];
-                out[j++] = gamma_1 - samples[1];
-                out[j++] = gamma_1 - samples[2];
-                out[j++] = gamma_1 - samples[3];
+                             ((static_cast<uint32_t>(seed[6]))       <<  8) |
+                             ((static_cast<uint32_t>(seed[5])));
+                samples[3] = ((static_cast<uint32_t>(seed[9]))       << 12) |
+                             ((static_cast<uint32_t>(seed[8]))       <<  4) |
+                             ((static_cast<uint32_t>(seed[7]))       >>  4);
             }
             else {
                 m_xof->squeeze(seed, 9);
                 samples[0] = ((static_cast<uint32_t>(seed[2]) & 0x03) << 16) |
-                             ((static_cast<uint32_t>(seed[1])       ) <<  8) |
-                             ((static_cast<uint32_t>(seed[0])       )      );
+                             ((static_cast<uint32_t>(seed[1]))        <<  8) |
+                             ((static_cast<uint32_t>(seed[0])));
                 samples[1] = ((static_cast<uint32_t>(seed[4]) & 0x0f) << 14) |
-                             ((static_cast<uint32_t>(seed[3])       ) <<  6) |
-                             ((static_cast<uint32_t>(seed[2])       ) >>  2);
+                             ((static_cast<uint32_t>(seed[3]))        <<  6) |
+                             ((static_cast<uint32_t>(seed[2]))        >>  2);
                 samples[2] = ((static_cast<uint32_t>(seed[6]) & 0x3f) << 12) |
-                             ((static_cast<uint32_t>(seed[5])       ) <<  4) |
-                             ((static_cast<uint32_t>(seed[4])       ) >>  4);
-                samples[3] = ((static_cast<uint32_t>(seed[8])       ) << 10) |
-                             ((static_cast<uint32_t>(seed[7])       ) <<  2) |
-                             ((static_cast<uint32_t>(seed[6])       ) >>  6);
-                
-                out[j++] = gamma_1 - samples[0];
-                out[j++] = gamma_1 - samples[1];
-                out[j++] = gamma_1 - samples[2];
-                out[j++] = gamma_1 - samples[3];
+                             ((static_cast<uint32_t>(seed[5]))        <<  4) |
+                             ((static_cast<uint32_t>(seed[4]))        >>  4);
+                samples[3] = ((static_cast<uint32_t>(seed[8]))        << 10) |
+                             ((static_cast<uint32_t>(seed[7]))        <<  2) |
+                             ((static_cast<uint32_t>(seed[6]))        >>  6);
             }
+
+            out[j++] = gamma_1 - samples[0];
+            out[j++] = gamma_1 - samples[1];
+            out[j++] = gamma_1 - samples[2];
+            out[j++] = gamma_1 - samples[3];
         }
     }
 }

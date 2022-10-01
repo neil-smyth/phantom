@@ -49,6 +49,7 @@ struct dilithium_set_t {
     uint32_t R2;
 };
 
+
 /**
  * @brief A component class for Dilithium
  */
@@ -79,6 +80,12 @@ public:
     // Dilithium LowBits()
     void low_bits(int32_t * _RESTRICT_ out, const int32_t * _RESTRICT_ in, size_t n, size_t k) const;
 
+    // Uniform sample rejection of an array in the range 0 <= s <= q-1
+    size_t reject_uniform(int32_t *s, size_t len, const uint8_t *buf, size_t buflen, uint32_t q);
+
+    // Sample rejection of an array in the range -eta <= s <= eta
+    size_t reject_eta(int32_t *s, size_t len, int32_t eta, const uint8_t *buf, size_t eta_blockbytes);
+
     /// Count the number of '1' values in a hint array
     uint32_t check_hint_ones(const int32_t *h, size_t k, size_t n) const;
 
@@ -101,23 +108,6 @@ public:
     /// Dilithium H()
     void h_function(int32_t *c, const uint8_t *mu, const uint8_t *w1, size_t n, size_t k);
 
-    /// Dilithium Decompose() of n x k blocks
-    void decompose_blocks(uint8_t * _RESTRICT_ t1, int32_t * _RESTRICT_ t0, const int32_t * _RESTRICT_ in, size_t n,
-        size_t k, uint32_t q) const;
-    
-    static inline int32_t decompose_2_r1(int32_t r);
-    static inline int32_t decompose_35_r1(int32_t r);
-
-    size_t rej_uniform(int32_t *a, size_t len, const uint8_t *buf, size_t buflen, uint32_t q);
-
-    /// Decompose() for Dilithium 2
-    static inline void decompose_2(int32_t * _RESTRICT_ t1, int32_t _RESTRICT_ *t0,
-        int32_t in, int32_t q, int32_t gamma_2);
-    
-    /// Decompose() for Dilithium 3 & 5
-    static inline void decompose_35(int32_t * _RESTRICT_ t1, int32_t _RESTRICT_ *t0,
-        int32_t in, int32_t q, int32_t gamma_2);
-
     /// A random oracle
     void oracle(size_t n, size_t weight_of_c, int32_t *c,
         const uint8_t *seed) const;
@@ -130,6 +120,18 @@ public:
     void collision_resistant_hash_message(const uint8_t *in, const phantom_vector<uint8_t>& msg, uint8_t *mu) const;
 
 protected:
+    // HighBits for Dilithium 2
+    static inline int32_t decompose_high_95232(int32_t r);
+
+    // HighBits for Dilithium 3 and 5
+    static inline int32_t decompose_high_261888(int32_t r);
+
+    /// Decompose() for Dilithium 2
+    static inline void decompose_95232(int32_t * _RESTRICT_ t1, int32_t _RESTRICT_ *t0, int32_t in);
+
+    /// Decompose() for Dilithium 3 & 5
+    static inline void decompose_261888(int32_t * _RESTRICT_ t1, int32_t _RESTRICT_ *t0, int32_t in);
+
     /// The selected Dilithium parameter set
     size_t m_set;
 

@@ -50,7 +50,7 @@ public:
         }
         m_ntt          = std::unique_ptr<ntt_dilithium>(ntt32);
         m_prng         = std::shared_ptr<csprng>(csprng::make(0x10000000, random_seed::seed_cb));
-        
+
         m_is_deterministic = true;
     }
     virtual ~ctx_dilithium() {}
