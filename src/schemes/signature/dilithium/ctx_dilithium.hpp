@@ -51,8 +51,8 @@ public:
         m_ntt          = std::unique_ptr<ntt_dilithium>(ntt32);
         m_prng         = std::shared_ptr<csprng>(csprng::make(0x10000000, random_seed::seed_cb));
 
-        // Sets 0-4 and 10-14 are deterministic, 5-9 and 15-19 are non-deterministic
-        m_is_deterministic = (set < 5) || (set >= 10 && set < 15);
+        // Sets 0-4 are deterministic, 5-9 are non-deterministic
+        m_is_deterministic = (set < 5);
     }
     virtual ~ctx_dilithium() {}
 
@@ -102,12 +102,11 @@ private:
     std::shared_ptr<csprng>        m_prng;
     std::unique_ptr<ntt_dilithium> m_ntt;
 
+    /// Flag indicating if the signature is created in a deterministic manner
     bool m_is_deterministic;
 
     const phantom_vector<std::string> m_sets = { "2", "3", "5", "5+", "5++",
-                                                 "2-random", "3-random", "5-random", "5+-random", "5++-random",
-                                                 "2-AES", "3-AES", "5-AES", "5+-AES", "5++-AES",
-                                                 "2-AES-random", "3-AES-random", "5-AES-random", "5+-AES-random", "5++-AES-random" };
+                                                 "2-random", "3-random", "5-random", "5+-random", "5++-random" };
 };
 
 }  // namespace schemes

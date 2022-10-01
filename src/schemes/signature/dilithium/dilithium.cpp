@@ -20,7 +20,7 @@ namespace phantom {
 namespace schemes {
 
 
-const dilithium_set_t dilithium::m_params[20] = {
+const dilithium_set_t dilithium::m_params[5] = {
     {
         0, 8380417, 4236238847, 23, 128, 256, 8, 4, 4, 13, 39, 131072, 17, 95232, 2, 2, 20, 78, 80, 7,
         1753, 731434, 4193792, 2365951
@@ -46,7 +46,7 @@ const dilithium_set_t dilithium::m_params[20] = {
 
 dilithium::dilithium(size_t set) : m_set(set)
 {
-    if (set > 19) {
+    if (set > 4) {
         throw std::invalid_argument("Parameter set is out of range");
     }
 
