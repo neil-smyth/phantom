@@ -37,7 +37,6 @@ struct dilithium_set_t {
     uint32_t gamma_1;
     uint16_t gamma_1_bits;
     uint32_t gamma_2;
-    uint32_t gamma_2_m;
     uint16_t eta;
     uint16_t eta_bits;
     uint16_t z_bits;
@@ -103,7 +102,7 @@ public:
     void h_function(int32_t *c, const uint8_t *mu, const uint8_t *w1, size_t n, size_t k);
 
     /// Dilithium Decompose() of n x k blocks
-    void decompose_blocks(int32_t * _RESTRICT_ t1, int32_t * _RESTRICT_ t0, const int32_t * _RESTRICT_ in, size_t n,
+    void decompose_blocks(uint8_t * _RESTRICT_ t1, int32_t * _RESTRICT_ t0, const int32_t * _RESTRICT_ in, size_t n,
         size_t k, uint32_t q) const;
     
     static inline int32_t decompose_2_r1(int32_t r);
@@ -121,7 +120,7 @@ public:
 
     /// A random oracle
     void oracle(size_t n, size_t weight_of_c, int32_t *c,
-        size_t num_weight_bytes, const uint8_t *signs) const;
+        const uint8_t *seed) const;
 
     /// Dilithium CRH(p, t1) - inner CRH()
     void collision_resistant_hash_t1(const uint8_t *rho, const int32_t *t1,

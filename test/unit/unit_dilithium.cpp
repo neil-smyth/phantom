@@ -20,7 +20,7 @@ using namespace schemes;  // NOLINT
 
 const lest::test specification[] =
 {
-    CASE("ExpandMask with seed")
+    CASE("ExpandMask with seed - Dilithium 2")
     {
         uint8_t mu[32] = {0x7a, 0x24, 0xb6, 0x66, 0xda, 0x34, 0x5c, 0x98, 0xc3, 0xa4, 0x00, 0xaa, 0xfd, 0x14, 0xa5, 0x1a, 0x6c, 0x07, 0xd7, 0x48, 0xc6, 0xfc, 0x04, 0xfb, 0xd1, 0x30, 0x88, 0xed, 0x8b, 0x33, 0x94, 0x8d};
         uint8_t rho[32] = {0x49, 0xe2, 0xf0, 0x22, 0x24, 0xc5, 0x32, 0x5d, 0x8b, 0x57, 0x3f, 0x34, 0x87, 0x8c, 0x73, 0xcf, 0x93, 0x6a, 0xb1, 0x6c, 0x80, 0x4d, 0x4f, 0x9a, 0xf5, 0xc6, 0xe4, 0xc1, 0xb4, 0x8d, 0xdb, 0x38};
@@ -45,20 +45,10 @@ const lest::test specification[] =
 
         for (size_t j = 0; j < l; ++j) {
             for (size_t i = 0; i < n; ++i) {
-                if (y[j*n+i] != ref_y[j][i]); {
+                if (y[j*n+i] != ref_y[j][i]) {
                     std::cout << "i = " << static_cast<int>(i) << ",j = " << static_cast<int>(j) << std::endl;
                 }
                 EXPECT(y[j*n+i] == ref_y[j][i]);
-            }
-        }
-
-        printf("A = ([");
-        for (size_t j = 0; j < l; ++j) {
-            for (size_t i = 0; i < n; ++i) {
-                printf("%8d", y[256*j+i]);
-                if (i < n-1) printf(", ");
-                else if (i < l-1) printf("], [");
-                else printf("])\n");
             }
         }
     },

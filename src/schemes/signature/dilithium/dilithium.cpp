@@ -22,15 +22,15 @@ namespace schemes {
 
 const dilithium_set_t dilithium::m_params[3] = {
     {
-        0, 8380417, 4236238847, 23, 128, 256, 8, 4, 4, 13, 39, 131072, 18, 95232, 22550, 2, 2, 20, 78, 80, 7,
+        0, 8380417, 4236238847, 23, 128, 256, 8, 4, 4, 13, 39, 131072, 18, 95232, 2, 2, 20, 78, 80, 7,
         1753, 731434, 4193792, 2365951
     },
     {
-        1, 8380417, 4236238847, 23, 128, 256, 8, 6, 5, 13, 49, 523776, 20, 261888, 2050, 4, 3, 20, 196, 55, 6,
+        1, 8380417, 4236238847, 23, 128, 256, 8, 6, 5, 13, 49, 524288, 20, 261888, 4, 3, 20, 196, 55, 6,
         1753, 731434, 4193792, 2365951
     },
     {
-        2, 8380417, 4236238847, 23, 128, 256, 8, 8, 7, 13, 60, 523776, 20, 261888, 2050, 2, 2, 20, 120, 75, 7,
+        2, 8380417, 4236238847, 23, 128, 256, 8, 8, 7, 13, 60, 524288, 20, 261888, 2, 2, 20, 120, 75, 7,
         1753, 731434, 4193792, 2365951
     }
 };
@@ -50,29 +50,39 @@ dilithium::~dilithium()
 }
 
 void dilithium::oracle(size_t n, size_t weight_of_c, int32_t *c,
-    size_t num_weight_bytes, const uint8_t *signs) const
+    const uint8_t *seed) const
 {
-    size_t i, j, k, b;
-    uint8_t mask = 1;
+    size_t i, b,pos;
+    uint8_t buf[136];
+    uint64_t signs = 0;
 
-    // Initialise the first n - weight_of_c output coefficients to zero
-    std::fill(c, c + (n - weight_of_c), 0);
+    m_xof->init(32);
+    m_xof->absorb(seed, 32);
+    m_xof->final();
+    m_xof->squeeze(buf, 136);
 
-    // Distribute the weight_of_c non-zero bytes throughout the array
-    for (i=n-weight_of_c, j=0, k=num_weight_bytes; i < n; i++, k++) {
-        b = signs[k];
-        while (b > i) {
-            b >>= 1;
-        }
+    signs = 0;
+    for (i = 0; i < 8; ++i) {
+        signs |= static_cast<uint64_t>(buf[i]) << 8*i;
+    }
+    pos = 8;
+
+    for (i = 0; i < n; ++i) {
+        c[i] = 0;
+    }
+    for (i = n - weight_of_c; i < n; ++i) {
+        do {
+            if (pos >= 136) {
+                m_xof->squeeze(buf, 136);
+                pos = 0;
+            }
+
+            b = buf[pos++];
+        } while (b > i);
 
         c[i] = c[b];
-        c[b] = 1 - (2 * (static_cast<uint8_t>(-(signs[j] & mask)) >> 7));
-
-        // Increment j when mask is 0x80 and about to return to 0x01
-        j += mask >> 7;
-
-        // Rotate a single bit mask around the 8-bit mask variable
-        mask = core::bit_manipulation::rotl(mask, 1);
+        c[b] = 1 - 2*(signs & 1);
+        signs >>= 1;
     }
 }
 
@@ -133,23 +143,25 @@ void dilithium::low_bits(int32_t * _RESTRICT_ out, const int32_t * _RESTRICT_ in
 
 // Truncate the input ring polynomial by d bits and compute the residual.
 // NOTE: in MUST be in the range 0 to q-1 inclusive
-void dilithium::decompose_blocks(int32_t * _RESTRICT_ t1, int32_t * _RESTRICT_ t0, const int32_t * _RESTRICT_ in, size_t n,
+void dilithium::decompose_blocks(uint8_t * _RESTRICT_ t1, int32_t * _RESTRICT_ t0, const int32_t * _RESTRICT_ in, size_t n,
     size_t k, uint32_t q) const
 {
     size_t i;
     uint32_t gamma_2   = m_params[m_set].gamma_2;
-    int32_t temp;
+    int32_t r1, r0;
 
     if (gamma_2 == (q-1)/32) {
         for (i=0; i < k*n; i++) {
-            decompose_35(&t1[i], &temp, in[i], q, gamma_2);
-            t0[i] = temp;
+            decompose_35(&r1, &r0, in[i], q, gamma_2);
+            t1[i] = r1;
+            t0[i] = r0;
         }
     }
     else {
         for (i=0; i < k*n; i++) {
-            decompose_2(&t1[i], &temp, in[i], q, gamma_2);
-            t0[i] = temp;
+            decompose_2(&r1, &r0, in[i], q, gamma_2);
+            t1[i] = r1;
+            t0[i] = r0;
         }
     }
 }
@@ -302,9 +314,9 @@ void dilithium::expand_mask(const uint8_t *mu, uint32_t kappa,
     uint32_t gamma_1, uint32_t gamma_1_bits, uint32_t q, size_t l, size_t n, int32_t *y, const uint8_t *K)
 {
     int32_t samples[4];
-    uint8_t seed[9];
+    uint8_t seed[10];
 
-    kappa *= l;
+    //kappa *= l;
 
     for (size_t i=0; i < l; i++) {
 
@@ -323,16 +335,24 @@ void dilithium::expand_mask(const uint8_t *mu, uint32_t kappa,
         while (j < n) {
             // Create 5 bytes from which two gamma_1_bits samples are generated
             if (20 == gamma_1_bits) {
-                m_xof->squeeze(seed, 5);
+                m_xof->squeeze(seed, 10);
                 samples[0] = ((static_cast<uint32_t>(seed[2]) & 0xf) << 16) |
                              ((static_cast<uint32_t>(seed[1])      ) <<  8) |
                              ((static_cast<uint32_t>(seed[0])      )      );
-                samples[1] = ((static_cast<uint32_t>(seed[4]) & 0xf) << 14) |
+                samples[1] = ((static_cast<uint32_t>(seed[4])      ) << 12) |
                              ((static_cast<uint32_t>(seed[3])      ) <<  4) |
                              ((static_cast<uint32_t>(seed[2])      ) >>  4);
+                samples[2] = ((static_cast<uint32_t>(seed[7]) & 0xf) << 16) |
+                             ((static_cast<uint32_t>(seed[6])      ) <<  8) |
+                             ((static_cast<uint32_t>(seed[5])      )      );
+                samples[3] = ((static_cast<uint32_t>(seed[9])      ) << 12) |
+                             ((static_cast<uint32_t>(seed[8])      ) <<  4) |
+                             ((static_cast<uint32_t>(seed[7])      ) >>  4);
                 
                 out[j++] = gamma_1 - samples[0];
                 out[j++] = gamma_1 - samples[1];
+                out[j++] = gamma_1 - samples[2];
+                out[j++] = gamma_1 - samples[3];
             }
             else {
                 m_xof->squeeze(seed, 9);
@@ -361,17 +381,16 @@ void dilithium::expand_mask(const uint8_t *mu, uint32_t kappa,
 void dilithium::h_function(int32_t *c, const uint8_t *mu, const uint8_t *w1, size_t n, size_t k)
 {
     const size_t weight_of_c = m_params[m_set].weight_of_c;
-    const size_t num_weight_bytes = (weight_of_c + 7) >> 3;
-    phantom_vector<uint8_t> signs(num_weight_bytes + weight_of_c);
+    phantom_vector<uint8_t> seed(32);
 
-    m_xof->init(16);
+    m_xof->init(32);
     m_xof->absorb(mu, 64);
     m_xof->absorb(w1, k*n);
     m_xof->final();
-    m_xof->squeeze(signs.data(), num_weight_bytes + weight_of_c);
+    m_xof->squeeze(seed.data(), 32);
 
     // Generate the output coefficients for the spare polynomial
-    oracle(n, weight_of_c, c, num_weight_bytes, signs.data());
+    oracle(n, weight_of_c, c, seed.data());
 }
 
 void dilithium::collision_resistant_hash_t1(const uint8_t *rho, const int32_t *t1,
