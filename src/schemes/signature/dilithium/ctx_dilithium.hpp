@@ -35,8 +35,8 @@ class ctx_dilithium : public user_ctx
 public:
     explicit ctx_dilithium(size_t set) :
         m_scheme(PKC_SIG_DILITHIUM),
-        m_set(set),
-        m_dilithium(std::unique_ptr<dilithium>(new dilithium(set))),
+        m_set(set % 5),
+        m_dilithium(std::unique_ptr<dilithium>(new dilithium(m_set))),
         m_reduce(reducer_dilithium(m_dilithium->get_params()->q, m_dilithium->get_params()->inv_q, 32,
                                    m_dilithium->get_params()->R, m_dilithium->get_params()->R2)),
         m_reduction(m_reduce)
@@ -50,12 +50,15 @@ public:
         }
         m_ntt          = std::unique_ptr<ntt_dilithium>(ntt32);
         m_prng         = std::shared_ptr<csprng>(csprng::make(0x10000000, random_seed::seed_cb));
+
+        // Sets 0-4 are deterministic, 5-9 are non-deterministic
+        m_is_deterministic = (set < 5);
     }
     virtual ~ctx_dilithium() {}
 
     pkc_e get_scheme() override { return m_scheme;}
-    size_t get_set() override { return m_set; }
-    const std::string& get_set_name() override { return m_sets[m_set]; }
+    size_t get_set() override { return m_is_deterministic ? m_set : m_set + 5; }
+    const std::string& get_set_name() override { return m_sets[m_is_deterministic ? m_set : m_set + 5]; }
     const phantom_vector<std::string>& get_set_names() { return m_sets; }
 
     dilithium* get_dilithium() { return m_dilithium.get(); }
@@ -75,12 +78,15 @@ public:
     phantom_vector<uint32_t>& ntt_t0() { return m_ntt_t0; }
     phantom_vector<uint32_t>& ntt_t1() { return m_ntt_t1; }
 
+    bool is_deterministic() { return m_is_deterministic; }
+
 private:
+    alignas(DEFAULT_MEM_ALIGNMENT) uint8_t m_rho[32];  ///< ρ - a 256-bit random number
+    alignas(DEFAULT_MEM_ALIGNMENT) uint8_t m_K[32];    ///< K - a 256-bit random number
+    alignas(DEFAULT_MEM_ALIGNMENT) uint8_t m_tr[48];   ///< tr - a 384-bit random number
+
     const pkc_e              m_scheme;  ///< The crypto scheme associated with this user
     const size_t             m_set;     ///< The parameter set associated with this user
-    alignas(DEFAULT_MEM_ALIGNMENT) uint8_t      m_rho[32];  ///< ρ - a 256-bit random number
-    alignas(DEFAULT_MEM_ALIGNMENT) uint8_t      m_K[32];    ///< K - a 256-bit random number
-    alignas(DEFAULT_MEM_ALIGNMENT) uint8_t      m_tr[48];   ///< tr - a 384-bit random number
     phantom_vector<int32_t>  m_s1;      ///< The Dilithium s1 private key component
     phantom_vector<int32_t>  m_s2;      ///< The Dilithium s2 private key component
     phantom_vector<int32_t>  m_t;       ///< The Dilithium t key component
@@ -96,7 +102,11 @@ private:
     std::shared_ptr<csprng>        m_prng;
     std::unique_ptr<ntt_dilithium> m_ntt;
 
-    const phantom_vector<std::string> m_sets = { "I", "II", "III", "IV" };
+    /// Flag indicating if the signature is created in a deterministic manner
+    bool m_is_deterministic;
+
+    const phantom_vector<std::string> m_sets = { "2", "3", "5", "5+", "5++",
+                                                 "2-random", "3-random", "5-random", "5+-random", "5++-random" };
 };
 
 }  // namespace schemes

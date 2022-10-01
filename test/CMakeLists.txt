@@ -187,6 +187,12 @@ add_test(UNIT_NUMBER_MULTIPLICATIVE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/unit_numbe
 add_test(UNIT_NUMBER_ALGORITHMS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/unit_number_algorithms)
 add_test(UNIT_REDUCTION_BARRETT ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/unit_reduction_barrett)
 
+if (ENABLE_SIGNATURE_DILITHIUM)
+    add_executable(unit_dilithium unit/unit_dilithium.cpp) 
+    target_link_libraries(unit_dilithium phantom_static)
+    add_test(UNIT_DILITHIUM ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/unit_dilithium)
+endif (ENABLE_SIGNATURE_DILITHIUM)
+
 if (ENABLE_SIGNATURE_ECDSA)
     add_executable(gen_ecdsa_dual functional/gen_ecdsa_dual.cpp) 
     target_link_libraries(gen_ecdsa_dual phantom_static)

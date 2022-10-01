@@ -47,6 +47,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DJSON_NO_IO")
 option(BUILD_STATIC_LIBS "Build the static library" ON)
 option(BUILD_SHARED_LIBS "Build the shared library" ON)
 option(BUILD_TESTS "Build test programs" OFF)
+option(ENABLE_LOGGING "Enable log and trace" OFF)
 option(ENABLE_IBE_DLP "Build IBE-DLP" OFF)
 option(ENABLE_KEM_KYBER "Build KEM Kyber" OFF)
 option(ENABLE_KEM_SABER "Build KEM SABER" OFF)
@@ -77,6 +78,10 @@ option(ENABLE_ALL "Build all cryptosystems" ON)
 
 
 # -------- Enable/disable cryptosystems and features as appropriate --------- #
+
+if (ENABLE_LOGGING)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_ENABLE_LOGGING")
+endif (ENABLE_LOGGING)
 
 set(REQUIRE_PKC_LIBS OFF)
 set(REQUIRE_MPZ OFF)

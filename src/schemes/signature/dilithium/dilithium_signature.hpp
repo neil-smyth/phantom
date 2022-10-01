@@ -92,22 +92,34 @@ private:
     static size_t bits_2_set(security_strength_e bits);
 
     /// Generate a random sample with a uniform random distribution based on eta
-    void uniform_rand_sample_small(std::shared_ptr<csprng> prng, uint32_t q, int32_t eta, size_t bits,
-        int32_t *s, size_t n, size_t m) const;
+    void uniform_rand_sample_small(dilithium *dil, const phantom_vector<uint8_t>& seed,
+        uint32_t q, int32_t eta, size_t bits,
+        int32_t *s, size_t n, size_t m, uint16_t nonce) const;
 
     /// Uniform random sampling of a ring of n elements
-    void uniform_random_ring_q(dilithium* dil, uint32_t *a, size_t n, uint32_t q, uint32_t q_bits) const;
+    void uniform_random_ring_q(dilithium* dil, uint8_t *seed,
+                               uint16_t nonce, int32_t *a, size_t n, uint32_t q, uint32_t q_bits) const;
 
     /// Convert a polynomial ring to Montgomery representation
-    void to_montgomery(ctx_dilithium& ctx, uint32_t *out, const int32_t *in, uint32_t q, size_t n, size_t offset) const;
+    void to_montgomery(ctx_dilithium& ctx, uint32_t *out, const int32_t *in, uint32_t q,
+        size_t n, size_t offset) const;
 
     /// Convert a polynomial ring from Montgomery representation
     void from_montgomery(ctx_dilithium& ctx, int32_t *out, const uint32_t *in, uint32_t q,
         size_t n, size_t offset) const;
 
-    /// Compute t = A * y, y is also translated to mod q+
-    void create_rand_product(ctx_dilithium& ctx, uint32_t q, uint32_t q_bits, uint32_t *t, int32_t *y, size_t logn,
+    /// Compute t = A * y, y is also translated to mod q+ (A is generated on-the-fly)
+    void create_rand_product(ctx_dilithium& ctx, uint8_t *seed, uint32_t q, uint32_t q_bits,
+        uint32_t *t, int32_t *y, size_t logn,
         size_t k, size_t l, uint32_t *c) const;
+
+    /// Compute the product of the matrices A and y, where A has been precomputed
+    void create_A_product(ctx_dilithium& ctx, uint32_t *w, int32_t *A, int32_t *y, uint32_t q,
+        size_t n, size_t n_bits, size_t k, size_t l, uint32_t *c) const;
+
+    /// Generate matrix A using rejection sampling
+    void expand_A(ctx_dilithium& ctx, uint8_t *seed, uint32_t q, uint32_t q_bits, int32_t *A, size_t n,
+        size_t k, size_t l) const;
 
     /// Check if the norm of v is greater than or equal to b, i.e. ||v|| >= b
     uint32_t check_norm_inf(const int32_t *v, size_t n, size_t l, uint32_t q, uint32_t b) const;

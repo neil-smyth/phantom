@@ -42,17 +42,6 @@ public:
         return 0;
     }
 
-    /// Compare two arrays in constant-time, returns 1 if equal, otherwise returns 0
-    static T cmp_array_equal(const T *in1, const T *in2, size_t n)
-    {
-        for (size_t i=n; i--;) {
-            if (in1[i] != in2[i]) {
-                return 0;
-            }
-        }
-        return 1;
-    }
-
     /// Returns 1 if a is less than b, 0 otherwise
     static T cmp_lessthan(volatile T a, volatile T b)
     {
