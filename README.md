@@ -45,8 +45,8 @@ The focus is currently to build for x86_64 with GNU compiler and Linux, There is
 | ---- | --------- | ------ |
 | Format Preserving Encryption        | AES-FPE-FF1     | Compliant with NIST test vectors  |
 | Format Preserving Encryption        | AES-FPE-FF3-1   | Require NIST test vectors to test |
-| Encryption                          | AES-CTR         | Functional, requires KAT testing  |
-| Authenticated Encryption            | AES-CCM         | Future development                |
+| Encryption                          | AES-CTR         | Compliant with NIST test vectors  |
+| Authenticated Encryption            | AES-CCM         | Compliant with NIST test vectors  |
 | Authenticated Encryption            | AES-GCM         | Compliant with NIST test vectors  |
 | Cryptographic Hash                  | SHA-2           | Compliant with NIST test vectors  |
 | Cryptographic Hash                  | SHA-3           | Compliant with NIST test vectors  |
@@ -124,7 +124,7 @@ This is a big item on the TODO list - the functional tests in the _test_ directo
 Support for _Cpplint_ is provided if the cmake project detects the presence of of the _Cpplint_ parser. If so, static analysis of the source code can be conveniently performed using the target _cpplint_, for example:
 
 ```
-make cpplint
+cmake --build . --target cpplint
 ```
 
 ## Reference Manual
