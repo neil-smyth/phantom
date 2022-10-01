@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
 
     phantom_vector<uint8_t> m(128);
 
-    for (size_t i = 0; i < 5; i++) {
+    for (size_t i = 0; i < 10; i++) {
 
         stopwatch sw_keygen, sw_sign, sw_verify;
         uint32_t keygen_us = 0, sign_us = 0, verify_us = 0;

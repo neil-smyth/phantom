@@ -71,7 +71,7 @@ std::unique_ptr<user_ctx> dilithium_signature::create_ctx(size_t set,
                                                           bool masking) const
 {
     ctx_dilithium* ctx = new ctx_dilithium(set);
-    if (ctx->get_set() > 4) {
+    if (ctx->get_set() > 19) {
         throw std::invalid_argument("Parameter set is out of range");
     }
     return std::unique_ptr<user_ctx>(ctx);

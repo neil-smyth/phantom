@@ -35,8 +35,8 @@ class ctx_dilithium : public user_ctx
 public:
     explicit ctx_dilithium(size_t set) :
         m_scheme(PKC_SIG_DILITHIUM),
-        m_set(set),
-        m_dilithium(std::unique_ptr<dilithium>(new dilithium(set))),
+        m_set(set % 5),
+        m_dilithium(std::unique_ptr<dilithium>(new dilithium(m_set))),
         m_reduce(reducer_dilithium(m_dilithium->get_params()->q, m_dilithium->get_params()->inv_q, 32,
                                    m_dilithium->get_params()->R, m_dilithium->get_params()->R2)),
         m_reduction(m_reduce)
@@ -51,13 +51,14 @@ public:
         m_ntt          = std::unique_ptr<ntt_dilithium>(ntt32);
         m_prng         = std::shared_ptr<csprng>(csprng::make(0x10000000, random_seed::seed_cb));
 
-        m_is_deterministic = true;
+        // Sets 0-4 and 10-14 are deterministic, 5-9 and 15-19 are non-deterministic
+        m_is_deterministic = (set < 5) || (set >= 10 && set < 15);
     }
     virtual ~ctx_dilithium() {}
 
     pkc_e get_scheme() override { return m_scheme;}
-    size_t get_set() override { return m_set; }
-    const std::string& get_set_name() override { return m_sets[m_set]; }
+    size_t get_set() override { return m_is_deterministic ? m_set : m_set + 5; }
+    const std::string& get_set_name() override { return m_sets[m_is_deterministic ? m_set : m_set + 5]; }
     const phantom_vector<std::string>& get_set_names() { return m_sets; }
 
     dilithium* get_dilithium() { return m_dilithium.get(); }
@@ -103,7 +104,10 @@ private:
 
     bool m_is_deterministic;
 
-    const phantom_vector<std::string> m_sets = { "2", "3", "5", "5+", "5++" };
+    const phantom_vector<std::string> m_sets = { "2", "3", "5", "5+", "5++",
+                                                 "2-random", "3-random", "5-random", "5+-random", "5++-random",
+                                                 "2-AES", "3-AES", "5-AES", "5+-AES", "5++-AES",
+                                                 "2-AES-random", "3-AES-random", "5-AES-random", "5+-AES-random", "5++-AES-random" };
 };
 
 }  // namespace schemes
