@@ -52,7 +52,7 @@ public:
         m_prng         = std::shared_ptr<csprng>(csprng::make(0x10000000, random_seed::seed_cb));
 
         // Sets 0-4 are deterministic, 5-9 are non-deterministic
-        m_is_deterministic = (set < 5);
+        m_is_deterministic = (set < 5);  // NOLINT
     }
     virtual ~ctx_dilithium() {}
 
