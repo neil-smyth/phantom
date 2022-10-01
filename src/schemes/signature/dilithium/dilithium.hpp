@@ -136,7 +136,7 @@ protected:
     size_t m_set;
 
     /// The Dilithium parameter sets
-    static const dilithium_set_t m_params[3];
+    static const dilithium_set_t m_params[5];
 
     /// A SHAKE object
     std::unique_ptr<crypto::xof_sha3> m_xof;

@@ -27,15 +27,19 @@ size_t dilithium_signature::bits_2_set(security_strength_e bits)
     size_t set = 0;
     switch (bits)
     {
-        case SECURITY_STRENGTH_60:  set = 0; break;
-
+        case SECURITY_STRENGTH_60:
         case SECURITY_STRENGTH_80:
-        case SECURITY_STRENGTH_96:  set = 1; break;
+        case SECURITY_STRENGTH_96:
+        case SECURITY_STRENGTH_112: set = 0; break;
 
-        case SECURITY_STRENGTH_112:
-        case SECURITY_STRENGTH_128: set = 2; break;
+        case SECURITY_STRENGTH_128: set = 1; break;
 
-        case SECURITY_STRENGTH_160: set = 3; break;
+        case SECURITY_STRENGTH_160:
+        case SECURITY_STRENGTH_192: set = 2; break;
+
+        case SECURITY_STRENGTH_224: set = 3; break;
+
+        case SECURITY_STRENGTH_256: set = 4; break;
 
         default: throw std::invalid_argument("Security strength is invalid");
     }
@@ -56,7 +60,7 @@ std::unique_ptr<user_ctx> dilithium_signature::create_ctx(security_strength_e bi
                                                           bool masking) const
 {
     ctx_dilithium* ctx = new ctx_dilithium(dilithium_signature::bits_2_set(bits));
-    if (ctx->get_set() > 3) {
+    if (ctx->get_set() > 4) {
         throw std::invalid_argument("Parameter set is out of range");
     }
     return std::unique_ptr<user_ctx>(ctx);
@@ -67,7 +71,7 @@ std::unique_ptr<user_ctx> dilithium_signature::create_ctx(size_t set,
                                                           bool masking) const
 {
     ctx_dilithium* ctx = new ctx_dilithium(set);
-    if (ctx->get_set() > 3) {
+    if (ctx->get_set() > 4) {
         throw std::invalid_argument("Parameter set is out of range");
     }
     return std::unique_ptr<user_ctx>(ctx);

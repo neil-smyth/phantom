@@ -103,7 +103,7 @@ private:
 
     bool m_is_deterministic;
 
-    const phantom_vector<std::string> m_sets = { "2", "3", "5" };
+    const phantom_vector<std::string> m_sets = { "2", "3", "5", "5+", "5++" };
 };
 
 }  // namespace schemes
