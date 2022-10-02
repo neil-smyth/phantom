@@ -25,9 +25,9 @@ namespace phantom {
 namespace schemes {
 
 const kyber_set_t kyber_indcpa::m_params[3] = {
-    {0, 7681, 13, 0x8884, 12, 256, 8, 2, 5, 4, 11, 3, 11, 62, 1115, 4088, 5569},
-    {1, 7681, 13, 0x8884, 12, 256, 8, 3, 4, 4, 11, 3, 11, 62, 1115, 4088, 5569},
-    {2, 7681, 13, 0x8884, 12, 256, 8, 4, 3, 3, 11, 3, 11, 62, 1115, 4088, 5569},
+    {0, 3329, 12, 0x9D7E, 11, 256, 8, 2, 3, 2, 10, 4, 12, 17, 1175, 2285, 1353},
+    {1, 3329, 12, 0x9D7E, 11, 256, 8, 3, 2, 2, 10, 4, 12, 17, 1175, 2285, 1353},
+    {2, 3329, 12, 0x9D7E, 11, 256, 8, 4, 2, 2, 11, 5, 12, 17, 1175, 2285, 1353},
 };
 
 
@@ -360,6 +360,15 @@ void kyber_indcpa::map_message(int16_t* _RESTRICT_ v, const uint8_t*  _RESTRICT_
     }
 }
 
+int16_t barrett_reduce(int16_t a, int16_t q) {
+  int16_t t;
+  const int16_t v = ((1<<26) + q/2)/q;
+
+  t  = ((int32_t)v*a + (1<<25)) >> 26;
+  t *= q;
+  return a - t;
+}
+
 void kyber_indcpa::enc(int16_t * _RESTRICT_ u, int16_t * _RESTRICT_ v, const uint16_t * _RESTRICT_ t_ntt,
     const uint8_t * _RESTRICT_ rho, size_t logn, size_t k, const uint8_t * _RESTRICT_ m)
 {
@@ -370,7 +379,7 @@ void kyber_indcpa::enc(int16_t * _RESTRICT_ u, int16_t * _RESTRICT_ v, const uin
 
     size_t   n        = 1 << logn;
     uint16_t q        = m_params[m_set].q;
-    uint16_t q2       = q >> 1;
+    uint16_t q2       = (q + 1) >> 1;
     uint16_t q_bits   = m_params[m_set].q_bits;
     uint16_t q_inv    = m_params[m_set].q_inv;
     uint16_t q_norm   = m_params[m_set].q_norm;
@@ -424,6 +433,15 @@ void kyber_indcpa::enc(int16_t * _RESTRICT_ u, int16_t * _RESTRICT_ v, const uin
     LOG_DEBUG_ARRAY("u = AT.r + e1", u, k * n);
     LOG_DEBUG_ARRAY("v = t^Tr + [q/2].m + e2", v, n);
 
+    for (size_t i = 0; i < k; i++) {
+        for (size_t j = 0; j < n; j++) {
+            u[i] = barrett_reduce(u[i], q);
+        }
+    }
+    for (size_t j = 0; j < n; j++) {
+        v[j] = barrett_reduce(v[j], q);
+    }
+
     // Compress the two encryption variables
     compress(u, n, k, d_u, q, q_inv, q_norm);
     compress(v, n, 1, d_v, q, q_inv, q_norm);
@@ -473,6 +491,10 @@ void kyber_indcpa::dec(int16_t* _RESTRICT_ u, int16_t* _RESTRICT_ v,
     core::poly<int16_t>::sub(v, n, v, u);
     core::poly<int16_t>::centre(v, q, n);
     LOG_DEBUG_ARRAY("v - sT.u", v, n);
+
+    for (size_t j = 0; j < n; j++) {
+        v[j] = barrett_reduce(v[j], q);
+    }
 
     // Perform rounding of the output message
     compress(v, n, 1, 1, q, q_inv, q_norm);
