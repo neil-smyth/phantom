@@ -37,7 +37,7 @@ public:
 
     phantom_vector<int16_t>& s() { return m_s; }
     phantom_vector<int16_t>& t() { return m_t; }
-    phantom_vector<uint16_t>& t_ntt() { return m_t_ntt; }
+    phantom_vector<int16_t>& t_ntt() { return m_t_ntt; }
     uint8_t* rho() { return m_rho; }
     uint8_t* z() { return m_z; }
     kyber_indcpa* pke() { return m_kyber_pke.get(); }
@@ -52,7 +52,7 @@ private:
 
     phantom_vector<int16_t> m_s;
     phantom_vector<int16_t> m_t;
-    phantom_vector<uint16_t> m_t_ntt;
+    phantom_vector<int16_t> m_t_ntt;
     alignas(DEFAULT_MEM_ALIGNMENT) uint8_t m_rho[32];
     alignas(DEFAULT_MEM_ALIGNMENT) uint8_t m_z[32];
 };
