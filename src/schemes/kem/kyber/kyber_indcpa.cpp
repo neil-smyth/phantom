@@ -119,8 +119,9 @@ void kyber_indcpa::gen_matrix(int16_t *a, const uint8_t *seed, bool transposed)
     const size_t kyber_k = m_params[m_set].k;
 
     unsigned int off;
-    uint8_t buf[GEN_MATRIX_NBLOCKS(n, q) * XOF_BLOCKBYTES + 2];  // Matrix A is NOT sensitive
-    uint8_t nonce[2];
+    phantom_vector<uint8_t> scratch(GEN_MATRIX_NBLOCKS(n, q) * XOF_BLOCKBYTES + 2);
+    uint8_t *buf   = scratch.data();
+    uint8_t *nonce = buf + GEN_MATRIX_NBLOCKS(n, q) * XOF_BLOCKBYTES;
 
     for (size_t i=0; i < kyber_k; i++) {
         for (size_t j=0; j < kyber_k; j++) {
@@ -278,7 +279,7 @@ void kyber_indcpa::map_msg_to_poly(int16_t *r, const uint8_t *msg, const uint16_
     int16_t mask;
 
     for (size_t i = 0; i < n/8; i++) {
-        for (size_t j = 0; j < 8;j++) {
+        for (size_t j = 0; j < 8; j++) {
             mask = -static_cast<int16_t>((msg[i] >> j)&1);
             r[8*i+j] = mask & ((q+1)/2);
         }
@@ -292,7 +293,7 @@ void kyber_indcpa::map_poly_to_msg(uint8_t *msg, const int16_t *a, const uint16_
 
     for (size_t i = 0; i < n/8; i++) {
         msg[i] = 0;
-        for (size_t j = 0; j < 8;j++) {
+        for (size_t j = 0; j < 8; j++) {
             t  = a[8*i+j];
             t += (static_cast<int16_t>(t) >> 15) & q;
             t  = (static_cast<uint64_t>(((t << 1) + q/2) * q_inv) >> q_norm) & 1;
@@ -384,7 +385,6 @@ void kyber_indcpa::enc(int16_t * _RESTRICT_ u, int16_t * _RESTRICT_ v, const int
 
     phantom_vector<uint8_t> noiseseed_vec(64);
     uint8_t *noiseseed = noiseseed_vec.data();
-    //m_prng->get_mem(coins, 32);
 
     uint8_t nonce = 0;
     binomial_getnoise(r_eta, coins, nonce+=k, eta1, n, k);
@@ -411,7 +411,7 @@ void kyber_indcpa::enc(int16_t * _RESTRICT_ u, int16_t * _RESTRICT_ v, const int
     kyber_ntt::invntt_tomont(u, k, n, q, mont_inv);
     kyber_ntt::invntt_tomont(v, 1, n, q, mont_inv);
     LOG_DEBUG_ARRAY("tT.r", v, n);
-    
+
     core::poly<int16_t>::add(u, k*n, u, e1);
     LOG_DEBUG_ARRAY("NTT(r_eta)", r_eta, k * n);
 

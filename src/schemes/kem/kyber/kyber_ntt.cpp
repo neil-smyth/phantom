@@ -47,10 +47,10 @@ void kyber_ntt::ntt(int16_t *r, uint16_t q, uint16_t mont_inv)
   int16_t t, zeta;
 
   k = 1;
-  for(len = KYBER_N/2; len >= 2; len >>= 1) {
-    for(start = 0; start < KYBER_N; start = j + len) {
+  for (len = KYBER_N/2; len >= 2; len >>= 1) {
+    for (start = 0; start < KYBER_N; start = j + len) {
       zeta = zetas[k++];
-      for(j = start; j < start + len; j++) {
+      for (j = start; j < start + len; j++) {
         t = kyber_reduce::mont_mul(zeta, r[j + len], q, mont_inv);
         r[j + len] = r[j] - t;
         r[j] = r[j] + t;
@@ -63,13 +63,13 @@ void kyber_ntt::invntt(int16_t *r, uint16_t q, uint16_t mont_inv)
 {
   unsigned int start, len, j, k;
   int16_t t, zeta;
-  const int16_t f = 1441; // mont^2/128
+  const int16_t f = 1441;  // mont^2 / 128
 
   k = KYBER_N/2 - 1;
-  for(len = 2; len <= KYBER_N/2; len <<= 1) {
-    for(start = 0; start < KYBER_N; start = j + len) {
+  for (len = 2; len <= KYBER_N/2; len <<= 1) {
+    for (start = 0; start < KYBER_N; start = j + len) {
       zeta = zetas[k--];
-      for(j = start; j < start + len; j++) {
+      for (j = start; j < start + len; j++) {
         t = r[j];
         r[j] = kyber_reduce::barrett(t + r[j + len], q);
         r[j + len] = r[j + len] - t;
@@ -109,7 +109,8 @@ void kyber_ntt::tomont(int16_t *r, const size_t k, const size_t n, uint16_t q, u
     }
 }
 
-void kyber_ntt::basemul(int16_t r[2], const int16_t a[2], const int16_t b[2], int16_t zeta, uint16_t q, uint16_t mont_inv)
+void kyber_ntt::basemul(int16_t r[2], const int16_t a[2], const int16_t b[2],
+  int16_t zeta, uint16_t q, uint16_t mont_inv)
 {
     r[0]  = kyber_reduce::mont_mul(a[1], b[1], q, mont_inv);
     r[0]  = kyber_reduce::mont_mul(r[0], zeta, q, mont_inv);
