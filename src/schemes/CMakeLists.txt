@@ -16,6 +16,8 @@ set(libsrc_ibe_dlp
 
 set(libsrc_kem_kyber
     ${PROJECT_SOURCE_DIR}/kem/kyber/ctx_kyber.hpp /
+    ${PROJECT_SOURCE_DIR}/kem/kyber/kyber_ntt.cpp /
+    ${PROJECT_SOURCE_DIR}/kem/kyber/kyber_ntt.hpp /
     ${PROJECT_SOURCE_DIR}/kem/kyber/kyber_kem.cpp /
     ${PROJECT_SOURCE_DIR}/kem/kyber/kyber_kem.hpp /
     ${PROJECT_SOURCE_DIR}/kem/kyber/kyber_indcpa.cpp /

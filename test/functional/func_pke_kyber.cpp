@@ -53,13 +53,17 @@ int main(int argc, char *argv[])
             phantom_vector<uint8_t> ct;
             phantom_vector<uint8_t> pt2;
 
+            phantom_vector<uint8_t> pkb;
+            dut_b.get_public_key(ctx_b, pkb);
+            dut_a.set_public_key(ctx_a, pkb);
+
             sw_enc.start();
             dut_a.pke_encrypt(ctx_a, pt, ct);
             sw_enc.stop();
 
             bool ready;
             sw_dec.start();
-            ready = dut_a.pke_decrypt(ctx_a, ct, pt2);
+            ready = dut_b.pke_decrypt(ctx_b, ct, pt2);
             if (!ready) {
                 std::cerr << "Decryption failed" << std::endl;
                 return EXIT_FAILURE;
@@ -78,7 +82,7 @@ int main(int argc, char *argv[])
             dec_us    += sw_dec.elapsed_us();
         }
 
-        std::cout << "KYBER " << ((0 == i)? "Light" : (1 == i)? "Normal" : "Paranoid") << std::endl;
+        std::cout << "KYBER " << ctx_a->get_set_name() << std::endl;
         std::cout << "keygen time     = " << static_cast<float>(keygen_us)/(2*NUM_ITER)
             << " us, " << (2*NUM_ITER*1000000.0f)/static_cast<float>(keygen_us) << " per sec" << std::endl;
         std::cout << "encryption time = " << static_cast<float>(enc_us)/(NUM_ITER)
