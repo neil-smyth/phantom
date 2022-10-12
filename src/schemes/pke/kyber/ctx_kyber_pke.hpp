@@ -46,7 +46,7 @@ private:
     const pkc_e  m_scheme;
     const size_t m_set;
 
-    const phantom_vector<std::string> m_sets = { "Light", "Normal", "Paranoid" };
+    const phantom_vector<std::string> m_sets = { "Kyber512", "Kyber768", "Kyber1024" };
 
     std::unique_ptr<kyber_indcpa> m_kyber_pke;
 

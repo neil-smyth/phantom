@@ -16,6 +16,7 @@
 #include "core/reduction_montgomery.hpp"
 #include "core/ntt_binary.hpp"
 #include "sampling/gaussian_cdf.hpp"
+#include "crypto/hash_sha3.hpp"
 #include "crypto/xof_sha3.hpp"
 #include "./phantom.hpp"
 
@@ -70,8 +71,8 @@ public:
     void keygen(uint8_t* _RESTRICT_ rho, int16_t* _RESTRICT_ s, int16_t* _RESTRICT_ t);
 
     /// Public key encryption
-    void enc(int16_t* _RESTRICT_ u, int16_t* _RESTRICT_ v, const int16_t* _RESTRICT_ t_ntt,
-        const uint8_t* _RESTRICT_ rho, size_t k, const uint8_t* _RESTRICT_ m);
+    void enc(int16_t* _RESTRICT_ u, int16_t* _RESTRICT_ v, const int16_t* _RESTRICT_ pk_t_ntt,
+        const uint8_t* _RESTRICT_ pk_rho, const uint8_t *coins, size_t k, const uint8_t* _RESTRICT_ m);
 
     /// Public key decryption
     void dec(int16_t* _RESTRICT_ u, int16_t* _RESTRICT_ v,
@@ -106,8 +107,9 @@ private:
     static void map_poly_to_msg(uint8_t *msg, const int16_t *a, const uint16_t q,
         const uint16_t q_inv, const uint16_t q_norm, const size_t n);
 
-    std::shared_ptr<csprng>           m_prng;
-    std::unique_ptr<crypto::xof_sha3> m_xof;
+    std::shared_ptr<csprng>            m_prng;
+    std::unique_ptr<crypto::xof_sha3>  m_xof;
+    std::unique_ptr<crypto::hash_sha3> m_sha3;
 
     const size_t m_set;
 };

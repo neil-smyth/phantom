@@ -81,6 +81,7 @@ void kyber_indcpa::init()
 
     m_prng   = std::shared_ptr<csprng>(csprng::make(0x10000000, random_seed::seed_cb));
     m_xof    = std::unique_ptr<crypto::xof_sha3>(new crypto::xof_sha3());
+    m_sha3   = std::unique_ptr<crypto::hash_sha3>(new crypto::hash_sha3());
 
     LOG_DEBUG("Kyber KEM Scheme");
 }
@@ -182,7 +183,7 @@ void kyber_indcpa::binomial_getnoise(int16_t *r, const uint8_t seed[KYBER_SYMBYT
     phantom_vector<uint8_t> buf(3 * n / 4);
 
     for (size_t i = 0; i < k; i++) {
-        kyber_shake256_prf(buf.data(), sizeof(buf), seed, nonce++);
+        kyber_shake256_prf(buf.data(), buf.size(), seed, nonce++);
         if (3 == eta) {
             cbd3(r + n*i, buf.data(), n);
         }
@@ -321,10 +322,9 @@ void kyber_indcpa::keygen(uint8_t * _RESTRICT_ rho, int16_t * _RESTRICT_ s, int1
 
     // Generate the seed for matrix A from rho
     uint8_t noiseseed[64];
-    crypto::hash_sha3 sha3;
-    sha3.init(32);
-    sha3.update(rho, 32);
-    sha3.final(noiseseed);
+    m_sha3->init(32);
+    m_sha3->update(rho, 32);
+    m_sha3->final(noiseseed);
     LOG_DEBUG_ARRAY("noiseseed", noiseseed, sizeof(noiseseed));
 
     // Generate matrix A deterministically using noiseseed
@@ -354,7 +354,7 @@ void kyber_indcpa::keygen(uint8_t * _RESTRICT_ rho, int16_t * _RESTRICT_ s, int1
 }
 
 void kyber_indcpa::enc(int16_t * _RESTRICT_ u, int16_t * _RESTRICT_ v, const int16_t * _RESTRICT_ t_ntt,
-    const uint8_t * _RESTRICT_ rho, size_t k, const uint8_t * _RESTRICT_ m)
+    const uint8_t * _RESTRICT_ pk_rho, const uint8_t *coins, size_t k, const uint8_t * _RESTRICT_ m)
 {
     LOG_DEBUG("Kyber CPA Encryption\n");
 
@@ -379,18 +379,17 @@ void kyber_indcpa::enc(int16_t * _RESTRICT_ u, int16_t * _RESTRICT_ v, const int
     int16_t *e2    = e1 + k * n;
 
     LOG_DEBUG_ARRAY("m", m, 32);
-    LOG_DEBUG_ARRAY("rho", rho, 32);
+    LOG_DEBUG_ARRAY("rho", pk_rho, 32);
     LOG_DEBUG_ARRAY("r", r_eta, 32);
 
-    phantom_vector<uint8_t> seed_vec(64);
-    uint8_t *seed      = seed_vec.data();
-    uint8_t *noiseseed = seed;
-    m_prng->get_mem(seed, 32);
+    phantom_vector<uint8_t> noiseseed_vec(64);
+    uint8_t *noiseseed = noiseseed_vec.data();
+    //m_prng->get_mem(coins, 32);
 
     uint8_t nonce = 0;
-    binomial_getnoise(r_eta, seed, nonce+=k, eta1, n, k);
-    binomial_getnoise(e1, seed, nonce+=k, eta2, n, k);
-    binomial_getnoise(e2, seed, nonce++, eta2, n, 1);
+    binomial_getnoise(r_eta, coins, nonce+=k, eta1, n, k);
+    binomial_getnoise(e1, coins, nonce+=k, eta2, n, k);
+    binomial_getnoise(e2, coins, nonce++, eta2, n, 1);
     LOG_DEBUG_ARRAY("r_eta = Sam(r)", r_eta, k*n);
     LOG_DEBUG_ARRAY("e1 = Sam(r)", e1, k * n);
     LOG_DEBUG_ARRAY("e2 = Sam(r)", e2, n);
@@ -399,7 +398,7 @@ void kyber_indcpa::enc(int16_t * _RESTRICT_ u, int16_t * _RESTRICT_ v, const int
 
     crypto::hash_sha3 sha3;
     sha3.init(32);
-    sha3.update(rho, 32);
+    sha3.update(pk_rho, 32);
     sha3.final(noiseseed);
 
     kyber_ntt::fwd_ntt(r_eta, k, n, q, mont_inv);
@@ -469,7 +468,7 @@ void kyber_indcpa::dec(int16_t* _RESTRICT_ u, int16_t* _RESTRICT_ v,
     LOG_DEBUG_ARRAY("v", v, n);
 
     map_poly_to_msg(m, v, q, q_inv, q_norm, n);
-    LOG_DEBUG_ARRAY("m", m, 32);
+    LOG_DEBUG_ARRAY("m decrypt", m, 32);
 
     // Free the temporary memory resources (and erase the contents)
     aligned_free(temp);

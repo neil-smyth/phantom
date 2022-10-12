@@ -172,10 +172,13 @@ bool kyber_pke::encrypt(const std::unique_ptr<user_ctx>& ctx, const phantom_vect
     const uint16_t dv_bits = kyber_indcpa::m_params[myctx.get_set()].d_v + 1;
     const size_t   k       = kyber_indcpa::m_params[myctx.get_set()].k;
 
+    phantom_vector<uint8_t> coins(32);
+    myctx.pke()->get_prng()->get_mem(coins.data(), 32);
+
     // Kyber CPA Encryption of the public key
     int16_t *u = reinterpret_cast<int16_t*>(aligned_malloc((k + 1) * n * sizeof(int16_t)));
     int16_t *v = u + k * n;
-    myctx.pke()->enc(u, v, myctx.t_ntt().data(), myctx.rho(), k, pt.data());
+    myctx.pke()->enc(u, v, myctx.t_ntt().data(), myctx.rho(), coins.data(), k, pt.data());
     LOG_DEBUG_ARRAY("u", u, k*n);
     LOG_DEBUG_ARRAY("v", v, n);
 
