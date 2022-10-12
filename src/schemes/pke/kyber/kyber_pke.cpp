@@ -85,14 +85,15 @@ bool kyber_pke::set_public_key(std::unique_ptr<user_ctx>& ctx, const phantom_vec
 {
     ctx_kyber_pke& myctx = dynamic_cast<ctx_kyber_pke&>(*ctx.get());
 
-    size_t   n   = kyber_indcpa::m_params[myctx.get_set()].n;
-    uint16_t d_t = kyber_indcpa::m_params[myctx.get_set()].d_t;
+    size_t   n       = kyber_indcpa::m_params[myctx.get_set()].n;
+    size_t   k_param = kyber_indcpa::m_params[myctx.get_set()].k;
+    uint16_t d_t     = kyber_indcpa::m_params[myctx.get_set()].d_t;
 
-    myctx.t_ntt() = phantom_vector<int16_t>(n);
+    myctx.t_ntt() = phantom_vector<int16_t>(k_param * n);
 
     packing::unpacker up(k);
-    for (size_t i = 0; i < n; i++) {
-        myctx.t_ntt()[i] = up.read_unsigned(d_t, packing::RAW);
+    for (size_t i = 0; i < k_param * n; i++) {
+        myctx.t_ntt()[i] = up.read_signed(d_t, packing::RAW);
     }
     for (size_t i = 0; i < 32; i++) {
         myctx.rho()[i] = up.read_unsigned(8, packing::RAW);
@@ -105,19 +106,21 @@ bool kyber_pke::get_public_key(std::unique_ptr<user_ctx>& ctx, phantom_vector<ui
 {
     ctx_kyber_pke& myctx = dynamic_cast<ctx_kyber_pke&>(*ctx.get());
 
-    size_t   n   = kyber_indcpa::m_params[myctx.get_set()].n;
-    uint16_t d_t = kyber_indcpa::m_params[myctx.get_set()].d_t;
+    size_t   n       = kyber_indcpa::m_params[myctx.get_set()].n;
+    size_t   k_param = kyber_indcpa::m_params[myctx.get_set()].k;
+    uint16_t d_t     = kyber_indcpa::m_params[myctx.get_set()].d_t;
 
     k.clear();
 
-    packing::packer pack(d_t * n + 32 * 8);
-    for (size_t i = 0; i < n; i++) {
-        pack.write_unsigned(myctx.t_ntt()[i], d_t, packing::RAW);
+    packing::packer pack(d_t * k_param * n + 32 * 8);
+    for (size_t i = 0; i < k_param * n; i++) {
+        pack.write_signed(myctx.t_ntt()[i], d_t, packing::RAW);
     }
     for (size_t i = 0; i < 32; i++) {
         pack.write_unsigned(myctx.rho()[i], 8, packing::RAW);
     }
 
+    pack.flush();
     k = pack.get();
 
     return true;

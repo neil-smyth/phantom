@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
             decap_us  += sw_decap.elapsed_us();
         }
 
-        std::cout << "KYBER " << ((0 == i)? "Light" : (1 == i)? "Normal" : "Paranoid") << std::endl;
+        std::cout << "KYBER " << ctx_a->get_set_name() << std::endl;
         std::cout << "keygen time        = " << static_cast<float>(keygen_us)/(2*NUM_ITER)
             << " us, " << (2*NUM_ITER*1000000.0f)/static_cast<float>(keygen_us) << " per sec" << std::endl;
         std::cout << "encapsualtion time = " << static_cast<float>(encap_us)/(NUM_ITER)

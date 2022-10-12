@@ -61,23 +61,12 @@ bool kyber_kem::keygen(std::unique_ptr<user_ctx>& ctx)
     ctx_kyber& myctx = dynamic_cast<ctx_kyber&>(*ctx.get());
 
     size_t   n       = kyber_indcpa::m_params[myctx.get_set()].n;
-    size_t   n_bits  = kyber_indcpa::m_params[myctx.get_set()].n_bits;
     size_t   k       = kyber_indcpa::m_params[myctx.get_set()].k;
-    uint16_t q       = kyber_indcpa::m_params[myctx.get_set()].q;
 
     myctx.s()     = phantom_vector<int16_t>(k*n);
     myctx.t()     = phantom_vector<int16_t>(k*n);
     myctx.t_ntt() = phantom_vector<int16_t>(k*n);
     myctx.get_pke()->keygen(myctx.rho(), myctx.s().data(), myctx.t_ntt().data());
-
-    /*for (size_t i = 0; i < k*n; i++) {
-        int16_t tmp = myctx.t()[i];
-        tmp += q & (tmp >> 15);
-        myctx.t_ntt()[i] = myctx.get_pke()->get_reduction().convert_to(tmp);
-    }
-    for (size_t i = 0; i < k; i++) {
-        myctx.get_pke()->get_ntt()->fwd(myctx.t_ntt().data() + i*n, n_bits);
-    }*/
 
     myctx.get_pke()->get_prng()->get_mem(myctx.z(), 32);
     LOG_DEBUG_ARRAY("z", myctx.z(), 32);
@@ -90,10 +79,8 @@ bool kyber_kem::set_public_key(std::unique_ptr<user_ctx>& ctx, const phantom_vec
     ctx_kyber& myctx = dynamic_cast<ctx_kyber&>(*ctx.get());
 
     size_t   n       = kyber_indcpa::m_params[myctx.get_set()].n;
-    size_t   n_bits  = kyber_indcpa::m_params[myctx.get_set()].n_bits;
     uint16_t d_t     = kyber_indcpa::m_params[myctx.get_set()].d_t;
     size_t   k_param = kyber_indcpa::m_params[myctx.get_set()].k;
-    uint16_t q       = kyber_indcpa::m_params[myctx.get_set()].q;
 
     myctx.t()     = phantom_vector<int16_t>(k_param*n);
     myctx.t_ntt() = phantom_vector<int16_t>(k_param*n);
@@ -105,15 +92,6 @@ bool kyber_kem::set_public_key(std::unique_ptr<user_ctx>& ctx, const phantom_vec
     for (size_t i = 0; i < 32; i++) {
         myctx.rho()[i] = up.read_unsigned(8, packing::RAW);
     }
-
-    /*for (size_t i = 0; i < k_param*n; i++) {
-        int16_t tmp = myctx.t()[i];
-        tmp += q & (tmp >> 15);
-        myctx.t_ntt()[i] = myctx.get_pke()->get_reduction().convert_to(tmp);
-    }
-    for (size_t i = 0; i < k_param; i++) {
-        myctx.get_pke()->get_ntt()->fwd(myctx.t_ntt().data() + i*n, n_bits);
-    }*/
 
     return true;
 }
@@ -277,8 +255,6 @@ bool kyber_kem::encapsulate(std::unique_ptr<user_ctx>& ctx, const phantom_vector
     ctx_kyber& myctx = dynamic_cast<ctx_kyber&>(*ctx.get());
 
     size_t   n       = kyber_indcpa::m_params[myctx.get_set()].n;
-    size_t   n_bits  = kyber_indcpa::m_params[myctx.get_set()].n_bits;
-    uint16_t q_bits  = kyber_indcpa::m_params[myctx.get_set()].q_bits;
     uint16_t du_bits = kyber_indcpa::m_params[myctx.get_set()].d_u + 1;
     uint16_t dv_bits = kyber_indcpa::m_params[myctx.get_set()].d_v + 1;
     size_t   k       = kyber_indcpa::m_params[myctx.get_set()].k;
