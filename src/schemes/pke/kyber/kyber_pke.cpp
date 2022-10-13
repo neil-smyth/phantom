@@ -66,15 +66,6 @@ bool kyber_pke::keygen(std::unique_ptr<user_ctx>& ctx)
     myctx.t_ntt() = phantom_vector<int16_t>(k*n);
     myctx.pke()->keygen(myctx.rho(), myctx.s().data(), myctx.t_ntt().data());
 
-    /*for (size_t i = 0; i < k*n; i++) {
-        int16_t tmp = myctx.t()[i];
-        tmp += q & (tmp >> 15);
-        myctx.t_ntt()[i] = myctx.pke()->get_reduction().convert_to(tmp);
-    }
-    for (size_t i = 0; i < k; i++) {
-        myctx.pke()->get_ntt()->fwd(myctx.t_ntt().data() + i*n, n_bits);
-    }*/
-
     myctx.pke()->get_prng()->get_mem(myctx.z(), 32);
     LOG_DEBUG_ARRAY("z", myctx.z(), 32);
 

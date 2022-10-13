@@ -365,7 +365,7 @@ void saber_indcpa::keygen(phantom_vector<uint8_t>& pk, phantom_vector<uint8_t>& 
 
     // Calculate b = A^T.s and scale the output
     memset(b, 0, sizeof(uint16_t) * l * SABER_N);
-    matrix_mul(b, l, A, s, true);
+    matrix_mul(b, l, A, s, false);
     for (size_t i=0; i < l*SABER_N; i++) {
         b[i] = (b[i] + h1) >> (eq - ep);
     }
@@ -397,12 +397,12 @@ void saber_indcpa::enc(const phantom_vector<uint8_t>& pk, const phantom_vector<u
 
     phantom_vector<uint8_t> seed_A(SABRE_MSG_LEN);
     phantom_vector<uint16_t> storage(SABER_N * (2 + 3*l + l*l));
-    uint16_t* mp = storage.data();   // SABER_N
-    uint16_t* A  = mp + SABER_N;     // l*l*SABER_N
-    uint16_t* bp = A + l*l*SABER_N;  // l*SABER_N
-    uint16_t* b  = bp + l*SABER_N;   // l*SABER_N
-    uint16_t* sp = b + l*SABER_N;    // l*SABER_N
-    uint16_t* vp = sp + l*SABER_N;   // l*SABER_N
+    uint16_t* mp = storage.data();    // SABER_N
+    uint16_t* A  = mp + SABER_N;      // l*l*SABER_N
+    uint16_t* bp = A  + SABER_N*l*l;  // l*SABER_N
+    uint16_t* b  = bp + SABER_N*l;    // l*SABER_N
+    uint16_t* sp = b  + SABER_N*l;    // l*SABER_N
+    uint16_t* vp = sp + SABER_N*l;    // l*SABER_N
 
     // Create a local copy of the seed for A from the public key and use
     // it to generate the matrix A, identical to the matrix A from the other party
@@ -414,7 +414,7 @@ void saber_indcpa::enc(const phantom_vector<uint8_t>& pk, const phantom_vector<u
 
     // Calculate bp = A^T.sp
     memset(bp, 0, sizeof(uint16_t)*l*SABER_N);
-    matrix_mul(bp, l, A, sp, true);
+    matrix_mul(bp, l, A, sp, false);
     for (size_t i=0; i < l*SABER_N; i++) {
         bp[i] = (bp[i] + h1) >> (eq - ep);
     }
@@ -476,8 +476,8 @@ void saber_indcpa::dec(const phantom_vector<uint8_t>& sk, const phantom_vector<u
 
     phantom_vector<uint16_t> storage(SABER_N * (2 + 2*l));
     uint16_t* s  = storage.data();    // l*SABER_N
-    uint16_t* b  = s + l*SABER_N;     // l*SABER_N
-    uint16_t* cm = b + l*SABER_N;     // SABER_N
+    uint16_t* b  = s  + SABER_N*l;    // l*SABER_N
+    uint16_t* cm = b  + SABER_N*l;    // SABER_N
     uint16_t* v  = cm + SABER_N;      // SABER_N
 
     // Unpack the secret key and the ciphertext and calculate v = b.s
