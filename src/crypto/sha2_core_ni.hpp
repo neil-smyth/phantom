@@ -124,33 +124,34 @@ public:
         __m128i msg_0, msg_1, msg_2, msg_3;
 
         // Rounds 0 - 3
-        tmp   = _mm_loadu_si128(data);                  // Load 4 32-bit words
-        msg_0 = tmp;                                    // msg_0 = ( W_3 = M3, W_2 = M_2, W_1 = M_1, W_0 = M_0 )
+        tmp   = _mm_loadu_si128(data);               // Load 4 32-bit words
+        msg_0 = tmp;                                 // msg_0 = ( W_3 = M3, W_2 = M_2, W_1 = M_1, W_0 = M_0 )
         update_state(0, tmp, ABEF, CDGH);
 
         // Rounds 4 - 7
-        tmp   = _mm_loadu_si128(data + 1);              // Load next 4 32-bit words
-        msg_1 = tmp;                                    // msg_1 = ( W_7 = M_7, W_6 = M_6, W_5 = M_5, W_4 = M_4 )
+        tmp   = _mm_loadu_si128(data + 1);           // Load next 4 32-bit words
+        msg_1 = tmp;                                 // msg_1 = ( W_7 = M_7, W_6 = M_6, W_5 = M_5, W_4 = M_4 )
         update_state(4, tmp, ABEF, CDGH);
-        msg_0 = _mm_sha256msg1_epu32(msg_0, msg_1);     // msg_0 = ( X_19, X_18, X_17, X_16 ) =
-                                                        // ( W_3 + \sigma_0(W_4), ..., W_0 + \sigma_0(W_1) )
+        msg_0 = _mm_sha256msg1_epu32(msg_0, msg_1);  // msg_0 = ( X_19, X_18, X_17, X_16 ) =
+                                                     // ( W_3 + \sigma_0(W_4), ..., W_0 + \sigma_0(W_1) )
 
         // Rounds 8 - 11
-        tmp   = _mm_loadu_si128(data + 2);              // Load next 4 32-bit words
-        msg_2 = tmp;                                    // msg_2 = ( W_11 = M_11, W_10 = M_10, W_9 = M_9, W_8 = M_8 )
+        tmp   = _mm_loadu_si128(data + 2);           // Load next 4 32-bit words
+        msg_2 = tmp;                                 // msg_2 = ( W_11 = M_11, W_10 = M_10, W_9 = M_9, W_8 = M_8 )
         update_state(8, tmp, ABEF, CDGH);
-        msg_1 = _mm_sha256msg1_epu32(msg_1, msg_2);     // msg_1 = ( X_23, X_22, X_21, X_20 )
+        msg_1 = _mm_sha256msg1_epu32(msg_1, msg_2);  // msg_1 = ( X_23, X_22, X_21, X_20 )
 
         // Rounds 12 - 15
-        tmp   = _mm_loadu_si128(data + 3);              // Load next 4 32-bit words
-        msg_3 = tmp;                                    // msg_3 = ( W_15 = M_15, W_14 = M_14, W_13 = M_13, W_12 = M_12 )
+        tmp   = _mm_loadu_si128(data + 3);           // Load next 4 32-bit words
+        msg_3 = tmp;                                 // msg_3 = ( W_15 = M_15, W_14 = M_14, W_13 = M_13, W_12 = M_12 )
         update_state(12, tmp, ABEF, CDGH);
 
         // Update msg_0 using msg_2 before it's modified
-        tmp   = _mm_alignr_epi8(msg_3, msg_2, 4);       // tmp   = ( W_12, W_11, W_10, W_9 )
-        msg_0 = _mm_add_epi32(msg_0, tmp);              // msg_0 = msg_0 + ( W_12, W_11, W_10, W_9 )
-        msg_0 = _mm_sha256msg2_epu32(msg_0, msg_3);     // msg_0 = ( X_19 + W_12 + \sigma_1(W_17)], ..., X_16 + W_9 + \sigma_1(W_14)] )
-        msg_2 = _mm_sha256msg1_epu32(msg_2, msg_3);     // msg_2 = ( X_27, X_26, X_25, X_24 )
+        tmp   = _mm_alignr_epi8(msg_3, msg_2, 4);    // tmp   = ( W_12, W_11, W_10, W_9 )
+        msg_0 = _mm_add_epi32(msg_0, tmp);           // msg_0 = msg_0 + ( W_12, W_11, W_10, W_9 )
+        msg_0 = _mm_sha256msg2_epu32(msg_0, msg_3);  // msg_0 = ( X_19 + W_12 + \sigma_1(W_17)], ...,
+                                                     //         X_16 + W_9 + \sigma_1(W_14)] )
+        msg_2 = _mm_sha256msg1_epu32(msg_2, msg_3);  // msg_2 = ( X_27, X_26, X_25, X_24 )
 
         // Rounds 16 - 19
         tmp   = msg_0;
@@ -202,7 +203,7 @@ public:
         update_state(52, tmp, ABEF, CDGH);
         tmp   = _mm_alignr_epi8(msg_1, msg_0, 4);       // tmp = ( W_52, W_51, W_50, W_49 )
         msg_2 = _mm_add_epi32(msg_2, tmp);              // msg_2 = msg_2 + ( W_52, W_51, W_50, W_49 )
-        msg_2 = _mm_sha256msg2_epu32( msg_2, msg_1);    // Calculate ( W_59, W_58, W_57, W_56 )
+        msg_2 = _mm_sha256msg2_epu32(msg_2, msg_1);     // Calculate ( W_59, W_58, W_57, W_56 )
 
         // Rounds 56 - 59
         tmp   = msg_2;                                  // ( W_59, W_58, W_57, W_56 )
