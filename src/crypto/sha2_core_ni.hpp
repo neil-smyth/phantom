@@ -12,18 +12,25 @@
 #include "crypto/sha2.hpp"
 #include "crypto/hash.hpp"
 
-#if defined(__x86_64__) && __has_include("cpuid.h")
+
+#if defined(__x86_64__)
+
+#if __has_include("cpuid.h")
 #include <cpuid.h>
 #endif
 
-#if defined(__GNUG__)
-# include <stdint.h>
-# include <x86intrin.h>
+#include <stdint.h>
+#include <x86intrin.h>
 
+#endif
+
+#if defined(__clang__)
+// Ensure that we enable support for SHA-NI
+#pragma clang attribute push(__attribute__((target("sse4.1,sha"))), apply_to = function)
+#elif defined(__GNUG__)
 // Ensure that we enable support for SHA-NI
 #pragma GCC target("sse4.1")
 #pragma GCC target("sha")
-
 #endif
 
 
@@ -34,6 +41,7 @@ namespace crypto {
 class sha2_core_ni
 {
 private:
+#if defined(__x86_64__)
     /**
      * @brief Updates the state variables A, B, C, ..., H for 4 rounds
      */
@@ -56,6 +64,7 @@ private:
         msg_1 = _mm_sha256msg2_epu32(msg_1, msg_0);
         msg_3 = _mm_sha256msg1_epu32(msg_3, msg_0);
     }
+#endif
 
 public:
     /**
@@ -92,6 +101,7 @@ public:
      */
     static void core(sha2_ctx<uint32_t>* ctx)
     {
+#if defined(__x86_64__)
         // Load the state and reorder
         __m128i DCBA = _mm_loadu_si128(reinterpret_cast<__m128i*>(&ctx->hash[0]));  // (D, C, B, A)
         __m128i HGFE = _mm_loadu_si128(reinterpret_cast<__m128i*>(&ctx->hash[4]));  // (H, G, F, E)
@@ -215,8 +225,10 @@ public:
         HGFE = _mm_unpackhi_epi64(FEBA, HGDC);                              // (H, G, F, E)
         _mm_storeu_si128(reinterpret_cast<__m128i*>(&ctx->hash[0]), DCBA);  // (D, C, B, A)
         _mm_storeu_si128(reinterpret_cast<__m128i*>(&ctx->hash[4]), HGFE);  // (H, G, F, E)
+#endif
     }
 };
+
 
 }  // namespace crypto
 }  // namespace phantom
