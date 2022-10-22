@@ -10,6 +10,7 @@
 #pragma once
 
 #include "crypto/sha2.hpp"
+#include <limits>
 #include "crypto/hash.hpp"
 
 
