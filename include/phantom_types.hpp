@@ -99,6 +99,13 @@ namespace utilities {}
 /// CSPRNG pool size used to store random 32-bit words
 #define RANDOM_POOL_SIZE        64
 
+/// The enumerated logging level
+enum log_level_e {
+    LOG_LEVEL_NONE = 0,
+    LOG_LEVEL_DEBUG,
+    LOG_LEVEL_WARNING,
+    LOG_LEVEL_ERROR,
+};
 
 /// An enumerated type for security strengths
 enum security_strength_e {

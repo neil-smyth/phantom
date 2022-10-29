@@ -68,8 +68,10 @@ class scheme;
 class pkc
 {
 public:
-    /// Class constructor based on the selected scheme and parameter set
-    explicit pkc(pkc_e type);
+    /// @brief Class constructor based on the selected scheme and parameter set
+    /// @param type The type of PKC algorithm to be used
+    /// @param logging Logging level to be used (default: NONE)
+    explicit pkc(pkc_e type, log_level_e logging = LOG_LEVEL_NONE);
 
     /// Class destructor
     ~pkc();

@@ -112,7 +112,7 @@ const std::string build_info::compiler()
 }
 
 
-pkc::pkc(pkc_e type)
+pkc::pkc(pkc_e type, log_level_e logging)
 {
     switch (type)
     {
@@ -179,6 +179,9 @@ pkc::pkc(pkc_e type)
         default:
             throw std::invalid_argument("Unsupported scheme");
     }
+
+    // Set the scheme's logging
+    m_scheme->set_logging(logging);
 }
 
 pkc::~pkc()

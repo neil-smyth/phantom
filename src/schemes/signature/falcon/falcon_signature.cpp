@@ -105,6 +105,10 @@ bool falcon_signature::keygen(std::unique_ptr<user_ctx>& ctx)
     return true;
 }
 
+void falcon_signature::set_logging(log_level_e logging)
+{
+}
+
 const uint8_t max_fg_bits[] = {
     0, /* unused */
     8,

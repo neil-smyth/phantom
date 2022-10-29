@@ -111,6 +111,10 @@ std::unique_ptr<user_ctx> rsassa_pss_signature::create_ctx(size_t set,
     return std::unique_ptr<user_ctx>(ctx);
 }
 
+void rsassa_pss_signature::set_logging(log_level_e logging)
+{
+}
+
 bool rsassa_pss_signature::keygen(std::unique_ptr<user_ctx>& ctx)
 {
     LOG_DEBUG("RSA KeyGen\n");

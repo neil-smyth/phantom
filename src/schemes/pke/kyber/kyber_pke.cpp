@@ -52,6 +52,10 @@ std::unique_ptr<user_ctx> kyber_pke::create_ctx(size_t set,
     return std::unique_ptr<user_ctx>(ctx);
 }
 
+void kyber_pke::set_logging(log_level_e logging)
+{
+}
+
 bool kyber_pke::keygen(std::unique_ptr<user_ctx>& ctx)
 {
     LOG_DEBUG("Kyber KeyGen\n");
@@ -170,7 +174,6 @@ bool kyber_pke::encrypt(const std::unique_ptr<user_ctx>& ctx, const phantom_vect
     ctx_kyber_pke& myctx = dynamic_cast<ctx_kyber_pke&>(*ctx.get());
 
     const size_t   n       = kyber_indcpa::m_params[myctx.get_set()].n;
-    const size_t   n_bits  = kyber_indcpa::m_params[myctx.get_set()].n_bits;
     const uint16_t du_bits = kyber_indcpa::m_params[myctx.get_set()].d_u + 1;
     const uint16_t dv_bits = kyber_indcpa::m_params[myctx.get_set()].d_v + 1;
     const size_t   k       = kyber_indcpa::m_params[myctx.get_set()].k;
@@ -209,7 +212,6 @@ bool kyber_pke::decrypt(const std::unique_ptr<user_ctx>& ctx, const phantom_vect
     ctx_kyber_pke& myctx = dynamic_cast<ctx_kyber_pke&>(*ctx.get());
 
     const size_t n       = kyber_indcpa::m_params[myctx.get_set()].n;
-    const size_t n_bits  = kyber_indcpa::m_params[myctx.get_set()].n_bits;
     const size_t du_bits = kyber_indcpa::m_params[myctx.get_set()].d_u + 1;
     const size_t dv_bits = kyber_indcpa::m_params[myctx.get_set()].d_v + 1;
     const size_t k       = kyber_indcpa::m_params[myctx.get_set()].k;

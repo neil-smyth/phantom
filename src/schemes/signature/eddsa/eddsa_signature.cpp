@@ -105,6 +105,10 @@ std::unique_ptr<user_ctx> eddsa_signature::create_ctx(size_t set,
     return std::unique_ptr<user_ctx>(ctx);
 }
 
+void eddsa_signature::set_logging(log_level_e logging)
+{
+}
+
 bool eddsa_signature::keygen(std::unique_ptr<user_ctx>& ctx)
 {
     ctx_eddsa& myctx = dynamic_cast<ctx_eddsa&>(*ctx.get());

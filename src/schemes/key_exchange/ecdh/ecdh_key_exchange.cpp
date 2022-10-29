@@ -114,6 +114,10 @@ std::unique_ptr<user_ctx> ecdh_key_exchange::create_ctx(size_t set,
     return std::unique_ptr<user_ctx>(ctx);
 }
 
+void ecdh_key_exchange::set_logging(log_level_e logging)
+{
+}
+
 bool ecdh_key_exchange::keygen(std::unique_ptr<user_ctx>& ctx)
 {
     LOG_DEBUG("ECDH KeyGen\n");

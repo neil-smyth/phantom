@@ -19,6 +19,7 @@
 #include <mutex>  // NOLINT
 #include <limits>
 
+#include "./phantom_types.hpp"
 
 #define LOGGER_DEFAULT_BASENAME          "debug"
 #define LOGGER_DEFAULT_BASE_EXTENSION    "log"
@@ -32,12 +33,6 @@
 namespace phantom {
 namespace logging {
 
-/// The enumerated debug level
-enum log_level_e {
-    LOG_LEVEL_DEBUG = 0,
-    LOG_LEVEL_WARNING,
-    LOG_LEVEL_ERROR,
-};
 
 /**
  * @brief A logging class that ping pongs between two files with a common base name

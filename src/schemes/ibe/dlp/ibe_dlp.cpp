@@ -88,6 +88,10 @@ std::unique_ptr<user_ctx> ibe_dlp::create_ctx(size_t set,
     return std::unique_ptr<user_ctx>(ctx);
 }
 
+void ibe_dlp::set_logging(log_level_e logging)
+{
+}
+
 bool ibe_dlp::keygen(std::unique_ptr<user_ctx>& ctx)
 {
     ctx_ibe_dlp& myctx = dynamic_cast<ctx_ibe_dlp&>(*ctx.get());

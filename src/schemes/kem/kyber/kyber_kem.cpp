@@ -54,6 +54,10 @@ std::unique_ptr<user_ctx> kyber_kem::create_ctx(size_t set,
     return std::unique_ptr<user_ctx>(ctx);
 }
 
+void kyber_kem::set_logging(log_level_e logging)
+{
+}
+
 bool kyber_kem::keygen(std::unique_ptr<user_ctx>& ctx)
 {
     LOG_DEBUG("Kyber KeyGen\n");

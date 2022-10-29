@@ -77,6 +77,10 @@ std::unique_ptr<user_ctx> dilithium_signature::create_ctx(size_t set,
     return std::unique_ptr<user_ctx>(ctx);
 }
 
+void dilithium_signature::set_logging(log_level_e logging)
+{
+}
+
 // Uniform sampling of an mx1 matrix with coefficients of -eta to +eta
 void dilithium_signature::uniform_rand_sample_small(dilithium *dil, const phantom_vector<uint8_t>& seed,
     uint32_t q, int32_t eta, size_t bits,

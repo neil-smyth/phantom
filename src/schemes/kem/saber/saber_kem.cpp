@@ -50,6 +50,10 @@ std::unique_ptr<user_ctx> saber_kem::create_ctx(size_t set,
     return std::unique_ptr<user_ctx>(ctx);
 }
 
+void saber_kem::set_logging(log_level_e logging)
+{
+}
+
 bool saber_kem::keygen(std::unique_ptr<user_ctx>& ctx)
 {
     LOG_DEBUG("Saber KeyGen\n");

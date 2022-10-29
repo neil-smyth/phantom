@@ -46,6 +46,9 @@ public:
                                          cpu_word_size_e size_hint,
                                          bool masking = true) const override;
 
+    /// @brief Set the logging level
+    /// @param logging The enumerated log level value
+    void set_logging(log_level_e logging) override;
 
     /// Key manipulation methods
     /// @{
