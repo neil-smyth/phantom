@@ -236,8 +236,8 @@ uint32_t dilithium::make_hint(int32_t *_RESTRICT_ h, const int32_t *_RESTRICT_ r
     uint32_t sum     = 0;
     int32_t  gamma_2 = m_params[m_set].gamma_2;
 
-    LOG_DEBUG_ARRAY("MAKE_HINT: r", r, k*n);
-    LOG_DEBUG_ARRAY("MAKE_HINT: r + z", z, k*n);
+    LOG_DEBUG_ARRAY("MAKE_HINT: r", g_pkc_log_level, r, k*n);
+    LOG_DEBUG_ARRAY("MAKE_HINT: r + z", g_pkc_log_level, z, k*n);
 
     for (size_t i=0; i < k*n; i++) {
         h[i] = r[i] > gamma_2 || r[i] < -gamma_2 || (r[i] == -gamma_2 && 0 != z[i]);

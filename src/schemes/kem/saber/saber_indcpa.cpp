@@ -73,7 +73,7 @@ void saber_indcpa::init()
     m_prng = std::shared_ptr<csprng>(csprng::make(0x10000000, random_seed::seed_cb));
     m_xof  = std::unique_ptr<crypto::xof_sha3>(new crypto::xof_sha3());
 
-    LOG_DEBUG("Kyber KEM Scheme");
+    LOG_DEBUG("Kyber KEM Scheme", g_pkc_log_level);
 }
 
 saber_indcpa::~saber_indcpa()
@@ -330,7 +330,7 @@ void saber_indcpa::matrix_mul(uint16_t *out, size_t l, const uint16_t *in1, cons
 
 void saber_indcpa::keygen(phantom_vector<uint8_t>& pk, phantom_vector<uint8_t>& sk)
 {
-    LOG_DEBUG("Saber CPA Key Generation\n");
+    LOG_DEBUG("Saber CPA Key Generation\n", g_pkc_log_level);
 
     // NOTE: the psuedorandom number r is provided as an input
     // and the public key is already decompressed
@@ -356,7 +356,7 @@ void saber_indcpa::keygen(phantom_vector<uint8_t>& pk, phantom_vector<uint8_t>& 
     m_xof->absorb(seed_A, SABRE_MSG_LEN);
     m_xof->final();
     m_xof->squeeze(seed_A, SABRE_MSG_LEN);
-    LOG_DEBUG_ARRAY("seed_A", seed_A, SABRE_MSG_LEN);
+    LOG_DEBUG_ARRAY("seed_A", g_pkc_log_level, seed_A, SABRE_MSG_LEN);
     gen_matrix_shake128(A, seed_A, l, eq*(SABER_N/8));
 
     // Generate the 256-bit random seed for the secret and the secret matrix s
@@ -386,7 +386,7 @@ void saber_indcpa::keygen(phantom_vector<uint8_t>& pk, phantom_vector<uint8_t>& 
 void saber_indcpa::enc(const phantom_vector<uint8_t>& pk, const phantom_vector<uint8_t>& pt,
     const uint8_t* _RESTRICT_ seed_s, phantom_vector<uint8_t>& ct)
 {
-    LOG_DEBUG("Saber CPA Encryption\n");
+    LOG_DEBUG("Saber CPA Encryption\n", g_pkc_log_level);
 
     size_t   l        = m_params[m_set].l;
     size_t   eq       = m_params[m_set].eq;
@@ -466,7 +466,7 @@ void saber_indcpa::enc(const phantom_vector<uint8_t>& pk, const phantom_vector<u
 void saber_indcpa::dec(const phantom_vector<uint8_t>& sk, const phantom_vector<uint8_t>& ct,
     uint8_t* pt)
 {
-    LOG_DEBUG("Saber CPA Decryption\n");
+    LOG_DEBUG("Saber CPA Decryption\n", g_pkc_log_level);
 
     size_t   l        = m_params[m_set].l;
     size_t   eq       = m_params[m_set].eq;

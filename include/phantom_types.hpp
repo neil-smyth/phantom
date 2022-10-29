@@ -107,6 +107,9 @@ enum log_level_e {
     LOG_LEVEL_ERROR,
 };
 
+
+extern log_level_e g_pkc_log_level;  ///< A global logging level associated with PKC
+
 /// An enumerated type for security strengths
 enum security_strength_e {
     SECURITY_STRENGTH_60 = 0,

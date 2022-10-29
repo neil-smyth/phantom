@@ -287,6 +287,15 @@ configure_file(
 )
 
 
+# -------------------------------- libuuid ---------------------------------- #
+
+include(cmake/libuuid.cmake)
+if (LIBUUID_LIBRARIES)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DENABLE_LIBUUID")
+    link_libraries("-luuid")
+endif (LIBUUID_LIBRARIES)
+
+
 # -------------------------- Set the include paths -------------------------- #
 
 include_directories(
@@ -304,7 +313,8 @@ set(libsrc
     ${PROJECT_SOURCE_DIR}/include/phantom.hpp /
     ${PROJECT_SOURCE_DIR}/src/phantom.cpp /
     ${PROJECT_SOURCE_DIR}/src/utils/third_party/cpp-base64/base64.cpp /
-    ${PROJECT_SOURCE_DIR}/src/utils/stopwatch.cpp
+    ${PROJECT_SOURCE_DIR}/src/utils/stopwatch.cpp /
+    ${PROJECT_SOURCE_DIR}/src/utils/uuid.cpp
 )
 
 set(libsrc ${libsrc} ${PROJECT_SOURCE_DIR}/bindings/c/build_info.cpp)

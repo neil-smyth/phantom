@@ -33,27 +33,29 @@ class ntt_binary : public ntt_base<T>
                   "number instantiated with unsupported type");
 
 private:
-    const reduction<R, T>& m_reduce;  ///< Reduction object (passed by reference)
-    const size_t           m_n;       ///< Length of the NTT
-    const T                m_invn;    ///< Modular inverse of the length
-    phantom_vector<T>      m_fwd;     ///< Table for the NTT
-    phantom_vector<T>      m_inv;     ///< Table for the INTT
+    const reduction<R, T>& m_reduce;   ///< Reduction object (passed by reference)
+    const size_t           m_n;        ///< Length of the NTT
+    const T                m_invn;     ///< Modular inverse of the length
+    phantom_vector<T>      m_fwd;      ///< Table for the NTT
+    phantom_vector<T>      m_inv;      ///< Table for the INTT
+    log_level_e            m_logging;  ///< Base logging level
 
 public:
     /// Constructor with user-defined generator and inverse generator
-    ntt_binary(const reduction<R, T>& reduce, T g, T invg, size_t n) :
+    ntt_binary(const reduction<R, T>& reduce, T g, T invg, size_t n, log_level_e logging = LOG_LEVEL_NONE) :
         m_reduce(reduce),
         m_n(n),
-        m_invn(m_reduce.inverse_2k(m_n))
+        m_invn(m_reduce.inverse_2k(m_n)),
+        m_logging(logging)
     {
-        LOG_DEBUG("Using provided primitive nth-root: g = " << g << ", invg = " << invg);
+        LOG_DEBUG("Using provided primitive nth-root: g = " << g << ", invg = " << invg, m_logging);
 
         // Generate the necessary NTT lookup tables
         init(g, invg, n);
     }
 
     /// Constructor with user-defined generator
-    ntt_binary(const reduction<R, T>& reduce, T g, size_t n) :
+    ntt_binary(const reduction<R, T>& reduce, T g, size_t n, log_level_e logging = LOG_LEVEL_NONE) :
         m_reduce(reduce),
         m_n(n),
         m_invn(m_reduce.inverse_2k(m_n))
@@ -61,14 +63,14 @@ public:
         T q      = m_reduce.get_q();
         T invg   = number<T>::umod_mul_inverse(g, q);
 
-        LOG_DEBUG("Using provided primitive nth-root: g = " << g << ", invg = " << invg);
+        LOG_DEBUG("Using provided primitive nth-root: g = " << g << ", invg = " << invg, m_logging);
 
         // Generate the necessary NTT lookup tables
         init(g, invg, n);
     }
 
     /// Constructor that must calculate generator and inverse generator
-    ntt_binary(const reduction<R, T>& reduce, size_t n) :
+    ntt_binary(const reduction<R, T>& reduce, size_t n, log_level_e logging = LOG_LEVEL_NONE) :
         m_reduce(reduce),
         m_n(n),
         m_invn(m_reduce.inverse_2k(m_n))
@@ -79,7 +81,7 @@ public:
         T g      = find_prim_root(q, m_n);
         T invg   = number<T>::umod_mul_inverse(g, q);
 
-        LOG_DEBUG("Deriving primitive nth-root: g = " << g << ", invg = " << invg);
+        LOG_DEBUG("Deriving primitive nth-root: g = " << g << ", invg = " << invg, m_logging);
 
         // Generate the necessary NTT lookup tables
         init(g, invg, n);

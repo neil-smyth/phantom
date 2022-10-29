@@ -83,7 +83,7 @@ void kyber_indcpa::init()
     m_xof    = std::unique_ptr<crypto::xof_sha3>(new crypto::xof_sha3());
     m_sha3   = std::unique_ptr<crypto::hash_sha3>(new crypto::hash_sha3());
 
-    LOG_DEBUG("Kyber KEM Scheme");
+    LOG_DEBUG("Kyber KEM Scheme", g_pkc_log_level);
 }
 
 kyber_indcpa::~kyber_indcpa()
@@ -319,14 +319,14 @@ void kyber_indcpa::keygen(uint8_t * _RESTRICT_ rho, int16_t * _RESTRICT_ s, int1
 
     // Generate a 256 bit random byte array to be used to seed a CSPRNG.
     m_prng->get_mem(rho, 32);
-    LOG_DEBUG_ARRAY("rho", rho, 32);
+    LOG_DEBUG_ARRAY("rho", g_pkc_log_level, rho, 32);
 
     // Generate the seed for matrix A from rho
     uint8_t noiseseed[64];
     m_sha3->init(32);
     m_sha3->update(rho, 32);
     m_sha3->final(noiseseed);
-    LOG_DEBUG_ARRAY("noiseseed", noiseseed, sizeof(noiseseed));
+    LOG_DEBUG_ARRAY("noiseseed", g_pkc_log_level, noiseseed, sizeof(noiseseed));
 
     // Generate matrix A deterministically using noiseseed
     gen_matrix(a, noiseseed, false);
@@ -336,13 +336,13 @@ void kyber_indcpa::keygen(uint8_t * _RESTRICT_ rho, int16_t * _RESTRICT_ s, int1
     uint8_t nonce = 0;
     binomial_getnoise(s, noiseseed, nonce+=k, eta1, n, k);
     binomial_getnoise(e, noiseseed, nonce+=k, eta1, n, k);
-    LOG_DEBUG_ARRAY("s", s, k * n);
-    LOG_DEBUG_ARRAY("e", e, k * n);
+    LOG_DEBUG_ARRAY("s", g_pkc_log_level, s, k * n);
+    LOG_DEBUG_ARRAY("e", g_pkc_log_level, e, k * n);
 
     // Convert sand e tothe NTT domain
     kyber_ntt::fwd_ntt(s, k, n, q, mont_inv);
     kyber_ntt::fwd_ntt(e, k, n, q, mont_inv);
-    LOG_DEBUG_ARRAY("NTT(s)", s, k * n);
+    LOG_DEBUG_ARRAY("NTT(s)", g_pkc_log_level, s, k * n);
 
     // Calculate t = As + e (NTT domain)
     kyber_ntt::mul_acc_mont(t, k, k, a, s, n, q, mont_inv);
@@ -351,13 +351,13 @@ void kyber_indcpa::keygen(uint8_t * _RESTRICT_ rho, int16_t * _RESTRICT_ s, int1
 
     // Map t to the range -q/2 to q/2
     kyber_reduce::poly_barrett(t, n, k, q);
-    LOG_DEBUG_ARRAY("t = As + e", t, k * n);
+    LOG_DEBUG_ARRAY("t = As + e", g_pkc_log_level, t, k * n);
 }
 
 void kyber_indcpa::enc(int16_t * _RESTRICT_ u, int16_t * _RESTRICT_ v, const int16_t * _RESTRICT_ t_ntt,
     const uint8_t * _RESTRICT_ pk_rho, const uint8_t *coins, size_t k, const uint8_t * _RESTRICT_ m)
 {
-    LOG_DEBUG("Kyber CPA Encryption\n");
+    LOG_DEBUG("Kyber CPA Encryption\n", g_pkc_log_level);
 
     // NOTE: the psuedorandom number r is provided as an input
     // and the public key is already decompressed
@@ -379,9 +379,9 @@ void kyber_indcpa::enc(int16_t * _RESTRICT_ u, int16_t * _RESTRICT_ v, const int
     int16_t *e1    = r_eta + k * n;
     int16_t *e2    = e1 + k * n;
 
-    LOG_DEBUG_ARRAY("m", m, 32);
-    LOG_DEBUG_ARRAY("rho", pk_rho, 32);
-    LOG_DEBUG_ARRAY("r", r_eta, 32);
+    LOG_DEBUG_ARRAY("m", g_pkc_log_level, m, 32);
+    LOG_DEBUG_ARRAY("rho", g_pkc_log_level, pk_rho, 32);
+    LOG_DEBUG_ARRAY("r", g_pkc_log_level, r_eta, 32);
 
     phantom_vector<uint8_t> noiseseed_vec(64);
     uint8_t *noiseseed = noiseseed_vec.data();
@@ -390,11 +390,11 @@ void kyber_indcpa::enc(int16_t * _RESTRICT_ u, int16_t * _RESTRICT_ v, const int
     binomial_getnoise(r_eta, coins, nonce+=k, eta1, n, k);
     binomial_getnoise(e1, coins, nonce+=k, eta2, n, k);
     binomial_getnoise(e2, coins, nonce++, eta2, n, 1);
-    LOG_DEBUG_ARRAY("r_eta = Sam(r)", r_eta, k*n);
-    LOG_DEBUG_ARRAY("e1 = Sam(r)", e1, k * n);
-    LOG_DEBUG_ARRAY("e2 = Sam(r)", e2, n);
+    LOG_DEBUG_ARRAY("r_eta = Sam(r)", g_pkc_log_level, r_eta, k*n);
+    LOG_DEBUG_ARRAY("e1 = Sam(r)", g_pkc_log_level, e1, k * n);
+    LOG_DEBUG_ARRAY("e2 = Sam(r)", g_pkc_log_level, e2, n);
 
-    LOG_DEBUG_ARRAY("t = As + e", t_ntt, k * n);
+    LOG_DEBUG_ARRAY("t = As + e", g_pkc_log_level, t_ntt, k * n);
 
     crypto::hash_sha3 sha3;
     sha3.init(32);
@@ -410,10 +410,10 @@ void kyber_indcpa::enc(int16_t * _RESTRICT_ u, int16_t * _RESTRICT_ v, const int
     kyber_ntt::mul_acc_mont(v, k, 1, t_ntt, r_eta, n, q, mont_inv);
     kyber_ntt::invntt_tomont(u, k, n, q, mont_inv);
     kyber_ntt::invntt_tomont(v, 1, n, q, mont_inv);
-    LOG_DEBUG_ARRAY("tT.r", v, n);
+    LOG_DEBUG_ARRAY("tT.r", g_pkc_log_level, v, n);
 
     core::poly<int16_t>::add(u, k*n, u, e1);
-    LOG_DEBUG_ARRAY("NTT(r_eta)", r_eta, k * n);
+    LOG_DEBUG_ARRAY("NTT(r_eta)", g_pkc_log_level, r_eta, k * n);
 
     // Map the message to q/2 and add to v with e2
     map_msg_to_poly(mm, m, q, n);
@@ -423,14 +423,14 @@ void kyber_indcpa::enc(int16_t * _RESTRICT_ u, int16_t * _RESTRICT_ v, const int
     // Map u and v to the range -q/2 to q/2
     kyber_reduce::poly_barrett(u, n, k, q);
     kyber_reduce::poly_barrett(v, n, 1, q);
-    LOG_DEBUG_ARRAY("u = AT.r + e1", u, k * n);
-    LOG_DEBUG_ARRAY("v = t^Tr + [q/2].m + e2", v, n);
+    LOG_DEBUG_ARRAY("u = AT.r + e1", g_pkc_log_level, u, k * n);
+    LOG_DEBUG_ARRAY("v = t^Tr + [q/2].m + e2", g_pkc_log_level, v, n);
 
     // Compress the two encryption variables
     compress(u, n, k, d_u, q, q_inv, q_norm);
     compress(v, n, 1, d_v, q, q_inv, q_norm);
-    LOG_DEBUG_ARRAY("Compress(u)", u, k*n);
-    LOG_DEBUG_ARRAY("Compress(v)", v, n);
+    LOG_DEBUG_ARRAY("Compress(u)", g_pkc_log_level, u, k*n);
+    LOG_DEBUG_ARRAY("Compress(v)", g_pkc_log_level, v, n);
 
     // Free the temporary memory resources (and erase the contents)
     aligned_free(temp);
@@ -449,26 +449,26 @@ void kyber_indcpa::dec(int16_t* _RESTRICT_ u, int16_t* _RESTRICT_ v,
 
     int16_t *temp  = reinterpret_cast<int16_t*>(aligned_malloc(n * sizeof(int16_t)));
 
-    LOG_DEBUG("Kyber CPA Decryption\n");
-    LOG_DEBUG_ARRAY("NTT(s)", reinterpret_cast<const int16_t*>(s), k*n);
+    LOG_DEBUG("Kyber CPA Decryption\n", g_pkc_log_level);
+    LOG_DEBUG_ARRAY("NTT(s)", g_pkc_log_level, reinterpret_cast<const int16_t*>(s), k*n);
 
     // Expand the transmitted u and v coefficients
     decompress(u, n, k, d_u, q);
     decompress(v, n, 1, d_v, q);
-    LOG_DEBUG_ARRAY("Decompress(u)", u, k*n);
-    LOG_DEBUG_ARRAY("Decompress(v)", v, n);
+    LOG_DEBUG_ARRAY("Decompress(u)", g_pkc_log_level, u, k*n);
+    LOG_DEBUG_ARRAY("Decompress(v)", g_pkc_log_level, v, n);
 
     kyber_ntt::fwd_ntt(u, k, n, q, mont_inv);
     kyber_ntt::mul_acc_mont(temp, k, 1, s, u, n, q, mont_inv);
     kyber_ntt::invntt_tomont(temp, 1, n, q, mont_inv);
-    LOG_DEBUG_ARRAY("s*u", temp, n);
+    LOG_DEBUG_ARRAY("s*u", g_pkc_log_level, temp, n);
 
     core::poly<int16_t>::sub(v, n, v, temp);
     kyber_reduce::poly_barrett(v, n, 1, q);
-    LOG_DEBUG_ARRAY("v", v, n);
+    LOG_DEBUG_ARRAY("v", g_pkc_log_level, v, n);
 
     map_poly_to_msg(m, v, q, q_inv, q_norm, n);
-    LOG_DEBUG_ARRAY("m decrypt", m, 32);
+    LOG_DEBUG_ARRAY("m decrypt", g_pkc_log_level, m, 32);
 
     // Free the temporary memory resources (and erase the contents)
     aligned_free(temp);

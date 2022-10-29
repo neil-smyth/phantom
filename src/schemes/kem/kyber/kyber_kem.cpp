@@ -36,31 +36,31 @@ std::unique_ptr<user_ctx> kyber_kem::create_ctx(security_strength_e bits,
                                                 cpu_word_size_e size_hint,
                                                 bool masking) const
 {
-    ctx_kyber* ctx = new ctx_kyber(kyber_indcpa::bits_2_set(bits));
-    if (ctx->get_set() > 2) {
-        throw std::invalid_argument("Parameter set is out of range");
-    }
-    return std::unique_ptr<user_ctx>(ctx);
+    return create_ctx(kyber_indcpa::bits_2_set(bits), size_hint, masking);
 }
 
 std::unique_ptr<user_ctx> kyber_kem::create_ctx(size_t set,
                                                 cpu_word_size_e size_hint,
                                                 bool masking) const
 {
+    std::stringstream ss;
     ctx_kyber* ctx = new ctx_kyber(set);
     if (ctx->get_set() > 2) {
-        throw std::invalid_argument("Parameter set is out of range");
+        ss << "Parameter set " << ctx->get_set() << " is out of range";
+        LOG_ERROR(ss.str(), g_pkc_log_level);
+        throw std::invalid_argument(ss.str());
     }
-    return std::unique_ptr<user_ctx>(ctx);
-}
 
-void kyber_kem::set_logging(log_level_e logging)
-{
+    ss << "Kyber KEM context created [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+    return std::unique_ptr<user_ctx>(ctx);
 }
 
 bool kyber_kem::keygen(std::unique_ptr<user_ctx>& ctx)
 {
-    LOG_DEBUG("Kyber KeyGen\n");
+    std::stringstream ss;
+    ss << "Kyber KEM KeyGen [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
 
     ctx_kyber& myctx = dynamic_cast<ctx_kyber&>(*ctx.get());
 
@@ -73,13 +73,17 @@ bool kyber_kem::keygen(std::unique_ptr<user_ctx>& ctx)
     myctx.get_pke()->keygen(myctx.rho(), myctx.s().data(), myctx.t_ntt().data());
 
     myctx.get_pke()->get_prng()->get_mem(myctx.z(), 32);
-    LOG_DEBUG_ARRAY("z", myctx.z(), 32);
+    LOG_DEBUG_ARRAY("z", g_pkc_log_level, myctx.z(), 32);
 
     return true;
 }
 
 bool kyber_kem::set_public_key(std::unique_ptr<user_ctx>& ctx, const phantom_vector<uint8_t>& k)
 {
+    std::stringstream ss;
+    ss << "Kyber KEM set public key [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_kyber& myctx = dynamic_cast<ctx_kyber&>(*ctx.get());
 
     size_t   n       = kyber_indcpa::m_params[myctx.get_set()].n;
@@ -102,6 +106,10 @@ bool kyber_kem::set_public_key(std::unique_ptr<user_ctx>& ctx, const phantom_vec
 
 bool kyber_kem::get_public_key(std::unique_ptr<user_ctx>& ctx, phantom_vector<uint8_t>& k)
 {
+    std::stringstream ss;
+    ss << "Kyber KEM get public key [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_kyber& myctx = dynamic_cast<ctx_kyber&>(*ctx.get());
 
     size_t   n       = kyber_indcpa::m_params[myctx.get_set()].n;
@@ -126,6 +134,10 @@ bool kyber_kem::get_public_key(std::unique_ptr<user_ctx>& ctx, phantom_vector<ui
 
 bool kyber_kem::set_private_key(std::unique_ptr<user_ctx>& ctx, const phantom_vector<uint8_t>& k)
 {
+    std::stringstream ss;
+    ss << "Kyber KEM set set_private_key key [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_kyber& myctx = dynamic_cast<ctx_kyber&>(*ctx.get());
 
     size_t   n         = kyber_indcpa::m_params[myctx.get_set()].n;
@@ -143,6 +155,10 @@ bool kyber_kem::set_private_key(std::unique_ptr<user_ctx>& ctx, const phantom_ve
 
 bool kyber_kem::get_private_key(std::unique_ptr<user_ctx>& ctx, phantom_vector<uint8_t>& k)
 {
+    std::stringstream ss;
+    ss << "Kyber KEM get set_private_key key [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_kyber& myctx = dynamic_cast<ctx_kyber&>(*ctx.get());
 
     size_t   n         = kyber_indcpa::m_params[myctx.get_set()].n;
@@ -254,7 +270,9 @@ void kyber_kem::g_function(crypto::xof_sha3* xof, const uint8_t *rho, const int1
 bool kyber_kem::encapsulate(std::unique_ptr<user_ctx>& ctx, const phantom_vector<uint8_t>& pk,
     phantom_vector<uint8_t>& c, phantom_vector<uint8_t>& key)
 {
-    LOG_DEBUG("Kyber Encapsulation\n");
+    std::stringstream ss;
+    ss << "Kyber KEM Encapsulation [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
 
     ctx_kyber& myctx = dynamic_cast<ctx_kyber&>(*ctx.get());
 
@@ -274,29 +292,29 @@ bool kyber_kem::encapsulate(std::unique_ptr<user_ctx>& ctx, const phantom_vector
     uint8_t* m = d + 32;
     uint8_t* K = key.data();
     myctx.get_pke()->get_prng()->get_mem(m, 32);
-    LOG_DEBUG_ARRAY("z", m, 32);
+    LOG_DEBUG_ARRAY("z", g_pkc_log_level, m, 32);
 
-    LOG_DEBUG_ARRAY("rho", myctx.rho(), 32);
-    LOG_DEBUG_ARRAY("encapsulate NTT(t)", myctx.t_ntt().data(), k*n);
-    LOG_DEBUG_ARRAY("KEM encapsulate m", m, 32);
+    LOG_DEBUG_ARRAY("rho", g_pkc_log_level, myctx.rho(), 32);
+    LOG_DEBUG_ARRAY("encapsulate NTT(t)", g_pkc_log_level, myctx.t_ntt().data(), k*n);
+    LOG_DEBUG_ARRAY("KEM encapsulate m", g_pkc_log_level, m, 32);
 
     // Hash the public key with m to create (Khat,r,d)
     g_function(myctx.get_pke()->get_xof(), myctx.rho(), myctx.t_ntt().data(), m, n, k, Khat, r, d);
-    LOG_DEBUG_ARRAY("Khat", Khat, 32);
-    LOG_DEBUG_ARRAY("r", r, 32);
-    LOG_DEBUG_ARRAY("d", d, 32);
+    LOG_DEBUG_ARRAY("Khat", g_pkc_log_level, Khat, 32);
+    LOG_DEBUG_ARRAY("r", g_pkc_log_level, r, 32);
+    LOG_DEBUG_ARRAY("d", g_pkc_log_level, d, 32);
 
     // Kyber CPA Encryption of the public key
     int16_t *u = reinterpret_cast<int16_t*>(aligned_malloc((k + 1) * n * sizeof(int16_t)));
     int16_t *v = u + k * n;
     myctx.get_pke()->enc(u, v, myctx.t_ntt().data(), myctx.rho(), r, k, m);
-    LOG_DEBUG_ARRAY("u", u, k*n);
-    LOG_DEBUG_ARRAY("v", v, n);
-    LOG_DEBUG_ARRAY("d", d, 32);
+    LOG_DEBUG_ARRAY("u", g_pkc_log_level, u, k*n);
+    LOG_DEBUG_ARRAY("v", g_pkc_log_level, v, n);
+    LOG_DEBUG_ARRAY("d", g_pkc_log_level, d, 32);
 
     // K = H(Khat, c), where c = (u, v, d)
     h_function(myctx.get_pke()->get_xof(), Khat, u, v, d, n, k, K);
-    LOG_DEBUG_ARRAY("K", K, 32);
+    LOG_DEBUG_ARRAY("K", g_pkc_log_level, K, 32);
 
     // Ciphertext
     packing::packer pack_c(k * n * du_bits + n * dv_bits + 32*8);
@@ -323,7 +341,9 @@ bool kyber_kem::decapsulate(std::unique_ptr<user_ctx>& ctx,
                             const phantom_vector<uint8_t>& c,
                             phantom_vector<uint8_t>& key)
 {
-    LOG_DEBUG("Kyber Decapsulation\n");
+    std::stringstream ss;
+    ss << "Kyber KEM Decapsulation [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
 
     ctx_kyber& myctx = dynamic_cast<ctx_kyber&>(*ctx.get());
 
@@ -359,45 +379,45 @@ bool kyber_kem::decapsulate(std::unique_ptr<user_ctx>& ctx,
         d[i] = p8[i] = unpack.read_unsigned(n_bits, packing::RAW);
     }
 
-    LOG_DEBUG_ARRAY("u", u, k*n);
-    LOG_DEBUG_ARRAY("v", v, n);
-    LOG_DEBUG_ARRAY("d", d, 32);
+    LOG_DEBUG_ARRAY("u", g_pkc_log_level, u, k*n);
+    LOG_DEBUG_ARRAY("v", g_pkc_log_level, v, n);
+    LOG_DEBUG_ARRAY("d", g_pkc_log_level, d, 32);
 
     // Generate the 256-bit random value to be encapsulated
     int16_t *s = myctx.s().data();
-    LOG_DEBUG_ARRAY("decapsulate s", s, 32);
+    LOG_DEBUG_ARRAY("decapsulate s", g_pkc_log_level, s, 32);
     myctx.get_pke()->dec(u, v, s, k, m);
 
-    LOG_DEBUG_ARRAY("rho", myctx.rho(), 32);
-    LOG_DEBUG_ARRAY("decapsulate NTT(t)", myctx.t_ntt().data(), k*n);
-    LOG_DEBUG_ARRAY("KEM decapsulate m", m, 32);
+    LOG_DEBUG_ARRAY("rho", g_pkc_log_level, myctx.rho(), 32);
+    LOG_DEBUG_ARRAY("decapsulate NTT(t)", g_pkc_log_level, myctx.t_ntt().data(), k*n);
+    LOG_DEBUG_ARRAY("KEM decapsulate m", g_pkc_log_level, m, 32);
 
     // Hash the public key and m and create a (K,r,d)
     g_function(myctx.get_pke()->get_xof(), myctx.rho(), myctx.t_ntt().data(), m, n, k, Khat, r, d);
-    LOG_DEBUG_ARRAY("Khat", Khat, 32);
-    LOG_DEBUG_ARRAY("r", r, 32);
-    LOG_DEBUG_ARRAY("d", d, 32);
+    LOG_DEBUG_ARRAY("Khat", g_pkc_log_level, Khat, 32);
+    LOG_DEBUG_ARRAY("r", g_pkc_log_level, r, 32);
+    LOG_DEBUG_ARRAY("d", g_pkc_log_level, d, 32);
 
     // Kyber CPA Encryption of the public key
     myctx.get_pke()->enc(u, v, myctx.t_ntt().data(), myctx.rho(), r, k, m);
-    LOG_DEBUG_ARRAY("u", u, k*n);
-    LOG_DEBUG_ARRAY("v", v, n);
+    LOG_DEBUG_ARRAY("u", g_pkc_log_level, u, k*n);
+    LOG_DEBUG_ARRAY("v", g_pkc_log_level, v, n);
 
-    LOG_DEBUG_ARRAY("Original u", p16, k*n);
-    LOG_DEBUG_ARRAY("Original v", p16 + k*n, n);
-    LOG_DEBUG_ARRAY("Original d", p8, 32);
+    LOG_DEBUG_ARRAY("Original u", g_pkc_log_level, p16, k*n);
+    LOG_DEBUG_ARRAY("Original v", g_pkc_log_level, p16 + k*n, n);
+    LOG_DEBUG_ARRAY("Original d", g_pkc_log_level, p8, 32);
 
     uint16_t cond = static_cast<uint16_t>(const_time<int16_t>::cmp_array_not_equal(u, p16, (k + 1) * n));
     cond |= static_cast<uint16_t>(const_time<uint8_t>::cmp_array_not_equal(d, p8, 32));
     if (cond) {
-        LOG_DEBUG("Signature mismatch");
+        LOG_DEBUG("Signature mismatch", g_pkc_log_level);
         h_function(myctx.get_pke()->get_xof(), myctx.z(), u, v, d, n, k, K);
         return false;
     }
     else {
         // K = H(K_bar, c), where c = (u, v, d)
         h_function(myctx.get_pke()->get_xof(), Khat, u, v, d, n, k, K);
-        LOG_DEBUG_ARRAY("K", K, 32);
+        LOG_DEBUG_ARRAY("K", g_pkc_log_level, K, 32);
     }
 
     // The key is directly output as the variable K

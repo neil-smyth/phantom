@@ -34,31 +34,32 @@ std::unique_ptr<user_ctx> saber_pke::create_ctx(security_strength_e bits,
                                                 cpu_word_size_e size_hint,
                                                 bool masking) const
 {
-    ctx_saber_pke* ctx = new ctx_saber_pke(saber_indcpa::bits_2_set(bits));
-    if (ctx->get_set() > 2) {
-        throw std::invalid_argument("Parameter set is out of range");
-    }
-    return std::unique_ptr<user_ctx>(ctx);
+    return create_ctx(saber_indcpa::bits_2_set(bits), size_hint, masking);
 }
 
 std::unique_ptr<user_ctx> saber_pke::create_ctx(size_t set,
                                                 cpu_word_size_e size_hint,
                                                 bool masking) const
 {
+    std::stringstream ss;
+
     ctx_saber_pke* ctx = new ctx_saber_pke(set);
     if (ctx->get_set() > 2) {
-        throw std::invalid_argument("Parameter set is out of range");
+        ss << "Parameter set " << ctx->get_set() << " is out of range";
+        LOG_ERROR(ss.str(), g_pkc_log_level);
+        throw std::invalid_argument(ss.str());
     }
-    return std::unique_ptr<user_ctx>(ctx);
-}
 
-void saber_pke::set_logging(log_level_e logging)
-{
+    ss << "SABER PKE context created [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+    return std::unique_ptr<user_ctx>(ctx);
 }
 
 bool saber_pke::keygen(std::unique_ptr<user_ctx>& ctx)
 {
-    LOG_DEBUG("Saber KeyGen\n");
+    std::stringstream ss;
+    ss << "SABER PKE KeyGen [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
 
     ctx_saber_pke& myctx = dynamic_cast<ctx_saber_pke&>(*ctx.get());
 
@@ -75,6 +76,10 @@ bool saber_pke::keygen(std::unique_ptr<user_ctx>& ctx)
 
 bool saber_pke::set_public_key(std::unique_ptr<user_ctx>& ctx, const phantom_vector<uint8_t>& k)
 {
+    std::stringstream ss;
+    ss << "SABER PKE set public key [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_saber_pke& myctx = dynamic_cast<ctx_saber_pke&>(*ctx.get());
 
     size_t l   = saber_indcpa::m_params[myctx.get_set()].l;
@@ -92,6 +97,10 @@ bool saber_pke::set_public_key(std::unique_ptr<user_ctx>& ctx, const phantom_vec
 
 bool saber_pke::get_public_key(std::unique_ptr<user_ctx>& ctx, phantom_vector<uint8_t>& k)
 {
+    std::stringstream ss;
+    ss << "SABER PKE get public key [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_saber_pke& myctx = dynamic_cast<ctx_saber_pke&>(*ctx.get());
 
     size_t l   = saber_indcpa::m_params[myctx.get_set()].l;
@@ -111,6 +120,10 @@ bool saber_pke::get_public_key(std::unique_ptr<user_ctx>& ctx, phantom_vector<ui
 
 bool saber_pke::set_private_key(std::unique_ptr<user_ctx>& ctx, const phantom_vector<uint8_t>& k)
 {
+    std::stringstream ss;
+    ss << "SABER PKE set private key [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_saber_pke& myctx = dynamic_cast<ctx_saber_pke&>(*ctx.get());
 
     size_t l   = saber_indcpa::m_params[myctx.get_set()].l;
@@ -128,6 +141,10 @@ bool saber_pke::set_private_key(std::unique_ptr<user_ctx>& ctx, const phantom_ve
 
 bool saber_pke::get_private_key(std::unique_ptr<user_ctx>& ctx, phantom_vector<uint8_t>& k)
 {
+    std::stringstream ss;
+    ss << "SABER PKE get private key [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_saber_pke& myctx = dynamic_cast<ctx_saber_pke&>(*ctx.get());
 
     size_t l   = saber_indcpa::m_params[myctx.get_set()].l;
@@ -148,9 +165,11 @@ bool saber_pke::get_private_key(std::unique_ptr<user_ctx>& ctx, phantom_vector<u
 bool saber_pke::encrypt(const std::unique_ptr<user_ctx>& ctx, const phantom_vector<uint8_t> pt,
             phantom_vector<uint8_t>& ct)
 {
-    ctx_saber_pke& myctx = dynamic_cast<ctx_saber_pke&>(*ctx.get());
+    std::stringstream ss;
+    ss << "SABER PKE Encrypt [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
 
-    LOG_DEBUG("Saber PKE Encrypt\n");
+    ctx_saber_pke& myctx = dynamic_cast<ctx_saber_pke&>(*ctx.get());
 
     phantom_vector<uint8_t> seed(32);
     myctx.pke()->get_prng()->get_mem(seed.data(), 32);
@@ -177,9 +196,11 @@ bool saber_pke::encrypt(const std::unique_ptr<user_ctx>& ctx, const phantom_vect
 bool saber_pke::decrypt(const std::unique_ptr<user_ctx>& ctx, const phantom_vector<uint8_t> ct,
             phantom_vector<uint8_t>& pt)
 {
-    ctx_saber_pke& myctx = dynamic_cast<ctx_saber_pke&>(*ctx.get());
+    std::stringstream ss;
+    ss << "SABER PKE Decrypt [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
 
-    LOG_DEBUG("Saber PKE Decrypt\n");
+    ctx_saber_pke& myctx = dynamic_cast<ctx_saber_pke&>(*ctx.get());
 
     // saber CPA Encryption of the public key
     phantom_vector<uint8_t> pt_vec(SABRE_MSG_LEN);

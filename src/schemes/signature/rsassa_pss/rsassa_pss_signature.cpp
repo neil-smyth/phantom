@@ -74,14 +74,15 @@ std::unique_ptr<user_ctx> rsassa_pss_signature::create_ctx(security_strength_e b
                                                            cpu_word_size_e size_hint,
                                                            bool masking) const
 {
-    size_t set = bits_2_set(bits);
-    return create_ctx(set, size_hint, masking);
+    return create_ctx(rsassa_pss_signature::bits_2_set(bits), size_hint, masking);
 }
 
 std::unique_ptr<user_ctx> rsassa_pss_signature::create_ctx(size_t set,
                                                            cpu_word_size_e size_hint,
                                                            bool masking) const
 {
+    std::stringstream ss;
+
     // Obtain the hash from the parameter set
     hash_alg_e hash = static_cast<hash_alg_e>((set >> 8) & 0x1f);
 
@@ -102,22 +103,30 @@ std::unique_ptr<user_ctx> rsassa_pss_signature::create_ctx(size_t set,
                                                            set, &m_params[0], 16, masking);
             break;
 #endif
-        default: throw std::invalid_argument("size_hint set is out of range");
+        default: {
+            ss << "size_hint " << set << " is out of range";
+            LOG_ERROR(ss.str(), g_pkc_log_level);
+            throw std::invalid_argument(ss.str());
+        }
     }
 
     if ((ctx->get_set() & 0xff) > 5) {
-        throw std::invalid_argument("Parameter set is out of range");
+        delete ctx;
+        ss << "Parameter set " << ctx->get_set() << " is out of range";
+        LOG_ERROR(ss.str(), g_pkc_log_level);
+        throw std::invalid_argument(ss.str());
     }
-    return std::unique_ptr<user_ctx>(ctx);
-}
 
-void rsassa_pss_signature::set_logging(log_level_e logging)
-{
+    ss << "RSASSA PSS Signature context created [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+    return std::unique_ptr<user_ctx>(ctx);
 }
 
 bool rsassa_pss_signature::keygen(std::unique_ptr<user_ctx>& ctx)
 {
-    LOG_DEBUG("RSA KeyGen\n");
+    std::stringstream ss;
+    ss << "RSASSA PSS Signature KeyGen [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
 
     phantom::rsa::ctx_rsa& myctx = dynamic_cast<phantom::rsa::ctx_rsa&>(*ctx.get());
 
@@ -147,6 +156,10 @@ bool rsassa_pss_signature::keygen(std::unique_ptr<user_ctx>& ctx)
 
 bool rsassa_pss_signature::set_public_key(std::unique_ptr<user_ctx>& ctx, const phantom_vector<uint8_t>& k)
 {
+    std::stringstream ss;
+    ss << "RSASSA PSS Signature set public key [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     phantom::rsa::ctx_rsa& myctx = dynamic_cast<phantom::rsa::ctx_rsa&>(*ctx.get());
 
     switch (myctx.get_wordsize())
@@ -175,6 +188,10 @@ bool rsassa_pss_signature::set_public_key(std::unique_ptr<user_ctx>& ctx, const 
 
 bool rsassa_pss_signature::get_public_key(std::unique_ptr<user_ctx>& ctx, phantom_vector<uint8_t>& k)
 {
+    std::stringstream ss;
+    ss << "RSASSA PSS Signature get public key [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     phantom::rsa::ctx_rsa& myctx = dynamic_cast<phantom::rsa::ctx_rsa&>(*ctx.get());
 
     switch (myctx.get_wordsize())
@@ -203,6 +220,10 @@ bool rsassa_pss_signature::get_public_key(std::unique_ptr<user_ctx>& ctx, phanto
 
 bool rsassa_pss_signature::set_private_key(std::unique_ptr<user_ctx>& ctx, const phantom_vector<uint8_t>& k)
 {
+    std::stringstream ss;
+    ss << "RSASSA PSS Signature set private key [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     phantom::rsa::ctx_rsa& myctx = dynamic_cast<phantom::rsa::ctx_rsa&>(*ctx.get());
 
     switch (myctx.get_wordsize())
@@ -231,6 +252,10 @@ bool rsassa_pss_signature::set_private_key(std::unique_ptr<user_ctx>& ctx, const
 
 bool rsassa_pss_signature::get_private_key(std::unique_ptr<user_ctx>& ctx, phantom_vector<uint8_t>& k)
 {
+    std::stringstream ss;
+    ss << "RSASSA PSS Signature get private key [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     phantom::rsa::ctx_rsa& myctx = dynamic_cast<phantom::rsa::ctx_rsa&>(*ctx.get());
 
     switch (myctx.get_wordsize())
@@ -260,7 +285,9 @@ bool rsassa_pss_signature::get_private_key(std::unique_ptr<user_ctx>& ctx, phant
 bool rsassa_pss_signature::sign(const std::unique_ptr<user_ctx>& ctx, const phantom_vector<uint8_t>& m,
             phantom_vector<uint8_t>& s)
 {
-    LOG_DEBUG("RSA RSASSA-PSS Sign\n");
+    std::stringstream ss;
+    ss << "RSASSA PSS Signature Sign [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
 
     phantom::rsa::ctx_rsa& myctx = dynamic_cast<phantom::rsa::ctx_rsa&>(*ctx.get());
 
@@ -291,7 +318,9 @@ bool rsassa_pss_signature::sign(const std::unique_ptr<user_ctx>& ctx, const phan
 bool rsassa_pss_signature::verify(const std::unique_ptr<user_ctx>& ctx, const phantom_vector<uint8_t>& m,
             const phantom_vector<uint8_t>& s)
 {
-    LOG_DEBUG("RSA RSASSA-PSS Verify\n");
+    std::stringstream ss;
+    ss << "RSASSA PSS Signature Verify [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
 
     phantom::rsa::ctx_rsa& myctx = dynamic_cast<phantom::rsa::ctx_rsa&>(*ctx.get());
 

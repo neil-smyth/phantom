@@ -60,29 +60,16 @@ std::unique_ptr<user_ctx> ecdsa_signature::create_ctx(security_strength_e bits,
                                                       cpu_word_size_e size_hint,
                                                       bool masking) const
 {
-    user_ctx* ctx;
-    switch (size_hint)
-    {
-        case CPU_WORD_SIZE_16: ctx = new ctx_ecdsa_tmpl<uint16_t>(bits_2_set(bits)); break;
-        case CPU_WORD_SIZE_32: ctx = new ctx_ecdsa_tmpl<uint32_t>(bits_2_set(bits)); break;
-#if defined(IS_64BIT)
-        case CPU_WORD_SIZE_64: ctx = new ctx_ecdsa_tmpl<uint64_t>(bits_2_set(bits)); break;
-#endif
-        default: throw std::invalid_argument("size_hint set is out of range");;
-    }
-
-    if (ctx->get_set() > 14) {
-        delete ctx;
-        throw std::invalid_argument("Parameter set is out of range");
-    }
-    return std::unique_ptr<user_ctx>(ctx);
+    return create_ctx(ecdsa_signature::bits_2_set(bits), size_hint, masking);
 }
 
 std::unique_ptr<user_ctx> ecdsa_signature::create_ctx(size_t set,
                                                       cpu_word_size_e size_hint,
                                                       bool masking) const
 {
+    std::stringstream ss;
     user_ctx* ctx;
+
     switch (size_hint)
     {
         case CPU_WORD_SIZE_16: ctx = new ctx_ecdsa_tmpl<uint16_t>(set); break;
@@ -90,22 +77,31 @@ std::unique_ptr<user_ctx> ecdsa_signature::create_ctx(size_t set,
 #if defined(IS_64BIT)
         case CPU_WORD_SIZE_64: ctx = new ctx_ecdsa_tmpl<uint64_t>(set); break;
 #endif
-        default: throw std::invalid_argument("size_hint set is out of range");;
+        default: {
+            ss << "size_hint " << set << " is out of range";
+            LOG_ERROR(ss.str(), g_pkc_log_level);
+            throw std::invalid_argument(ss.str());
+        }
     }
 
     if (ctx->get_set() > 14) {
         delete ctx;
-        throw std::invalid_argument("Parameter set is out of range");
+        ss << "Parameter set " << ctx->get_set() << " is out of range";
+        LOG_ERROR(ss.str(), g_pkc_log_level);
+        throw std::invalid_argument(ss.str());
     }
-    return std::unique_ptr<user_ctx>(ctx);
-}
 
-void ecdsa_signature::set_logging(log_level_e logging)
-{
+    ss << "ECDSA Signature context created [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+    return std::unique_ptr<user_ctx>(ctx);
 }
 
 bool ecdsa_signature::keygen(std::unique_ptr<user_ctx>& ctx)
 {
+    std::stringstream ss;
+    ss << "ECDSA Signature KeyGen [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_ecdsa& myctx = dynamic_cast<ctx_ecdsa&>(*ctx.get());
 
 restart:
@@ -145,6 +141,10 @@ restart:
 
 bool ecdsa_signature::set_public_key(std::unique_ptr<user_ctx>& ctx, const phantom_vector<uint8_t>& key)
 {
+    std::stringstream ss;
+    ss << "ECDSA Signature set public key [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_ecdsa& myctx = dynamic_cast<ctx_ecdsa&>(*ctx.get());
 
     switch (myctx.get_wordsize())
@@ -175,6 +175,10 @@ bool ecdsa_signature::set_public_key(std::unique_ptr<user_ctx>& ctx, const phant
 
 bool ecdsa_signature::get_public_key(std::unique_ptr<user_ctx>& ctx, phantom_vector<uint8_t>& key)
 {
+    std::stringstream ss;
+    ss << "ECDSA Signature get public key [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_ecdsa& myctx = dynamic_cast<ctx_ecdsa&>(*ctx.get());
 
     switch (myctx.get_wordsize())
@@ -205,6 +209,10 @@ bool ecdsa_signature::get_public_key(std::unique_ptr<user_ctx>& ctx, phantom_vec
 
 bool ecdsa_signature::set_private_key(std::unique_ptr<user_ctx>& ctx, const phantom_vector<uint8_t>& key)
 {
+    std::stringstream ss;
+    ss << "ECDSA Signature set private key [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_ecdsa& myctx = dynamic_cast<ctx_ecdsa&>(*ctx.get());
 
     uint8_t* sk = myctx.sk().data();
@@ -220,6 +228,10 @@ bool ecdsa_signature::set_private_key(std::unique_ptr<user_ctx>& ctx, const phan
 
 bool ecdsa_signature::get_private_key(std::unique_ptr<user_ctx>& ctx, phantom_vector<uint8_t>& key)
 {
+    std::stringstream ss;
+    ss << "ECDSA Signature get private key [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_ecdsa& myctx = dynamic_cast<ctx_ecdsa&>(*ctx.get());
 
     uint8_t* sk = myctx.sk().data();
@@ -249,6 +261,10 @@ bool ecdsa_signature::sign(const std::unique_ptr<user_ctx>& ctx,
                            const phantom_vector<uint8_t>& m,
                            phantom_vector<uint8_t>& s)
 {
+    std::stringstream ss;
+    ss << "ECDSA Signature Sign [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_ecdsa& myctx = dynamic_cast<ctx_ecdsa&>(*ctx.get());
 
     switch (myctx.get_wordsize())
@@ -289,6 +305,10 @@ bool ecdsa_signature::verify(const std::unique_ptr<user_ctx>& ctx,
                              const phantom_vector<uint8_t>& m,
                              const phantom_vector<uint8_t>& s)
 {
+    std::stringstream ss;
+    ss << "ECDSA Signature Verify [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_ecdsa& myctx = dynamic_cast<ctx_ecdsa&>(*ctx.get());
 
     switch (myctx.get_wordsize())

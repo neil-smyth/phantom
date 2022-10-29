@@ -51,10 +51,14 @@ class user_ctx : public aligned_base<DEFAULT_MEM_ALIGNMENT>
 public:
     virtual ~user_ctx() {}
 
+    virtual const std::string& get_uuid();
     virtual pkc_e get_scheme() = 0;
     virtual size_t get_set() = 0;
     virtual const std::string& get_set_name() = 0;
     virtual const phantom_vector<std::string>& get_set_names() = 0;
+
+private:
+    std::string m_uuid;
 };
 
 // Forward declaration of the scheme interface class

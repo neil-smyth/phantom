@@ -45,9 +45,6 @@ public:
                                          cpu_word_size_e size_hint,
                                          bool masking = true) const override;
 
-    /// @brief Set the logging level
-    /// @param logging The enumerated log level value
-    void set_logging(log_level_e logging) override;
 
     /// Key manipulation methods
     /// @{
@@ -80,11 +77,11 @@ public:
     size_t get_msg_len(const std::unique_ptr<user_ctx>& ctx) const override;
 
 private:
-    // The Kyber H oracle
+    /// The Kyber H oracle
     static void h_function(crypto::xof_sha3* xof, const uint8_t *K, const int16_t *u,
         const int16_t *v, const uint8_t *d, size_t n, size_t k, uint8_t *md);
 
-    // The Kyber G oracle
+    /// The Kyber G oracle
     static void g_function(crypto::xof_sha3* xof, const uint8_t *rho, const int16_t *t,
         const uint8_t *m, size_t n, size_t k,
         uint8_t *K, uint8_t *r, uint8_t *d);

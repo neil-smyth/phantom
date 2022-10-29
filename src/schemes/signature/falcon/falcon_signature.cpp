@@ -64,26 +64,33 @@ std::unique_ptr<user_ctx> falcon_signature::create_ctx(security_strength_e bits,
                                                        cpu_word_size_e size_hint,
                                                        bool masking) const
 {
-    ctx_falcon* ctx = new ctx_falcon(falcon_signature::bits_2_set(bits));
-    if (ctx->get_set() > 1) {
-        throw std::invalid_argument("Parameter set is out of range");
-    }
-    return std::unique_ptr<user_ctx>(ctx);
+    return create_ctx(falcon_signature::bits_2_set(bits), size_hint, masking);
 }
 
 std::unique_ptr<user_ctx> falcon_signature::create_ctx(size_t set,
                                                        cpu_word_size_e size_hint,
                                                        bool masking) const
 {
+    std::stringstream ss;
+
     ctx_falcon* ctx = new ctx_falcon(set);
     if (ctx->get_set() > 1) {
-        throw std::invalid_argument("Parameter set is out of range");
+        ss << "Parameter set " << ctx->get_set() << " is out of range";
+        LOG_ERROR(ss.str(), g_pkc_log_level);
+        throw std::invalid_argument(ss.str());
     }
+
+    ss << "Falcon Signature context created [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
     return std::unique_ptr<user_ctx>(ctx);
 }
 
 bool falcon_signature::keygen(std::unique_ptr<user_ctx>& ctx)
 {
+    std::stringstream ss;
+    ss << "Falcon Signature KeyGen [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_falcon& myctx = dynamic_cast<ctx_falcon&>(*ctx.get());
 
     size_t   n    = ctx_falcon::m_params[myctx.get_set()].n;
@@ -103,10 +110,6 @@ bool falcon_signature::keygen(std::unique_ptr<user_ctx>& ctx)
         myctx.f().data(), myctx.g().data(), myctx.F().data(), myctx.G().data());
 
     return true;
-}
-
-void falcon_signature::set_logging(log_level_e logging)
-{
 }
 
 const uint8_t max_fg_bits[] = {
@@ -217,6 +220,10 @@ restart:
 
 bool falcon_signature::set_public_key(std::unique_ptr<user_ctx>& ctx, const phantom_vector<uint8_t>& key)
 {
+    std::stringstream ss;
+    ss << "Falcon Signature set public key [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_falcon& myctx = dynamic_cast<ctx_falcon&>(*ctx.get());
 
     size_t   n      = ctx_falcon::m_params[myctx.get_set()].n;
@@ -244,6 +251,10 @@ bool falcon_signature::set_public_key(std::unique_ptr<user_ctx>& ctx, const phan
 
 bool falcon_signature::get_public_key(std::unique_ptr<user_ctx>& ctx, phantom_vector<uint8_t>& key)
 {
+    std::stringstream ss;
+    ss << "Falcon Signature get public key [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_falcon& myctx = dynamic_cast<ctx_falcon&>(*ctx.get());
 
     size_t   n      = ctx_falcon::m_params[myctx.get_set()].n;
@@ -265,6 +276,10 @@ bool falcon_signature::get_public_key(std::unique_ptr<user_ctx>& ctx, phantom_ve
 
 bool falcon_signature::set_private_key(std::unique_ptr<user_ctx>& ctx, const phantom_vector<uint8_t>& key)
 {
+    std::stringstream ss;
+    ss << "Falcon Signature set private key [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_falcon& myctx = dynamic_cast<ctx_falcon&>(*ctx.get());
 
     size_t n = ctx_falcon::m_params[myctx.get_set()].n;
@@ -305,6 +320,10 @@ bool falcon_signature::set_private_key(std::unique_ptr<user_ctx>& ctx, const pha
 
 bool falcon_signature::get_private_key(std::unique_ptr<user_ctx>& ctx, phantom_vector<uint8_t>& key)
 {
+    std::stringstream ss;
+    ss << "Falcon Signature get private key [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_falcon& myctx = dynamic_cast<ctx_falcon&>(*ctx.get());
 
     size_t n = ctx_falcon::m_params[myctx.get_set()].n;
@@ -389,6 +408,10 @@ bool falcon_signature::sign(const std::unique_ptr<user_ctx>& ctx,
                             const phantom_vector<uint8_t>& m,
                             phantom_vector<uint8_t>& s)
 {
+    std::stringstream ss;
+    ss << "Falcon Signature Sign [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_falcon& myctx = dynamic_cast<ctx_falcon&>(*ctx.get());
 
     uint32_t q      = ctx_falcon::m_params[myctx.get_set()].q;
@@ -432,6 +455,10 @@ bool falcon_signature::verify(const std::unique_ptr<user_ctx>& ctx,
                               const phantom_vector<uint8_t>& m,
                               const phantom_vector<uint8_t>& s)
 {
+    std::stringstream ss;
+    ss << "Falcon Signature Verify [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_falcon& myctx = dynamic_cast<ctx_falcon&>(*ctx.get());
 
     uint32_t q      = ctx_falcon::m_params[myctx.get_set()].q;

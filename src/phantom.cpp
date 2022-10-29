@@ -29,6 +29,7 @@
 #include "crypto/fpe.hpp"
 #include "crypto/xof_sha3.hpp"
 #include "crypto/shamirs_secret_sharing.hpp"
+#include "utils/uuid.hpp"
 
 namespace phantom {
 
@@ -80,6 +81,10 @@ namespace phantom {
     : ((__DATE__[4] == ' ' ? 0 : \
       ((__DATE__[4] - '0') * 10)) + __DATE__[5] - '0'))
 
+
+log_level_e g_pkc_log_level;
+
+
 const std::string build_info::version()
 {
     return PHANTOM_BUILD_VERSION;
@@ -109,6 +114,15 @@ const std::string build_info::build_date()
 const std::string build_info::compiler()
 {
     return COMPILER_VERSION;
+}
+
+
+const std::string& user_ctx::get_uuid()
+{
+    if (m_uuid.empty()) {
+        m_uuid = utilities::uuid::generate();
+    }
+    return m_uuid;
 }
 
 
@@ -181,7 +195,7 @@ pkc::pkc(pkc_e type, log_level_e logging)
     }
 
     // Set the scheme's logging
-    m_scheme->set_logging(logging);
+    g_pkc_log_level = logging;
 }
 
 pkc::~pkc()
