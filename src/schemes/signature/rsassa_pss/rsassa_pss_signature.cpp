@@ -55,7 +55,10 @@ size_t rsassa_pss_signature::bits_2_set(security_strength_e bits)
 
         case SECURITY_STRENGTH_160: set = 4; break;
 
-        default: throw std::invalid_argument("Security strength is invalid");
+        default: {
+            LOG_ERROR("Security strength is invalid", g_pkc_log_level);
+            throw std::invalid_argument("Security strength is invalid");
+        }
     }
 
     return set;
@@ -104,7 +107,7 @@ std::unique_ptr<user_ctx> rsassa_pss_signature::create_ctx(size_t set,
             break;
 #endif
         default: {
-            ss << "size_hint " << set << " is out of range";
+            ss << "size_hint " << set << " is out of range";  // NOLINT
             LOG_ERROR(ss.str(), g_pkc_log_level);
             throw std::invalid_argument(ss.str());
         }

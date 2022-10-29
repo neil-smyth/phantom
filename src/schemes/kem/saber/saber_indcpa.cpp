@@ -48,7 +48,10 @@ size_t saber_indcpa::bits_2_set(security_strength_e bits)
         case SECURITY_STRENGTH_192:
         case SECURITY_STRENGTH_256: set = 2; break;
 
-        default: throw std::invalid_argument("Security strength is invalid");
+        default: {
+            LOG_ERROR("Security strength is invalid", g_pkc_log_level);
+            throw std::invalid_argument("Security strength is invalid");
+        }
     }
 
     return set;
