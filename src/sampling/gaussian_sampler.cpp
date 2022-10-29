@@ -111,7 +111,7 @@ int32_t gaussian_sampler::round(int64_t centre)
 
 int32_t gaussian_sampler::flip_and_round(double centre)
 {
-    size_t   i, j;
+    int      i, j;
     size_t   precision = m_flips + m_log_base * m_k;
     int64_t  c         = static_cast<int64_t>((centre * (1UL << precision)));
     int64_t  base_c    = (c >> m_flips);
@@ -119,7 +119,7 @@ int32_t gaussian_sampler::flip_and_round(double centre)
     uint64_t rbits     = 0;
     int64_t  check;
 
-    for (i = m_flips-1, j = 0; i >= 0; i--, j++) {
+    for (i = m_flips-1, j = 0U; i >= 0; i--, j++) {
         // Generate 64 random bits rather than sequentially generating
         // individual random bits
         j &= 0x3f;

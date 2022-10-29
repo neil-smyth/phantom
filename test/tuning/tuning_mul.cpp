@@ -24,6 +24,9 @@ using namespace core;     // NOLINT
 
 int main(int argc, char *argv[])
 {
+    (void) argc;
+    (void) argv;
+    
     std::cout << "Tuning - Multiplication" << std::endl;
 
     // Create a PRNG to randomize the input numbers

@@ -78,6 +78,8 @@ std::unique_ptr<user_ctx> eddsa_signature::create_ctx(size_t set,
     std::stringstream ss;
     user_ctx* ctx;
 
+    (void) masking;
+
     switch (size_hint)
     {
         case CPU_WORD_SIZE_16: ctx = new ctx_eddsa_tmpl<uint16_t>(set); break;

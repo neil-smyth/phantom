@@ -25,10 +25,10 @@ namespace schemes {
 
 const falcon_set_t ctx_falcon::m_params[2] = {
     {
-        0, 12289, 12289 - 2, 14, 512, 9, 0x403001, 0x77402FFF, 4091, 10952
+        0, 12289, 12289 - 2, 14, 512, 9, 0x403001, 0x77402FFF, 4091, 10952, 6598
     },
     {
-        1, 12289, 12289 - 2, 14, 1024, 10, 0x403001, 0x77402FFF, 4091, 10952
+        1, 12289, 12289 - 2, 14, 1024, 10, 0x403001, 0x77402FFF, 4091, 10952, 9331
     }
 };
 
@@ -75,6 +75,9 @@ std::unique_ptr<user_ctx> falcon_signature::create_ctx(size_t set,
                                                        bool masking) const
 {
     std::stringstream ss;
+
+    (void) size_hint;
+    (void) masking;
 
     ctx_falcon* ctx = new ctx_falcon(set);
     if (ctx->get_set() > 1) {
@@ -407,6 +410,18 @@ void falcon_signature::sign_h_function(crypto::xof_sha3 *xof, int32_t *a, const 
     }
 }
 
+bool falcon_signature::check_norm_bd(float bd, const int32_t *s1, const int32_t *s2, size_t n)
+{
+    size_t i;
+    float norm = 0;
+    for (i=n; i--;) {
+        norm += s1[i] * s1[i] + s2[i] * s2[i];
+    }
+    norm = sqrtf(norm);
+
+    return norm < bd;
+}
+
 bool falcon_signature::sign(const std::unique_ptr<user_ctx>& ctx,
                             const phantom_vector<uint8_t>& m,
                             phantom_vector<uint8_t>& s)
@@ -421,14 +436,23 @@ bool falcon_signature::sign(const std::unique_ptr<user_ctx>& ctx,
     uint32_t q_bits = ctx_falcon::m_params[myctx.get_set()].q_bits;
     size_t   n      = ctx_falcon::m_params[myctx.get_set()].n;
     size_t   logn   = ctx_falcon::m_params[myctx.get_set()].n_bits;
+    float    bd     = ctx_falcon::m_params[myctx.get_set()].bd;
 
     int32_t* tmp    = reinterpret_cast<int32_t*>(aligned_malloc(sizeof(int32_t) * 3 * n));
     int32_t* s1     = tmp;
     int32_t* s2     = s1 + n;
     int32_t* msg    = s2 + n;
 
+restart:
+
+    myctx.get_xof()->init(32);
+    myctx.get_xof()->absorb(m.data(), m.size());
+    myctx.get_xof()->final();
+    myctx.get_xof()->squeeze(reinterpret_cast<uint8_t*>(msg), 4 * n);
     for (size_t i = 0; i < n; i++) {
-        msg[i] = m[i];
+        uint32_t y = msg[i] & ((1 << q_bits) - 1);
+        y -= ((int32_t)(q - y) >> 31) * q;
+        msg[i] = y;
     }
 
     const double* sk = myctx.master_tree().data();
@@ -436,6 +460,10 @@ bool falcon_signature::sign(const std::unique_ptr<user_ctx>& ctx,
 
     core::poly<int32_t>::centre(s1, q, n);
     core::poly<int32_t>::centre(s2, q, n);
+
+    if (!check_norm_bd(bd, s1, s2, n)) {
+        goto restart;
+    }
 
     packing::packer pack_enc(2 * n * q_bits);
     for (size_t i = 0; i < n; i++) {
@@ -468,16 +496,29 @@ bool falcon_signature::verify(const std::unique_ptr<user_ctx>& ctx,
     uint32_t q_bits = ctx_falcon::m_params[myctx.get_set()].q_bits;
     size_t   n      = ctx_falcon::m_params[myctx.get_set()].n;
     size_t   logn   = ctx_falcon::m_params[myctx.get_set()].n_bits;
+    //float    bd     = ctx_falcon::m_params[myctx.get_set()].bd;
+
+    int32_t* msg    = reinterpret_cast<int32_t*>(aligned_malloc(sizeof(int32_t) * n));
 
     // Unpack the signature into z1, z2 and u
     phantom_vector<int32_t> s1(n), s2(n);
 
     packing::unpacker unpack(s);
     for (size_t i=0; i < n; i++) {
-        s1[i] = unpack.read_signed(q_bits, packing::HUFFMAN);
+        s1[i] = unpack.read_signed(q_bits, packing::RAW);
     }
     for (size_t i=0; i < n; i++) {
-        s2[i] = unpack.read_signed(q_bits, packing::HUFFMAN);
+        s2[i] = unpack.read_signed(q_bits, packing::RAW);
+    }
+
+    myctx.get_xof()->init(32);
+    myctx.get_xof()->absorb(m.data(), m.size());
+    myctx.get_xof()->final();
+    myctx.get_xof()->squeeze(reinterpret_cast<uint8_t*>(msg), 4 * n);
+    for (size_t i = 0; i < n; i++) {
+        uint32_t y = msg[i] & ((1 << q_bits) - 1);
+        y -= ((int32_t)(q - y) >> 31) * q;
+        msg[i] = y;
     }
 
     core::poly<int32_t>::mod_unsigned(s2.data(), n, q);
@@ -488,8 +529,13 @@ bool falcon_signature::verify(const std::unique_ptr<user_ctx>& ctx,
     myctx.get_ntt()->inv(us2, logn);
     myctx.get_reduction().convert_from(us2, us2, n);
 
-    core::poly<int32_t>::sub_single(s1.data(), n, s2.data());
+    core::poly<int32_t>::sub(s1.data(), n, msg, s1.data());
     core::poly<int32_t>::centre(s1.data(), q, n);
+    //core::poly<int32_t>::centre(s2.data(), q, n);
+
+    /*if (!check_norm_bd(bd, s1.data(), s2.data(), n)) {
+        return false;
+    }*/
 
     return true;
 }

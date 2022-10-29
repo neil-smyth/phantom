@@ -32,14 +32,12 @@ const lest::test specification[] =
         uint32_t kappa = 0;
         uint32_t gamma_1 = 131072;
         uint32_t gamma_1_bits = 17;
-        uint32_t q = 8380417;
         size_t l = 4;
         size_t n = 256;
         int32_t y[4*256] = {0};
-        const uint8_t K[32] = {0x87, 0x58, 0x8e, 0x98, 0x8c, 0x4a, 0x42, 0x3b, 0x8b, 0xe4, 0x30, 0x5c, 0xc4, 0xf4, 0xb7, 0xf7, 0x4d, 0x37, 0x34, 0xec, 0xed, 0x4b, 0xec, 0x55, 0xfc, 0xf8, 0x6c, 0x3a, 0x5f, 0x36, 0x04, 0x9c};
-
+        
         dilithium dut(0);
-        dut.expand_mask(seed, kappa, gamma_1, gamma_1_bits, q, l, n, y, K);
+        dut.expand_mask(seed, kappa, gamma_1, gamma_1_bits, l, n, y);
 
         for (size_t j = 0; j < l; ++j) {
             for (size_t i = 0; i < n; ++i) {

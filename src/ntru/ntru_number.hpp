@@ -25,9 +25,6 @@
 namespace phantom {
 namespace ntru {
 
-#if defined(__SIZEOF_INT128__)
-using uint128_t = unsigned __int128;
-#endif
 
 /**
  * @brief Arithmetic specific to NTRU

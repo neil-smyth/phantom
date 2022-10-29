@@ -306,11 +306,11 @@ int32_t aes_ni::encrypt(uint8_t out[16], const uint8_t in[16])
     case 14 * 16:
         t = _mm_aesenc_si128(t, *reinterpret_cast<const __m128i*>(++key));
         t = _mm_aesenc_si128(t, *reinterpret_cast<const __m128i*>(++key));
-        // DO NOT BREAK!
+        __attribute__((fallthrough)); // DO NOT BREAK!
     case 12 * 16:
         t = _mm_aesenc_si128(t, *reinterpret_cast<const __m128i*>(++key));
         t = _mm_aesenc_si128(t, *reinterpret_cast<const __m128i*>(++key));
-        // DO NOT BREAK!
+        __attribute__((fallthrough)); // DO NOT BREAK!
     case 10 * 16:
         t = _mm_aesenc_si128(t, *reinterpret_cast<const __m128i*>(++key));
         t = _mm_aesenc_si128(t, *reinterpret_cast<const __m128i*>(++key));
@@ -344,11 +344,11 @@ int32_t aes_ni::decrypt(uint8_t out[16], const uint8_t in[16])
     case 14 * 16:
         t = _mm_aesdec_si128(t, *reinterpret_cast<const __m128i*>(--key));
         t = _mm_aesdec_si128(t, *reinterpret_cast<const __m128i*>(--key));
-        // DO NOT BREAK!
+        __attribute__((fallthrough));  // DO NOT BREAK!
     case 12 * 16:
         t = _mm_aesdec_si128(t, *reinterpret_cast<const __m128i*>(--key));
         t = _mm_aesdec_si128(t, *reinterpret_cast<const __m128i*>(--key));
-        // DO NOT BREAK!
+        __attribute__((fallthrough));  // DO NOT BREAK!
     case 10 * 16:
         t = _mm_aesdec_si128(t, *reinterpret_cast<const __m128i*>(--key));
         t = _mm_aesdec_si128(t, *reinterpret_cast<const __m128i*>(--key));

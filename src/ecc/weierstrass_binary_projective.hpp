@@ -109,6 +109,7 @@ public:
 
     void negate(const ecc_config<T>& config) override
     {
+        (void) config;
         m_y ^= m_x;
     }
 
@@ -132,6 +133,8 @@ public:
 
     retcode_e convert_from(const ecc_config<T>& config, core::mp<T>* x, core::mp<T>* y) const override
     {
+        (void) config;
+
         core::mp_gf2n<T>& mp_gf2n_x = reinterpret_cast<core::mp_gf2n<T>&>(*x);
         core::mp_gf2n<T>& mp_gf2n_y = reinterpret_cast<core::mp_gf2n<T>&>(*y);
 

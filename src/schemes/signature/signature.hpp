@@ -43,6 +43,10 @@ public:
     virtual bool sign(const std::unique_ptr<user_ctx>& ctx,
         const phantom_vector<uint8_t>& m, phantom_vector<uint8_t>& s, const phantom_vector<uint8_t>& c)
     {
+        (void) ctx;
+        (void) m;
+        (void) s;
+        (void) c;
         return false;
     }
 
@@ -56,6 +60,10 @@ public:
     virtual bool verify(const std::unique_ptr<user_ctx>& ctx,
         const phantom_vector<uint8_t>& m, const phantom_vector<uint8_t>& s, const phantom_vector<uint8_t>& c)
     {
+        (void) ctx;
+        (void) m;
+        (void) s;
+        (void) c;
         return false;
     }
 };

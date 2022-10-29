@@ -36,6 +36,7 @@ struct falcon_set_t {
     uint32_t inv_g;
     uint32_t R;
     uint32_t R2;
+    float    bd;
 };
 
 /// A class describing the Falcon user context

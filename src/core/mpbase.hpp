@@ -380,7 +380,7 @@ public:
      * @param n Product length
      * @return const size_t Memory required (in limbs)
      */
-    static const size_t get_toom22_scratch_size(size_t n);
+    static size_t get_toom22_scratch_size(size_t n);
 
     /**
      * @brief Get the toom33 scratch length given the product length
@@ -388,7 +388,7 @@ public:
      * @param n Product length
      * @return const size_t Memory required (in limbs)
      */
-    static const size_t get_toom33_scratch_size(size_t n);
+    static size_t get_toom33_scratch_size(size_t n);
 
     /**
      * @brief Toom-2 multiplication (km = 2, kn = 2)

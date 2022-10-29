@@ -87,8 +87,8 @@ json perf_ibe::run(phantom::pkc_e pkc_type, size_t duration_us, cpu_word_size_e 
             // Generate a User ID
             std::stringstream ss;
             ss << std::hex << std::setfill('0') << std::setw(5) << num_iter  << "@foobar.com";
-            char id[32];
-            strncpy(id, ss.str().c_str(), 32);
+            char id[33];
+            strncpy(id, ss.str().c_str(), sizeof(id) - 1);
 
             phantom_vector<uint8_t> vec_id(id, id + 16);
             phantom_vector<uint8_t> vec_user_key;

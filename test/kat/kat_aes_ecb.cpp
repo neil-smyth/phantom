@@ -103,6 +103,9 @@ aes_ecb_tv tv[] = {
 
 int main(int argc, char *argv[])
 {
+    (void) argc;
+    (void) argv;
+    
     std::cout << "AES ECB Known Answer Test" << std::endl;
 
     for (size_t i=0; i < 12; i++) {

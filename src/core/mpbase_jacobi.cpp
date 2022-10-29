@@ -126,6 +126,9 @@ public:
         h0 = mpbase<T>::mul_1(b_limbs, b_limbs, n, M->u[0][0]);
         h1 = mpbase<T>::submul_1(b_limbs, a_limbs, n, M->u[1][0]);
         assert(h0 == h1);
+#else
+        (void) M;
+        (void) a_limbs;
 #endif
 
         n -= (r_limbs[n-1] | b_limbs[n-1]) == 0;
@@ -653,6 +656,9 @@ public:
     static void jacobi_callback(hgcd_jacobi_ctx<T> *ctx, const T *g_limbs, size_t gn, const T *q_limbs, size_t qn,
         int d, T* scratch)
     {
+        (void) qn;
+        (void) scratch;
+
         if (g_limbs) {
             assert(gn > 0);
             if (gn != 1 || g_limbs[0] != 1) {
@@ -684,6 +690,9 @@ public:
     {
         assert(!g_limbs);
         assert(d >= 0);
+
+        (void) g_limbs;
+        (void) gn;
 
         qn = mpbase<T>::normalized_size(q_limbs, qn);
         if (qn > 0) {

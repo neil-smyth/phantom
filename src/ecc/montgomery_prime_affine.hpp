@@ -187,6 +187,7 @@ public:
 
     retcode_e convert_to_mixed(const ecc_config<T>& config) override
     {
+        (void) config;
         return POINT_OK;
     }
 

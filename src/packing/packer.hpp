@@ -34,10 +34,10 @@ public:
 
     void write_signed(int32_t data, size_t bits, pack_e type);
     void write_unsigned(uint32_t data, size_t bits, pack_e type);
-    void flush(size_t alignment = 1);
+    void flush();
 
     const phantom_vector<uint8_t>& get();
-    const phantom_vector<uint8_t>& serialize(size_t alignment = 1);
+    const phantom_vector<uint8_t>& serialize();
 
 private:
     const std::unique_ptr<stream> m_stream;

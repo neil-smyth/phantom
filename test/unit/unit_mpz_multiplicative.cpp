@@ -194,7 +194,7 @@ const lest::test specification[] =
         temp.setbit(16 *  12 * 2);
         mpz<uint16_t>::tdiv_q(mu, temp, m);
 
-        mod_config<uint16_t> mod = { m, mu, m.sizeinbase(2), 12, 16, reduction_e::REDUCTION_BARRETT };
+        mod_config<uint16_t> mod = { m, mu, m.sizeinbase(2), 12, 16, reduction_e::REDUCTION_BARRETT, mpz<uint16_t>(uint16_t(0)), 0, nullptr };
 
         mpz<uint16_t> r = a.sqrt_mod(mod);
         EXPECT(r.get_str(16) == "4");
@@ -208,7 +208,7 @@ const lest::test specification[] =
         temp.setbit(16 *  12 * 2);
         mpz<uint16_t>::tdiv_q(mu, temp, m);
 
-        mod_config<uint16_t> mod = { m, mu, m.sizeinbase(2), 12, 16, reduction_e::REDUCTION_BARRETT };
+        mod_config<uint16_t> mod = { m, mu, m.sizeinbase(2), 12, 16, reduction_e::REDUCTION_BARRETT, mpz<uint16_t>(uint16_t(0)), 0, nullptr };
 
         b = a.square_mod(mod);
         mpz<uint16_t> r = a.sqrt_mod(mod);
@@ -245,7 +245,7 @@ const lest::test specification[] =
         temp.setbit(16 *  12 * 2);
         mpz<uint16_t>::tdiv_q(mu, temp, m);
 
-        mod_config<uint16_t> mod = { m, mu, m.sizeinbase(2), 12, 16, reduction_e::REDUCTION_BARRETT };
+        mod_config<uint16_t> mod = { m, mu, m.sizeinbase(2), 12, 16, reduction_e::REDUCTION_BARRETT, mpz<uint16_t>(uint16_t(0)), 0, nullptr };
 
         mpz<uint16_t> r = a.pow_mod(b, mod);
         EXPECT(r.sizeinbase(2) == 65U);
@@ -276,7 +276,7 @@ const lest::test specification[] =
         temp.setbit(32 * 32 * 2);
         mpz<uint32_t>::tdiv_q(mu, temp, m);
 
-        mod_config<uint32_t> mod = { m, mu, m.sizeinbase(2), 32, 32, reduction_e::REDUCTION_BARRETT };
+        mod_config<uint32_t> mod = { m, mu, m.sizeinbase(2), 32, 32, reduction_e::REDUCTION_BARRETT, mpz<uint32_t>(uint32_t(0)), 0, nullptr };
 
         mpz<uint32_t> r = a.pow_mod(b, mod);
         EXPECT(r.sizeinbase(2) == 1024U);
@@ -523,7 +523,7 @@ const lest::test specification[] =
 
         mpz<uint16_t> temp, mu;
         mpz<uint16_t>::tdiv_q(mu, temp, m);
-        mod_config<uint16_t> mod = { m, mu, m.sizeinbase(2), 12, 16, reduction_e::REDUCTION_NAIVE };
+        mod_config<uint16_t> mod = { m, mu, m.sizeinbase(2), 12, 16, reduction_e::REDUCTION_NAIVE, mpz<uint16_t>(uint16_t(0)), 0, nullptr };
 
         mpz<uint16_t> c = (a * inv).mod(mod);
         mpz<uint16_t> scale = (a * inv).mod(mod);
@@ -543,7 +543,7 @@ const lest::test specification[] =
 
         mpz<uint16_t> temp, mu;
         mpz<uint16_t>::tdiv_q(mu, temp, m);
-        mod_config<uint16_t> mod = { m, mu, m.sizeinbase(2), 12, 16, reduction_e::REDUCTION_NAIVE };
+        mod_config<uint16_t> mod = { m, mu, m.sizeinbase(2), 12, 16, reduction_e::REDUCTION_NAIVE, mpz<uint16_t>(uint16_t(0)), 0, nullptr };
 
         mpz<uint16_t> c = ((x2 - x1) * inv).mod(mod);
         EXPECT(c == uint16_t(1));
@@ -577,7 +577,7 @@ const lest::test specification[] =
         temp.setbit(16 * 12 * 2);
         mpz<uint16_t>::tdiv_q(mu, temp, m);
 
-        mod_config<uint16_t> mod = { m, mu, m.sizeinbase(2), 12, 16, reduction_e::REDUCTION_BARRETT };
+        mod_config<uint16_t> mod = { m, mu, m.sizeinbase(2), 12, 16, reduction_e::REDUCTION_BARRETT, mpz<uint16_t>(uint16_t(0)), 0, nullptr };
         mpz<uint16_t> b = a.barrett(mod);
         EXPECT(b.sizeinbase(2) == 1U);
         EXPECT(b == uint16_t(1));
@@ -591,7 +591,7 @@ const lest::test specification[] =
         mpz<uint16_t>::tdiv_q(mu, temp, m);
 
         a = a * m - uint16_t(1);
-        mod_config<uint16_t> mod = { m, mu, m.sizeinbase(2), 12, 16, reduction_e::REDUCTION_BARRETT };
+        mod_config<uint16_t> mod = { m, mu, m.sizeinbase(2), 12, 16, reduction_e::REDUCTION_BARRETT, mpz<uint16_t>(uint16_t(0)), 0, nullptr };
         mpz<uint16_t> b = a.barrett(mod);
         EXPECT(b.sizeinbase(2) == 192U);
         EXPECT(b.get_str(16, true) == "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFE");
@@ -604,7 +604,7 @@ const lest::test specification[] =
         temp.setbit(16 *  12 * 2);
         mpz<uint16_t>::tdiv_q(mu, temp, m);
 
-        mod_config<uint16_t> mod = { m, mu, m.sizeinbase(2), 12, 16, reduction_e::REDUCTION_BARRETT };
+        mod_config<uint16_t> mod = { m, mu, m.sizeinbase(2), 12, 16, reduction_e::REDUCTION_BARRETT, mpz<uint16_t>(uint16_t(0)), 0, nullptr };
         mpz<uint16_t> b = a.barrett(mod);
         EXPECT(b.sizeinbase(2) == 192U);
         EXPECT(b.get_str(16, true) == "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFA");
@@ -618,7 +618,7 @@ const lest::test specification[] =
         temp.setbit(64 * 3 * 2);
         mpz<uint64_t>::tdiv_q(mu, temp, m);
 
-        mod_config<uint64_t> mod = { m, mu, m.sizeinbase(2), 3, 64, reduction_e::REDUCTION_BARRETT };
+        mod_config<uint64_t> mod = { m, mu, m.sizeinbase(2), 3, 64, reduction_e::REDUCTION_BARRETT, mpz<uint64_t>(uint64_t(0)), 0, nullptr };
         mpz<uint64_t> b = a.barrett(mod);
         EXPECT(b.sizeinbase(2) == 1U);
         EXPECT(b == uint64_t(1));
@@ -632,7 +632,7 @@ const lest::test specification[] =
         mpz<uint64_t>::tdiv_q(mu, temp, m);
 
         a = a * m - uint64_t(1);
-        mod_config<uint64_t> mod = { m, mu, m.sizeinbase(2), 3, 64, reduction_e::REDUCTION_BARRETT };
+        mod_config<uint64_t> mod = { m, mu, m.sizeinbase(2), 3, 64, reduction_e::REDUCTION_BARRETT, mpz<uint64_t>(uint64_t(0)), 0, nullptr };
         mpz<uint64_t> b = a.barrett(mod);
         EXPECT(b.sizeinbase(2) == 192U);
         EXPECT(b.get_str(16, true) == "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFE");
@@ -645,7 +645,7 @@ const lest::test specification[] =
         temp.setbit(64 * 3 * 2);
         mpz<uint64_t>::tdiv_q(mu, temp, m);
 
-        mod_config<uint64_t> mod = { m, mu, m.sizeinbase(2), 3, 64, reduction_e::REDUCTION_BARRETT };
+        mod_config<uint64_t> mod = { m, mu, m.sizeinbase(2), 3, 64, reduction_e::REDUCTION_BARRETT, mpz<uint64_t>(uint64_t(0)), 0, nullptr };
         mpz<uint64_t> b = a.barrett(mod);
         EXPECT(b.sizeinbase(2) == 192U);
         EXPECT(b.get_str(16, true) == "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFA");
@@ -658,7 +658,7 @@ const lest::test specification[] =
         temp.setbit(64 * 4 * 2);
         mpz<uint64_t>::tdiv_q(mu, temp, m);
 
-        mod_config<uint64_t> mod = { m, mu, m.sizeinbase(2), 4, 64, reduction_e::REDUCTION_BARRETT };
+        mod_config<uint64_t> mod = { m, mu, m.sizeinbase(2), 4, 64, reduction_e::REDUCTION_BARRETT, mpz<uint64_t>(uint64_t(0)), 0, nullptr };
         mpz<uint64_t> b = a.barrett(mod);
         EXPECT(b.sizeinbase(2) == 1U);
         EXPECT(b == uint64_t(1));
@@ -672,7 +672,7 @@ const lest::test specification[] =
         mpz<uint32_t>::tdiv_q(mu, temp, m);
 
         a = a * m - uint32_t(1);
-        mod_config<uint32_t> mod = { m, mu, m.sizeinbase(2), 7, 32, reduction_e::REDUCTION_BARRETT };
+        mod_config<uint32_t> mod = { m, mu, m.sizeinbase(2), 7, 32, reduction_e::REDUCTION_BARRETT, mpz<uint32_t>(uint32_t(0)), 0, nullptr };
         mpz<uint32_t> b = a.barrett(mod);
         EXPECT(b.sizeinbase(2) == 224U);
         EXPECT(b.get_str(16, true) == "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF000000000000000000000000");
@@ -686,7 +686,7 @@ const lest::test specification[] =
         mpz<uint64_t>::tdiv_q(mu, temp, m);
 
         a = a * m - uint64_t(1);
-        mod_config<uint64_t> mod = { m, mu, m.sizeinbase(2), 4, 64, reduction_e::REDUCTION_BARRETT };
+        mod_config<uint64_t> mod = { m, mu, m.sizeinbase(2), 4, 64, reduction_e::REDUCTION_BARRETT, mpz<uint64_t>(uint64_t(0)), 0, nullptr };
         mpz<uint64_t> b = a.barrett(mod);
         EXPECT(b.sizeinbase(2) == 224U);
         EXPECT(b.get_str(16, true) == "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF000000000000000000000000");
@@ -699,7 +699,7 @@ const lest::test specification[] =
         temp.setbit(64 * 4 * 2);
         mpz<uint64_t>::tdiv_q(mu, temp, m);
 
-        mod_config<uint64_t> mod = { m, mu, m.sizeinbase(2), 4, 64, reduction_e::REDUCTION_BARRETT };
+        mod_config<uint64_t> mod = { m, mu, m.sizeinbase(2), 4, 64, reduction_e::REDUCTION_BARRETT, mpz<uint64_t>(uint64_t(0)), 0, nullptr };
         mpz<uint64_t> b = a.barrett(mod);
         EXPECT(b.sizeinbase(2) == 224U);
         EXPECT(b.get_str(16, true) == "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFFFFFFFFFC");
@@ -725,7 +725,7 @@ const lest::test specification[] =
             mont_inv = t.is_negative()? t[0] : -t[0];
         }
 
-        mod_config<uint16_t> mod = { m, mu, m.sizeinbase(2), 12, 16, reduction_e::REDUCTION_MONTGOMERY, R2, mont_inv };
+        mod_config<uint16_t> mod = { m, mu, m.sizeinbase(2), 12, 16, reduction_e::REDUCTION_MONTGOMERY, R2, mont_inv, nullptr };
 
         mpz<uint16_t> one(uint16_t(1));
         a = a.mul_mont(R2, mod);
@@ -755,7 +755,7 @@ const lest::test specification[] =
             mont_inv = t.is_negative()? t[0] : -t[0];
         }
 
-        mod_config<uint16_t> mod = { m, mu, m.sizeinbase(2), 12, 16, reduction_e::REDUCTION_MONTGOMERY, R2, mont_inv };
+        mod_config<uint16_t> mod = { m, mu, m.sizeinbase(2), 12, 16, reduction_e::REDUCTION_MONTGOMERY, R2, mont_inv, nullptr };
 
         a = a.mul_mont(R2, mod);
         a = a.mul_mont(uint16_t(1), mod);
@@ -781,7 +781,7 @@ const lest::test specification[] =
             mont_inv = t.is_negative()? t[0] : -t[0];
         }
 
-        mod_config<uint32_t> mod = { m, mu, m.sizeinbase(2), 6, 32, reduction_e::REDUCTION_MONTGOMERY, R2, mont_inv };
+        mod_config<uint32_t> mod = { m, mu, m.sizeinbase(2), 6, 32, reduction_e::REDUCTION_MONTGOMERY, R2, mont_inv, nullptr };
 
         mpz<uint32_t> one(uint32_t(1));
         a = a.mul_mont(R2, mod);
@@ -816,7 +816,7 @@ const lest::test specification[] =
         }
         std::cout << "inv = " << mont_inv << std::endl;
 
-        mod_config<uint32_t> mod = { m, mu, m.sizeinbase(2), 6, 32, reduction_e::REDUCTION_MONTGOMERY, R2, mont_inv };
+        mod_config<uint32_t> mod = { m, mu, m.sizeinbase(2), 6, 32, reduction_e::REDUCTION_MONTGOMERY, R2, mont_inv, nullptr };
 
         a = a.mul_mont(R2, mod);
         std::cout << "a = " << a.get_str(16) << std::endl;
@@ -844,7 +844,7 @@ const lest::test specification[] =
             mont_inv = t.is_negative()? t[0] : -t[0];
         }
 
-        mod_config<uint64_t> mod = { m, mu, m.sizeinbase(2), 3, 64, reduction_e::REDUCTION_MONTGOMERY, R2, mont_inv };
+        mod_config<uint64_t> mod = { m, mu, m.sizeinbase(2), 3, 64, reduction_e::REDUCTION_MONTGOMERY, R2, mont_inv, nullptr };
 
         mpz<uint64_t> one(uint64_t(1));
         a = a.mul_mont(R2, mod);
@@ -883,7 +883,7 @@ const lest::test specification[] =
         }
         std::cout << "inv = " << mont_inv << std::endl;
 
-        mod_config<uint64_t> mod = { m, mu, m.sizeinbase(2), 3, 64, reduction_e::REDUCTION_MONTGOMERY, R2, mont_inv };
+        mod_config<uint64_t> mod = { m, mu, m.sizeinbase(2), 3, 64, reduction_e::REDUCTION_MONTGOMERY, R2, mont_inv, nullptr };
 
         a = a.mul_mont(R2, mod);
         std::cout << "a = " << a.get_str(16) << std::endl;
@@ -925,7 +925,7 @@ const lest::test specification[] =
             mont_inv = t.is_negative()? t[0] : -t[0];
         }
 
-        mod_config<uint16_t> mod = { m, mu, m.sizeinbase(2), 12, 16, reduction_e::REDUCTION_MONTGOMERY, R2, mont_inv };
+        mod_config<uint16_t> mod = { m, mu, m.sizeinbase(2), 12, 16, reduction_e::REDUCTION_MONTGOMERY, R2, mont_inv, nullptr };
 
         mpz<uint16_t> one(uint16_t(1));
         a = a.mul_mont(R2, mod);
@@ -954,7 +954,7 @@ const lest::test specification[] =
             mont_inv = t.is_negative()? t[0] : -t[0];
         }
 
-        mod_config<uint16_t> mod = { m, mu, m.sizeinbase(2), 12, 16, reduction_e::REDUCTION_MONTGOMERY, R2, mont_inv };
+        mod_config<uint16_t> mod = { m, mu, m.sizeinbase(2), 12, 16, reduction_e::REDUCTION_MONTGOMERY, R2, mont_inv, nullptr };
 
         mpz<uint16_t> one(uint16_t(1));
         a = a.mul_mont(R2, mod);

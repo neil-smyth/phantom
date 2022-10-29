@@ -27,12 +27,14 @@ const lest::test specification[] =
     {
         std::string datetime = build_info::build_date();
         //EXPECT(datetime == (PHANTOM_BUILD_VERSION));
+        EXPECT(datetime.length() > 0U);
         std::cout << "build date: " << datetime << std::endl;
     },
     CASE("Get compiler")
     {
         std::string compiler = build_info::compiler();
         //EXPECT(compiler == (PHANTOM_BUILD_VERSION));
+        EXPECT(compiler.length() > 0U);
         std::cout << "compiler: " << compiler << std::endl;
     },
 };

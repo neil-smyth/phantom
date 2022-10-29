@@ -42,6 +42,9 @@ std::unique_ptr<user_ctx> saber_kem::create_ctx(size_t set,
     ctx_saber* ctx = new ctx_saber(set);
     std::stringstream ss;
 
+    (void) size_hint;
+    (void) masking;
+
     if (ctx->get_set() > 2) {
         ss << "Parameter set " << ctx->get_set() << " is out of range";
         LOG_ERROR(ss.str(), g_pkc_log_level);
@@ -282,6 +285,7 @@ bool saber_kem::decapsulate(std::unique_ptr<user_ctx>& ctx,
 
 size_t saber_kem::get_msg_len(const std::unique_ptr<user_ctx>& ctx) const
 {
+    (void) ctx;
     return SABRE_MSG_LEN;
 }
 

@@ -20,6 +20,9 @@ using namespace utilities;  // NOLINT
 
 int main(int argc, char *argv[])
 {
+    (void) argc;
+    (void) argv;
+    
     std::cout << "RSA RSAES-OAEP Test" << std::endl;
 
     for (size_t i=0; i < 5; i++) {

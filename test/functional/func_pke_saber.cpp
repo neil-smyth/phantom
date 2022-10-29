@@ -22,6 +22,9 @@ using namespace utilities;  // NOLINT
 
 int main(int argc, char *argv[])
 {
+    (void) argc;
+    (void) argv;
+    
     std::cout << "Saber PKE Test" << std::endl;
 
     for (size_t i=0; i < 3; i++) {

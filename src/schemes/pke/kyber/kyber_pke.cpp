@@ -43,6 +43,9 @@ std::unique_ptr<user_ctx> kyber_pke::create_ctx(size_t set,
 {
     std::stringstream ss;
 
+    (void) size_hint;
+    (void) masking;
+
     ctx_kyber_pke* ctx = new ctx_kyber_pke(set);
     if (ctx->get_set() > 2) {
         ss << "Parameter set " << ctx->get_set() << " is out of range";

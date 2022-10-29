@@ -83,6 +83,9 @@ std::unique_ptr<user_ctx> ibe_dlp::create_ctx(size_t set,
     ctx_ibe_dlp* ctx = new ctx_ibe_dlp(set);
     std::stringstream ss;
 
+    (void) size_hint;
+    (void) masking;
+
     if (ctx->get_set() > 1) {
         ss << "Parameter set " << ctx->get_set() << " is out of range";
         LOG_ERROR(ss.str(), g_pkc_log_level);
@@ -344,6 +347,8 @@ bool ibe_dlp::load_user_key(std::unique_ptr<user_ctx>& ctx, const phantom_vector
     uint32_t q_bits = ctx_ibe_dlp::m_params[myctx.get_set()].q_bits;
     size_t   n      = ctx_ibe_dlp::m_params[myctx.get_set()].n;
     size_t   logn   = ctx_ibe_dlp::m_params[myctx.get_set()].logn;
+
+    (void) id;
 
     // Read the packed user secret key into s2
     myctx.s2() = phantom_vector<int32_t>(n);

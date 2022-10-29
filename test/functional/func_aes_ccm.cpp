@@ -22,6 +22,9 @@ using namespace phantom;  // NOLINT
 
 int main(int argc, char *argv[])
 {
+    (void) argc;
+    (void) argv;
+    
     std::cout << "AES-CCM Test" << std::endl;
 
     std::unique_ptr<csprng> rng = std::unique_ptr<csprng>(csprng::make(0x10000000, &random_seed::seed_cb));

@@ -38,6 +38,9 @@ static inline const char *stringFromEnum(hash_alg_e type)
 
 int main(int argc, char *argv[])
 {
+    (void) argc;
+    (void) argv;
+    
     std::cout << "Hashing Function Test" << std::endl;
 
     std::unique_ptr<csprng> rng = std::unique_ptr<csprng>(csprng::make(0, &random_seed::seed_cb));

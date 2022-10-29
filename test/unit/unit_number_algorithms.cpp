@@ -244,7 +244,6 @@ const lest::test specification[] =
 #if defined(__SIZEOF_INT128__)
     CASE("invx = (B^2-B*x-1)/x = (B^2-1)/x-B - 64-bit")
     {
-        using uint128_t = unsigned __int128;
         uint64_t inv;
         uint128_t max = 0xffffffffffffffffULL;
         max <<= 64ULL;

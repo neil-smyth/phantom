@@ -127,6 +127,9 @@ int32_t aes_ctr::encrypt_update(uint8_t *out, const uint8_t *in, size_t len)
 
 int32_t aes_ctr::encrypt_finish(uint8_t *out, const uint8_t *in, size_t len)
 {
+    (void) out;
+    (void) in;
+    (void) len;
     return EXIT_FAILURE;
 }
 
@@ -142,6 +145,9 @@ int32_t aes_ctr::decrypt_update(uint8_t *out, const uint8_t *in, size_t len)
 
 int32_t aes_ctr::decrypt_finish(uint8_t *out, const uint8_t *in, size_t len)
 {
+    (void) out;
+    (void) in;
+    (void) len;
     return EXIT_FAILURE;
 }
 

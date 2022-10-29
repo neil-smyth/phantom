@@ -79,6 +79,9 @@ void logger::logline(log_level_e base_level, log_level_e level, std::string cons
            << std::setw(30)
            << std::left
            << file
+           << std::setw(30)
+           << std::left
+           << func
            << std::setw(5)
            << std::right
            << line

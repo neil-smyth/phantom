@@ -126,32 +126,32 @@ public:
 /// Template specialization for unsigned 128-bit log2
 template<> class bits_log2<uint128_t> {
 public:
-    static constexpr const uint128_t value() { return 7; }
+    static constexpr uint128_t value() { return 7; }
 };
 #endif
 
 /// Template specialization for unsigned 64-bit log2
 template<> class bits_log2<uint64_t> {
 public:
-    static constexpr const uint64_t value() { return 6; }
+    static constexpr uint64_t value() { return 6; }
 };
 
 /// Template specialization for unsigned 32-bit log2
 template<> class bits_log2<uint32_t> {
 public:
-    static constexpr const uint32_t value() { return 5; }
+    static constexpr uint32_t value() { return 5; }
 };
 
 /// Template specialization for unsigned 16-bit log2
 template<> class bits_log2<uint16_t> {
 public:
-    static constexpr const uint16_t value() { return 4; }
+    static constexpr uint16_t value() { return 4; }
 };
 
 /// Template specialization for unsigned 8-bit log2
 template<> class bits_log2<uint8_t> {
 public:
-    static constexpr const uint8_t value() { return 3; }
+    static constexpr uint8_t value() { return 3; }
 };
 
 ///@}

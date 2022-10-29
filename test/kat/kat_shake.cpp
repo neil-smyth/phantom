@@ -120,6 +120,9 @@ bool test_message(size_t test_number, xof_alg_e type, const std::string &ref_dig
 
 int main(int argc, char *argv[])
 {
+    (void) argc;
+    (void) argv;
+    
     std::cout << "SHAKE Known Answer Test" << std::endl;
 
     for (size_t i=0; i < 6; i++) {

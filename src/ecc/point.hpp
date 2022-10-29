@@ -171,7 +171,11 @@ public:
     virtual retcode_e convert_to_mixed(const ecc_config<T>& config) = 0;
 
     /// Recover the y coordinate
-    virtual void y_recovery(const ecc_config<T>& config, point<T>& p, point<T>& p_minus) {}
+    virtual void y_recovery(const ecc_config<T>& config, point<T>& p, point<T>& p_minus) {
+        (void) config;
+        (void) p;
+        (void) p_minus;
+    }
 
     /// Point doubling
     virtual retcode_e doubling(const ecc_config<T>& config, size_t w) = 0;

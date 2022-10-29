@@ -43,6 +43,9 @@ std::unique_ptr<user_ctx> saber_pke::create_ctx(size_t set,
 {
     std::stringstream ss;
 
+    (void) size_hint;
+    (void) masking;
+
     ctx_saber_pke* ctx = new ctx_saber_pke(set);
     if (ctx->get_set() > 2) {
         ss << "Parameter set " << ctx->get_set() << " is out of range";
@@ -223,6 +226,7 @@ bool saber_pke::decrypt(const std::unique_ptr<user_ctx>& ctx, const phantom_vect
 
 size_t saber_pke::get_msg_len(const std::unique_ptr<user_ctx>& ctx) const
 {
+    (void) ctx;
     return SABRE_MSG_LEN;
 }
 

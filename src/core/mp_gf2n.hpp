@@ -260,6 +260,7 @@ public:
     /// Set the sign flag to the defined value
     virtual void set_sign(bool sign)
     {
+        (void) sign;
     }
 
     // Memory pre-allocation and value set to zero

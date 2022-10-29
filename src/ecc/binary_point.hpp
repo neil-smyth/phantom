@@ -54,6 +54,9 @@ public:
     /// A Montgomery ladder step
     virtual retcode_e ladder_step(const ecc_config<T>& config, point<T>* p_other, const point<T>& p_base)
     {
+        (void) config;
+        (void) p_other;
+        (void) p_base;
         return POINT_ERROR;
     }
 };

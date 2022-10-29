@@ -171,6 +171,9 @@ int32_t aes_gcm::encrypt_start(const uint8_t *iv, size_t iv_len,
     memset(m_iv, 0x00, sizeof(m_iv) );
     memset(m_authbuf, 0x00, sizeof(m_authbuf) );
 
+    (void) msg_len;
+    (void) tag_len;
+
     m_length = 0;
 
     if (12 == iv_len) {
@@ -304,6 +307,8 @@ int32_t aes_gcm::encrypt_finish(uint8_t *tag, size_t tag_len)
 int32_t aes_gcm::decrypt_start(const uint8_t *iv, size_t iv_len,
     const uint8_t *aad, size_t aad_len, size_t msg_len, size_t tag_len)
 {
+    (void) msg_len;
+    (void) tag_len;
     return encrypt_start(iv, iv_len, aad, aad_len);
 }
 

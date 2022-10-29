@@ -21,6 +21,9 @@ using namespace phantom;  // NOLINT
 
 int main(int argc, char *argv[])
 {
+    (void) argc;
+    (void) argv;
+    
     std::cout << "Kyber KEM Test" << std::endl;
 
     phantom_vector<uint8_t> m(128);

@@ -143,6 +143,7 @@ public:
 
     static core::mpz<uint16_t>& static_reduce(core::mpz<uint16_t>& a, const core::mod_config<uint16_t>& cfg)
     {
+        (void) cfg;
         return a;
     }
 };

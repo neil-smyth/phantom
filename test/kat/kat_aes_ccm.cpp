@@ -109,6 +109,9 @@ phantom_vector<uint8_t> cstring_to_hex(const std::string& input)
 
 int main(int argc, char *argv[])
 {
+    (void) argc;
+    (void) argv;
+    
     std::cout << "AES CCM Known Answer Test" << std::endl;
 
     for (size_t i=0; i < sizeof(tv)/sizeof(aes_ccm_tv); i++) {

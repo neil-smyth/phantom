@@ -336,10 +336,10 @@ df_kem = pd.DataFrame(dkem.data, columns=['Parameter Set', 'Operations/sec', 'Op
 
 plot_kem = sns.catplot(kind="bar", x = 'Parameter Set', y = 'Operations/sec', col = 'Scheme', hue='Operation',
     data=df_kem, legend_out=False, height=5, aspect=1.5, col_wrap=1, sharex=False, palette=sns.color_palette("GnBu_d", 3))
-ax = plot_kem.facet_axis(0, 0)
-for c in ax.containers:
-    labels = [f'{(v.get_height() / 1000):.1f}K' for v in c]
-    ax.bar_label(c, labels=labels, label_type='edge')
+for ax in plot_kem.axes.ravel():
+    for c in ax.containers:
+        labels = [f'{(v.get_height()):.1f}' for v in c]
+        ax.bar_label(c, labels=labels, label_type='edge')
 sns.move_legend(plot_kem, "upper right", bbox_to_anchor=(.95, 0.95))
 plot_kem.set_titles("{col_name}", size=20)
 plot_kem.set(xlabel="Parameter Set")
@@ -371,29 +371,29 @@ plt.subplots_adjust(hspace = 0.25)
 plt.savefig('kex.png')
 
 
-dpke = plotData()
-for pkc in dec["pkc"]:
-    if pkc["masking"] == True:
-        for pke in pkc["pke"]:
-            for metrics in pke["metrics"]:
-                if pke["scheme"] == "RSAES-OAEP":
-                    dpke.append(metrics["parameter_set"], metrics["keygen_per_sec"], "Key Generation", pke["scheme"])
-                    dpke.append(metrics["parameter_set"], metrics["encrypt_per_sec"], "Encryption", pke["scheme"])
-                    dpke.append(metrics["parameter_set"], metrics["decrypt_per_sec"], "Decryption", pke["scheme"])
-
-df_pke = pd.DataFrame(dpke.data, columns=['Parameter Set', 'Operations/sec', 'Operation', 'Scheme'])
-
-plot_pke = sns.catplot(kind="bar", x = 'Parameter Set', y = 'Operations/sec', col = 'Scheme', hue='Operation',
-    data=df_pke, legend_out=False, height=5, aspect=1.5, col_wrap=1, sharex=False, palette=sns.color_palette("GnBu_d", 3))
-ax = plot_pke.facet_axis(0, 0)
-for c in ax.containers:
-    labels = [f'{(v.get_height() / 1000):.1f}K' for v in c]
-    ax.bar_label(c, labels=labels, label_type='edge')
-sns.move_legend(plot_pke, "upper right")
-plot_pke.set_titles("{col_name}", size=20)
-plot_pke.set(xlabel="Parameter Set")
-plt.subplots_adjust(hspace = 0.25)
-plt.savefig('pke.png')
+#dpke = plotData()
+#for pkc in dec["pkc"]:
+#    if pkc["masking"] == True:
+#        for pke in pkc["pke"]:
+#            for metrics in pke["metrics"]:
+#                if pke["scheme"] == "RSAES-OAEP":
+#                    dpke.append(metrics["parameter_set"], metrics["keygen_per_sec"], "Key Generation", pke["scheme"])
+#                    dpke.append(metrics["parameter_set"], metrics["encrypt_per_sec"], "Encryption", pke["scheme"])
+#                    dpke.append(metrics["parameter_set"], metrics["decrypt_per_sec"], "Decryption", pke["scheme"])
+#
+#df_pke = pd.DataFrame(dpke.data, columns=['Parameter Set', 'Operations/sec', 'Operation', 'Scheme'])
+#
+#plot_pke = sns.catplot(kind="bar", x = 'Parameter Set', y = 'Operations/sec', col = 'Scheme', hue='Operation',
+#    data=df_pke, legend_out=False, height=5, aspect=1.5, col_wrap=1, sharex=False, palette=sns.color_palette("GnBu_d", 3))
+#ax = plot_pke.facet_axis(0, 0)
+#for c in ax.containers:
+#    labels = [f'{(v.get_height() / 1000):.1f}K' for v in c]
+#    ax.bar_label(c, labels=labels, label_type='edge')
+#sns.move_legend(plot_pke, "upper right")
+#plot_pke.set_titles("{col_name}", size=20)
+#plot_pke.set(xlabel="Parameter Set")
+#plt.subplots_adjust(hspace = 0.25)
+#plt.savefig('pke.png')
 
 
 dsig = plotData()

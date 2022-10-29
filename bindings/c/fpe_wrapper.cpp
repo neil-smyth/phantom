@@ -31,6 +31,8 @@ extern "C" {
 
     cfpe* create_fpe(int max_size)
     {
+        (void) max_size;
+
         cfpe* handle = new cfpe;
         handle->m.clear();
         return handle;
@@ -42,7 +44,7 @@ extern "C" {
         delete p_fpe;
     }
 
-    void create_fpe_ctx(cfpe *p_fpe, cfpe_ctx* p_ctx, const uint8_t* user_key, int user_key_len,
+    void create_fpe_ctx(cfpe_ctx* p_ctx, const uint8_t* user_key, int user_key_len,
         phantom::fpe_type_e type, phantom::fpe_format_e format, const uint8_t* tweak, int tweak_len)
     {
         phantom::phantom_vector<uint8_t> k(user_key, user_key + user_key_len), t(tweak, tweak + tweak_len);
@@ -70,7 +72,7 @@ extern "C" {
         }
     }
 
-    bool fpe_encrypt_str(cfpe* p_fpe, bool encrypt_flag, cfpe_ctx* p_ctx, char** inout, int n)
+    bool fpe_encrypt_str(bool encrypt_flag, cfpe_ctx* p_ctx, char** inout, int n)
     {
         if (nullptr == p_ctx || nullptr == p_ctx->smart_ctx.get() || nullptr == inout) {
             return false;
@@ -95,7 +97,7 @@ extern "C" {
         return true;
     }
 
-    bool fpe_encrypt_number(cfpe* p_fpe, bool encrypt_flag, cfpe_ctx* p_ctx, int* inout, int n, int range)
+    bool fpe_encrypt_number(bool encrypt_flag, cfpe_ctx* p_ctx, int* inout, int n, int range)
     {
         if (nullptr == p_ctx || nullptr == p_ctx->smart_ctx.get() || nullptr == inout) {
             return false;
@@ -113,7 +115,7 @@ extern "C" {
         return true;
     }
 
-    bool fpe_encrypt_float(cfpe* p_fpe, bool encrypt_flag, cfpe_ctx* p_ctx,
+    bool fpe_encrypt_float(bool encrypt_flag, cfpe_ctx* p_ctx,
         double* inout, int n, int range, int precision)
     {
         if (nullptr == p_ctx || nullptr == p_ctx->smart_ctx.get() || nullptr == inout) {
@@ -144,7 +146,7 @@ extern "C" {
         }
 
         cfpe_ctx* ctx = &it->second;
-        fpe_encrypt_str(p_fpe, encrypt_flag, ctx, inout, n);
+        fpe_encrypt_str(encrypt_flag, ctx, inout, n);
         return true;
     }
 
@@ -160,7 +162,7 @@ extern "C" {
         }
 
         cfpe_ctx* ctx = &it->second;
-        fpe_encrypt_number(p_fpe, encrypt_flag, ctx, inout, n, range);
+        fpe_encrypt_number(encrypt_flag, ctx, inout, n, range);
         return true;
     }
 
@@ -177,7 +179,7 @@ extern "C" {
         }
 
         cfpe_ctx* ctx = &it->second;
-        fpe_encrypt_float(p_fpe, encrypt_flag, ctx, inout, n, range, precision);
+        fpe_encrypt_float(encrypt_flag, ctx, inout, n, range, precision);
         return true;
     }
 

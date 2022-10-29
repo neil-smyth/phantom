@@ -87,6 +87,8 @@ std::unique_ptr<user_ctx> ecdh_key_exchange::create_ctx(size_t set,
     std::stringstream ss;
     user_ctx* ctx;
 
+    (void)masking;
+
     switch (size_hint)
     {
         case CPU_WORD_SIZE_16: ctx = new ctx_ecdh_tmpl<uint16_t>(set); break;
@@ -116,30 +118,39 @@ std::unique_ptr<user_ctx> ecdh_key_exchange::create_ctx(size_t set,
 
 bool ecdh_key_exchange::keygen(std::unique_ptr<user_ctx>& ctx)
 {
+    (void) ctx;
     LOG_WARNING("Illegal call", g_pkc_log_level);
     return false;
 }
 
 bool ecdh_key_exchange::set_public_key(std::unique_ptr<user_ctx>& ctx, const phantom_vector<uint8_t>& k)
 {
+    (void) ctx;
+    (void) k;
     LOG_WARNING("Illegal call", g_pkc_log_level);
     return false;
 }
 
 bool ecdh_key_exchange::get_public_key(std::unique_ptr<user_ctx>& ctx, phantom_vector<uint8_t>& k)
 {
+    (void) ctx;
+    (void) k;
     LOG_WARNING("Illegal call", g_pkc_log_level);
     return false;
 }
 
 bool ecdh_key_exchange::set_private_key(std::unique_ptr<user_ctx>& ctx, const phantom_vector<uint8_t>& k)
 {
+    (void) ctx;
+    (void) k;
     LOG_WARNING("Illegal call", g_pkc_log_level);
     return false;
 }
 
 bool ecdh_key_exchange::get_private_key(std::unique_ptr<user_ctx>& ctx, phantom_vector<uint8_t>& k)
 {
+    (void) ctx;
+    (void) k;
     LOG_WARNING("Illegal call", g_pkc_log_level);
     return false;
 }

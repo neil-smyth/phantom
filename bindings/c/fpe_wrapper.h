@@ -26,7 +26,7 @@ extern "C" {
     void destroy_fpe(cfpe *p_abc);
 
     /// Create a specific context based on the key, type, format and tweak value
-    void create_fpe_ctx(cfpe *p_fpe, cfpe_ctx* p_ctx,
+    void create_fpe_ctx(cfpe_ctx* p_ctx,
         const uint8_t* user_key, int user_key_len,
         phantom::fpe_type_e type, phantom::fpe_format_e format,
         const uint8_t* tweak, int tweak_len);
@@ -44,21 +44,18 @@ extern "C" {
     /**
      * @brief Encrypt/decrypt an array of n strings
      * 
-     * @param p_fpe FPE handle
-     * @param encrypt_flag True for encrypt, false for decrypt
+     *@param encrypt_flag True for encrypt, false for decrypt
      * @param p_ctx FPE context handle
      * @param inout Data to be transformed in-place
      * @param n Number of strings in array
      * @return true Success
      * @return false Failure
      */
-    bool fpe_encrypt_str(cfpe* p_fpe, bool encrypt_flag, cfpe_ctx* p_ctx,
-        char** inout, int n);
+    bool fpe_encrypt_str(bool encrypt_flag, cfpe_ctx* p_ctx, char** inout, int n);
 
     /**
      * @brief Encrypt/decrypt an array of n integers
      * 
-     * @param p_fpe FPE handle
      * @param encrypt_flag True for encrypt, false for decrypt
      * @param p_ctx FPE context handle
      * @param inout Data to be transformed in-place
@@ -66,21 +63,22 @@ extern "C" {
      * @return true Success
      * @return false Failure
      */
-    bool fpe_encrypt_number(cfpe* p_fpe, bool encrypt_flag, cfpe_ctx* p_ctx,
+    bool fpe_encrypt_number(bool encrypt_flag, cfpe_ctx* p_ctx,
         int* inout, int n, int range);
 
     /**
      * @brief Encrypt/decrypt an array of n floating-point numbers
      * 
-     * @param p_fpe FPE handle
      * @param encrypt_flag True for encrypt, false for decrypt
      * @param p_ctx FPE context handle
      * @param inout Data to be transformed in-place
      * @param n Number of doubles in array
+     * @param range Range
+     * @param precision Precision
      * @return true Success
      * @return false Failure
      */
-    bool fpe_encrypt_float(cfpe* p_fpe, bool encrypt_flag, cfpe_ctx* p_ctx,
+    bool fpe_encrypt_float(bool encrypt_flag, cfpe_ctx* p_ctx,
         double* inout, int n, int range, int precision);
 
     /**
@@ -102,14 +100,13 @@ extern "C" {
      * 
      * @param p_fpe FPE handle
      * @param encrypt_flag True for encrypt, false for decrypt
-     * @param p_ctx FPE context handle
+     * @param hashkey Hashmap key identifying a stored key
      * @param inout Data to be transformed in-place
      * @param n Number of strings in array
      * @return true Success
      * @return false Failure
      */
-    bool fpe_cache_encrypt_str(cfpe* p_fpe, bool encrypt_flag,
-        const char* hashkey, char** inout, int n);
+    bool fpe_cache_encrypt_str(cfpe* p_fpe, bool encrypt_flag, const char* hashkey, char** inout, int n);
 
     /**
      * @brief Encrypt/decrypt an array of n integers using a cached context

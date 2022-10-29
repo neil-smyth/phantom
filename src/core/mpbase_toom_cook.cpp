@@ -280,7 +280,7 @@ static void interpolate_recombine_5(T *c, T *v2, T *vm1, size_t n, size_t s, siz
  * @return const size_t Memory required (in limbs)
  */
 template<typename T>
-const size_t mpbase<T>::get_toom22_scratch_size(size_t n)
+size_t mpbase<T>::get_toom22_scratch_size(size_t n)
 {
     return 2 * (n + std::numeric_limits<T>::digits);
 }
@@ -659,7 +659,7 @@ void mpbase<T>::mul_toom32(T *out, const T *in1, size_t n1, const T *in2, size_t
  * @return const size_t Memory required (in limbs)
  */
 template<typename T>
-const size_t mpbase<T>::get_toom33_scratch_size(size_t n)
+size_t mpbase<T>::get_toom33_scratch_size(size_t n)
 {
     return 3 * (n + std::numeric_limits<T>::digits);
 }

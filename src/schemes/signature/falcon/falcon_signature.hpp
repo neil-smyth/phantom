@@ -89,6 +89,8 @@ private:
 
     static size_t bits_2_set(security_strength_e bits);
 
+    bool check_norm_bd(float bd, const int32_t *s1, const int32_t *s2, size_t n);
+
     /// Generate the key pair (f,g,F,G) and h
     static int32_t gen_keypair(std::unique_ptr<user_ctx>& ctx, int32_t* f, int32_t* g, int32_t* F, int32_t* G,
         int32_t* h, uint32_t* h_ntt);

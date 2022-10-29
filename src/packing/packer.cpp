@@ -24,6 +24,8 @@ packer::~packer()
 
 void packer::write_signed(int32_t data, size_t bits, pack_e type)
 {
+    (void) type;
+
     // Modify data and bits according to type
     uint32_t coded = static_cast<uint32_t>(data);
 
@@ -32,12 +34,13 @@ void packer::write_signed(int32_t data, size_t bits, pack_e type)
 
 void packer::write_unsigned(uint32_t data, size_t bits, pack_e type)
 {
+    (void) type;
     m_stream->write(data, bits);
 }
 
-void packer::flush(size_t alignment)
+void packer::flush()
 {
-    m_stream->flush(alignment);
+    m_stream->flush();
 }
 
 const phantom_vector<uint8_t>& packer::get()
@@ -45,9 +48,9 @@ const phantom_vector<uint8_t>& packer::get()
     return m_stream->get();
 }
 
-const phantom_vector<uint8_t>& packer::serialize(size_t alignment)
+const phantom_vector<uint8_t>& packer::serialize()
 {
-    m_stream->flush(alignment);
+    m_stream->flush();
     return m_stream->get();
 }
 

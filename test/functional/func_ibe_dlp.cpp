@@ -25,6 +25,9 @@ using namespace core;       // NOLINT
 
 int main(int argc, char *argv[])
 {
+    (void) argc;
+    (void) argv;
+    
     std::cout << "DLP-IBE Test" << std::endl;
 
     for (size_t i=0; i < 2; i++) {

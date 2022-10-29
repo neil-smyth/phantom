@@ -71,6 +71,9 @@ std::unique_ptr<user_ctx> dilithium_signature::create_ctx(size_t set,
 {
     std::stringstream ss;
 
+    (void) size_hint;
+    (void) masking;
+
     ctx_dilithium* ctx = new ctx_dilithium(set);
     if (ctx->get_set() > 9) {
         ss << "Parameter set " << ctx->get_set() << " is out of range";
@@ -85,8 +88,7 @@ std::unique_ptr<user_ctx> dilithium_signature::create_ctx(size_t set,
 
 // Uniform sampling of an mx1 matrix with coefficients of -eta to +eta
 void dilithium_signature::uniform_rand_sample_small(dilithium *dil, const phantom_vector<uint8_t>& seed,
-    uint32_t q, int32_t eta, size_t bits,
-    int32_t *s, size_t n, size_t m, uint16_t nonce) const
+    int32_t eta, int32_t *s, size_t n, size_t m, uint16_t nonce) const
 {
     auto xof = dil->get_xof();
 
@@ -128,8 +130,7 @@ void dilithium_signature::uniform_random_ring_q(dilithium* dil,
                                                 uint16_t nonce,
                                                 int32_t *a,
                                                 size_t n,
-                                                uint32_t q,
-                                                uint32_t q_bits) const
+                                                uint32_t q) const
 {
     const size_t shake128_rate          = 168;
     const size_t stream128_blockbytes   = shake128_rate;
@@ -160,7 +161,7 @@ void dilithium_signature::uniform_random_ring_q(dilithium* dil,
 }
 
 void dilithium_signature::create_rand_product(
-    ctx_dilithium& ctx, uint8_t *seed, uint32_t q, uint32_t q_bits, uint32_t *t, int32_t *y, size_t logn,
+    ctx_dilithium& ctx, uint8_t *seed, uint32_t q, uint32_t *t, int32_t *y, size_t logn,
     size_t k, size_t l, uint32_t *c) const
 {
     const size_t n = 1 << logn;
@@ -181,11 +182,11 @@ void dilithium_signature::create_rand_product(
 
     // k x l matrix multiplication of n-element rings
     for (size_t i=0; i < k; i++) {
-        uniform_random_ring_q(ctx.get_dilithium(), seed, (i << 8), reinterpret_cast<int32_t*>(c), n, q, q_bits);
+        uniform_random_ring_q(ctx.get_dilithium(), seed, (i << 8), reinterpret_cast<int32_t*>(c), n, q);
         ctx.get_ntt()->mul(t + i*n, yu, c);
 
         for (size_t j=1; j < l; j++) {
-            uniform_random_ring_q(ctx.get_dilithium(), seed, (i << 8) + j, reinterpret_cast<int32_t*>(c), n, q, q_bits);
+            uniform_random_ring_q(ctx.get_dilithium(), seed, (i << 8) + j, reinterpret_cast<int32_t*>(c), n, q);
             ctx.get_ntt()->mul(c, yu + j*n, c);
 
             for (size_t k=0; k < n; k++) {
@@ -237,13 +238,13 @@ void dilithium_signature::create_A_product(
 }
 
 void dilithium_signature::expand_A(
-    ctx_dilithium& ctx, uint8_t *seed, uint32_t q, uint32_t q_bits, int32_t *A, size_t n,
+    ctx_dilithium& ctx, uint8_t *seed, uint32_t q, int32_t *A, size_t n,
     size_t k, size_t l) const
 {
     // k x l matrix generation of n-element rings of uniform random samples
     for (size_t i=0; i < k; i++) {
         for (size_t j=0; j < l; j++) {
-            uniform_random_ring_q(ctx.get_dilithium(), seed, (i << 8) + j, A + i*l*n + j*n, n, q, q_bits);
+            uniform_random_ring_q(ctx.get_dilithium(), seed, (i << 8) + j, A + i*l*n + j*n, n, q);
         }
     }
 }
@@ -261,7 +262,6 @@ bool dilithium_signature::keygen(std::unique_ptr<user_ctx>& ctx)
     uint32_t q        = myctx.get_dilithium()->get_params()->q;
     uint32_t q_bits   = myctx.get_dilithium()->get_params()->q_bits;
     uint32_t eta      = myctx.get_dilithium()->get_params()->eta;
-    uint32_t eta_bits = myctx.get_dilithium()->get_params()->eta_bits;
     uint32_t l        = myctx.get_dilithium()->get_params()->l;
     uint32_t k        = myctx.get_dilithium()->get_params()->k;
     uint32_t d        = myctx.get_dilithium()->get_params()->d;
@@ -281,8 +281,8 @@ bool dilithium_signature::keygen(std::unique_ptr<user_ctx>& ctx)
     // -eta to +eta inclusive
     myctx.s1() = phantom_vector<int32_t>(l*n);
     myctx.s2() = phantom_vector<int32_t>(k*n);
-    uniform_rand_sample_small(myctx.get_dilithium(), rho_prime, q, eta, eta_bits, myctx.s1().data(), n, l, 0);
-    uniform_rand_sample_small(myctx.get_dilithium(), rho_prime, q, eta, eta_bits, myctx.s2().data(), n, k, l);
+    uniform_rand_sample_small(myctx.get_dilithium(), rho_prime, eta, myctx.s1().data(), n, l, 0);
+    uniform_rand_sample_small(myctx.get_dilithium(), rho_prime, eta, myctx.s2().data(), n, k, l);
     myctx.t()  = phantom_vector<int32_t>(k*n);
     LOG_DEBUG_ARRAY("s1", g_pkc_log_level, myctx.s1().data(), myctx.s1().size());
     LOG_DEBUG_ARRAY("s2", g_pkc_log_level, myctx.s2().data(), myctx.s2().size());
@@ -302,7 +302,7 @@ bool dilithium_signature::keygen(std::unique_ptr<user_ctx>& ctx)
     // sampled as a k x l matrix of ring polynomials with n coefficients.
     // The kxl A matrix is multiplied by the lx1 s1 matrix to form a kx1
     // matrix to which s2 is added.
-    create_rand_product(myctx, myctx.rho(), q, q_bits,
+    create_rand_product(myctx, myctx.rho(), q,
                         reinterpret_cast<uint32_t*>(myctx.t().data()), myctx.s1().data(), n_bits, k, l, c.data());
     core::poly<int32_t>::add(myctx.t().data(), k*n, myctx.t().data(), myctx.s2().data());
     core::poly<int32_t>::mod_unsigned(myctx.t().data(), k*n, q);
@@ -310,7 +310,7 @@ bool dilithium_signature::keygen(std::unique_ptr<user_ctx>& ctx)
 
     // Truncate and round the t ring polynomial by d bits and write to the public key.
     myctx.t1() = phantom_vector<int32_t>(k*n);
-    myctx.get_dilithium()->pwr_2_round(myctx.t1().data(), myctx.t().data(), q, n, k, d);
+    myctx.get_dilithium()->pwr_2_round(myctx.t1().data(), myctx.t().data(), n, k, d);
     LOG_DEBUG_ARRAY("t1", g_pkc_log_level, myctx.t1().data(), myctx.t1().size());
     LOG_DEBUG_ARRAY("t0", g_pkc_log_level, myctx.t().data(), myctx.t().size());
 
@@ -494,6 +494,7 @@ void dilithium_signature::to_montgomery(ctx_dilithium& ctx, uint32_t *out, const
 void dilithium_signature::from_montgomery(ctx_dilithium& ctx, int32_t *out, const uint32_t *in,
     uint32_t q, size_t n, size_t offset) const
 {
+    (void) q;
     ctx.get_reduction().convert_from(reinterpret_cast<uint32_t*>(out) + offset, in, n);
 }
 
@@ -529,7 +530,6 @@ bool dilithium_signature::sign(const std::unique_ptr<user_ctx>& ctx,
     size_t    n            = dil->get_params()->n;
     size_t    n_bits       = dil->get_params()->n_bits;
     size_t    q            = dil->get_params()->q;
-    uint32_t  q_bits       = dil->get_params()->q_bits;
     uint32_t  z_bits       = dil->get_params()->z_bits;
     uint32_t  beta         = dil->get_params()->beta;
     uint32_t  omega        = dil->get_params()->omega;
@@ -574,12 +574,12 @@ bool dilithium_signature::sign(const std::unique_ptr<user_ctx>& ctx,
     LOG_DEBUG_ARRAY("rho_prime", g_pkc_log_level, rho_prime.data(), 64);
 
     // Create the matrix A outside of the rejection loop
-    expand_A(myctx, myctx.rho(), q, q_bits, A, n, k, l);
+    expand_A(myctx, myctx.rho(), q, A, n, k, l);
 
 restart:
 
     // Generate y using the deterministic ExpandMask(ρ′, κ) function
-    dil->expand_mask(rho_prime.data(), kappa, gamma_1, gamma_1_bits, q, l, n, y, myctx.K());
+    dil->expand_mask(rho_prime.data(), kappa, gamma_1, gamma_1_bits, l, n, y);
     kappa += l;
     LOG_DEBUG_ARRAY("y", g_pkc_log_level, y, l*n);
 
@@ -775,7 +775,7 @@ bool dilithium_signature::verify(const std::unique_ptr<user_ctx>& ctx,
     }
 
     // Create a XOF random oracle and generate the kx1 matrix w = A*z mod q
-    create_rand_product(myctx, myctx.rho(), q, q_bits, reinterpret_cast<uint32_t*>(w),
+    create_rand_product(myctx, myctx.rho(), q, reinterpret_cast<uint32_t*>(w),
         z, n_bits, k, l, reinterpret_cast<uint32_t*>(temp));
 
     // Convert c to Montgomery representation in the NTT domain

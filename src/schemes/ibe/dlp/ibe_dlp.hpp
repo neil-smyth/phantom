@@ -56,7 +56,7 @@ public:
 
     /// @brief Load an IBE User Key
     /// @param ctx The user context containing the key
-    /// @param id The ID of the user for which a User Key is being extracted
+    /// @param id The ID of the user
     /// @param key The output User Key
     /// @return True on success, false otherwise
     bool load_user_key(std::unique_ptr<user_ctx>& ctx,

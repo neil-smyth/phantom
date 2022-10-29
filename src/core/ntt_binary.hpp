@@ -58,7 +58,8 @@ public:
     ntt_binary(const reduction<R, T>& reduce, T g, size_t n, log_level_e logging = LOG_LEVEL_NONE) :
         m_reduce(reduce),
         m_n(n),
-        m_invn(m_reduce.inverse_2k(m_n))
+        m_invn(m_reduce.inverse_2k(m_n)),
+        m_logging(logging)
     {
         T q      = m_reduce.get_q();
         T invg   = number<T>::umod_mul_inverse(g, q);
@@ -73,7 +74,8 @@ public:
     ntt_binary(const reduction<R, T>& reduce, size_t n, log_level_e logging = LOG_LEVEL_NONE) :
         m_reduce(reduce),
         m_n(n),
-        m_invn(m_reduce.inverse_2k(m_n))
+        m_invn(m_reduce.inverse_2k(m_n)),
+        m_logging(logging)
     {
         // No generator or inverse generator polynomial are provided,
         // therefore they are computed

@@ -999,6 +999,8 @@ key_sharing* key_sharing::make(key_sharing_type_e type, size_t key_len, std::sha
 {
     key_sharing* ctx = nullptr;
 
+    (void) key_len;
+
     switch (type)
     {
 #if defined(ENABLE_SHAMIRS_SECRET_SHARING)

@@ -154,18 +154,18 @@ public:
     }
 
     /// Add each coefficient of two polynomials
-    static void add_single(T *out, size_t n, const T *in)
+    static void add_single(T *inout, size_t n, const T *in)
     {
         for (size_t i=n; i--;) {
-            out[i] += in[i];
+            inout[i] += in[i];
         }
     }
 
     /// Subtract each coefficient of two polynomials
-    static void sub_single(T *out, size_t n, const T *in)
+    static void sub_single(T *inout, size_t n, const T *in)
     {
         for (size_t i=n; i--;) {
-            out[i] -= in[i];
+            inout[i] -= in[i];
         }
     }
 
