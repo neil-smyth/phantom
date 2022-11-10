@@ -594,7 +594,7 @@ T mpbase<T>::divappr_qr_1(T* q_limbs, T* n_limbs, size_t nn, const T* d_limbs, s
 {
     T qh;
     size_t qn;
-    ssize_t i;
+    ssize_t i, sdn;
     T n1, n0;
     T d1, d0;
     T cy, cy1;
@@ -620,10 +620,10 @@ T mpbase<T>::divappr_qr_1(T* q_limbs, T* n_limbs, size_t nn, const T* d_limbs, s
 
     q_limbs += qn;
 
-    dn -= 2;          // offset dn by 2 for main division loops,
-                        // saving two iterations in submul_1
-    d1 = d_limbs[dn + 1];
-    d0 = d_limbs[dn + 0];
+    dn -= 2;          // offset dn by 2 for main division loops, saving two iterations in submul_1
+    sdn = dn;
+    d1  = d_limbs[dn + 1];
+    d0  = d_limbs[dn + 0];
 
     n_limbs -= 2;
 
@@ -658,7 +658,7 @@ T mpbase<T>::divappr_qr_1(T* q_limbs, T* n_limbs, size_t nn, const T* d_limbs, s
 
     flag = ~T(0);
 
-    if (dn >= 0) {
+    if (sdn >= 0) {
         for (i = dn; i > 0; i--) {
             n_limbs--;
             if (n1 >= (d1 & flag)) {
