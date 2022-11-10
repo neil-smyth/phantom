@@ -1994,7 +1994,7 @@ void mpbase<T>::tdiv_qr(T* q_limbs, T* r_limbs, const T* n_limbs, size_t nn, con
             T quotient_too_large;
             size_t cnt;
 
-            size_t qn = nn - dn;
+            ssize_t qn = nn - dn;
             q_limbs[qn] = 0;             // zero high quotient limb
             qn += adjust;                // qn cannot become bigger
 
