@@ -39,7 +39,7 @@ bool unpacker::is_data_available() const
 int32_t unpacker::read_signed(size_t bits, pack_e type)
 {
     (void) type;
-    
+
     uint32_t coded          = m_stream->read(bits);  // flawfinder: ignore
     uint32_t sign           = 1 << (bits - 1);
     uint32_t sign_extension = ((1 << (32 - bits)) - 1) << bits;

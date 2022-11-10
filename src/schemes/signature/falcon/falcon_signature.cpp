@@ -8,6 +8,7 @@
  *****************************************************************************/
 
 #include "schemes/signature/falcon/falcon_signature.hpp"
+#include <limits>
 #include "schemes/signature/falcon/ctx_falcon.hpp"
 #include "ntru/ntru_master_tree.hpp"
 #include "ntru/ntru.hpp"
