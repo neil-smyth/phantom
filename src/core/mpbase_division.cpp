@@ -593,7 +593,7 @@ template<typename T>
 T mpbase<T>::divappr_qr_1(T* q_limbs, T* n_limbs, size_t nn, const T* d_limbs, size_t dn, T dinv)
 {
     T qh;
-    size_t qn, i;
+    ssize_t qn, i;
     T n1, n0;
     T d1, d0;
     T cy, cy1;
