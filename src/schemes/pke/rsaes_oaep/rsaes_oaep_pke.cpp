@@ -25,12 +25,13 @@ namespace schemes {
 template<typename T>
 using rsa_oaep = phantom::rsa::rsa_cryptosystem_oaep<T>;
 
-const phantom::rsa::rsa_set_t rsaes_oaep_pke::m_params[16] = {
+const phantom::rsa::rsa_set_t rsaes_oaep_pke::m_params[5] = {
     {0,  HASH_SHA2_224, 1024,  "65537"},
-    {1,  HASH_SHA2_224, 2048,  "65537"},
-    {2,  HASH_SHA2_256, 3072,  "65537"},
-    {3,  HASH_SHA2_256, 4096,  "65537"},
-    {4,  HASH_SHA2_256, 5120,  "65537"},
+    {1,  HASH_SHA2_224, 1536,  "65537"},
+    {2,  HASH_SHA2_256, 2048,  "65537"},
+    {3,  HASH_SHA2_256, 3072,  "65537"},
+    {4,  HASH_SHA2_256, 4096,  "65537"},
+    /*{4,  HASH_SHA2_256, 5120,  "65537"},
     {5,  HASH_SHA2_256, 6144,  "65537"},
     {6,  HASH_SHA2_256, 7168,  "65537"},
     {7,  HASH_SHA2_384, 8192,  "65537"},
@@ -41,7 +42,7 @@ const phantom::rsa::rsa_set_t rsaes_oaep_pke::m_params[16] = {
     {12, HASH_SHA2_384, 13312, "65537"},
     {13, HASH_SHA2_384, 14336, "65537"},
     {14, HASH_SHA2_512, 15360, "65537"},
-    {15, HASH_SHA2_512, 16384, "65537"},
+    {15, HASH_SHA2_512, 16384, "65537"},*/
 };
 
 size_t rsaes_oaep_pke::bits_2_set(security_strength_e bits)
