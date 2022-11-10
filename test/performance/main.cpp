@@ -30,6 +30,9 @@ int main(int argc, char *argv[])
 {
     size_t test_duration = 1000000;
 
+    (void) argc;
+    (void) argv;
+
     std::cout << "Phantom performance" << std::endl << std::endl;
 
     auto now = std::chrono::system_clock::now();

@@ -331,7 +331,7 @@ template<typename T>
 T mpbase<T>::divrem_2(T* q_limbs, size_t q_offset, T* n_limbs, size_t n, const T* d_limbs)
 {
     T most_significant_q_limb;
-    size_t i;
+    ssize_t i;
     T r1, r0, d1, d0;
 
     // Rule checking for conditions of use
