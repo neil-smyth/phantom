@@ -593,7 +593,8 @@ template<typename T>
 T mpbase<T>::divappr_qr_1(T* q_limbs, T* n_limbs, size_t nn, const T* d_limbs, size_t dn, T dinv)
 {
     T qh;
-    ssize_t qn, i;
+    size_t qn;
+    ssize_t i;
     T n1, n0;
     T d1, d0;
     T cy, cy1;
@@ -1989,7 +1990,7 @@ void mpbase<T>::tdiv_qr(T* q_limbs, T* r_limbs, const T* n_limbs, size_t nn, con
 
             T* tp;
             T cy;
-            size_t in, rn;
+            ssize_t in, rn;
             T quotient_too_large;
             size_t cnt;
 
@@ -2225,8 +2226,7 @@ int mpbase<T>::divisible_p(const T *a_limbs, size_t an, const T *d_limbs, size_t
             twos = bit_manipulation::ctz(dlow);
             dlow = (dlow >> twos) | (dsecond << (std::numeric_limits<T>::digits - twos));
             assert(dlow);
-            return (an < 0) ? modexact_1_odd(a_limbs, an, dlow)
-                            : mod_1(a_limbs, an, dlow);
+            return mod_1(a_limbs, an, dlow);
         }
     }
 
