@@ -25,10 +25,10 @@ namespace schemes {
 
 const falcon_set_t ctx_falcon::m_params[2] = {
     {
-        0, 12289, 12289 - 2, 14, 512, 9, 0x403001, 0x77402FFF, 4091, 10952, 6598
+        0, 12289, 12289 - 2, 14, 512, 9, 49, 1254, 4091, 10952, 5833
     },
     {
-        1, 12289, 12289 - 2, 14, 1024, 10, 0x403001, 0x77402FFF, 4091, 10952, 9331
+        1, 12289, 12289 - 2, 14, 1024, 10, 7, 8778, 4091, 10952, 8382
     }
 };
 
@@ -443,32 +443,43 @@ bool falcon_signature::sign(const std::unique_ptr<user_ctx>& ctx,
     int32_t* s2     = s1 + n;
     int32_t* msg    = s2 + n;
 
-restart:
+    uint32_t num_restarts = 0;
 
     myctx.get_xof()->init(32);
     myctx.get_xof()->absorb(m.data(), m.size());
     myctx.get_xof()->final();
-    myctx.get_xof()->squeeze(reinterpret_cast<uint8_t*>(msg), 4 * n);
-    for (size_t i = 0; i < n; i++) {
-        uint32_t y = msg[i] & ((1 << q_bits) - 1);
-        y -= ((int32_t)(q - y) >> 31) * q;
-        msg[i] = y;
+    uint8_t hash_bytes[2];
+    size_t i = 0;
+    while (i < n)
+    {
+        myctx.get_xof()->squeeze(hash_bytes, 2);
+        uint32_t y = (static_cast<uint32_t>(hash_bytes[1]) << 8) | static_cast<uint32_t>(hash_bytes[0]);
+        if (y < 5*q)
+        {
+            while (y >= q) y -= q;
+            msg[i] = y;
+            i++;
+        }
     }
 
     const double* sk = myctx.master_tree().data();
-    ntru::ntru_master_tree::gaussian_sample_with_tree(myctx.get_csprng(), sk, logn, q, msg, 0, s1, s2);
+
+restart:
+
+    if (!ntru::ntru_master_tree::gaussian_sample_with_tree(myctx.get_csprng(), sk, logn, q, msg, 0, s1, s2)) {
+        num_restarts++;
+        goto restart;
+    }
 
     core::poly<int32_t>::centre(s1, q, n);
     core::poly<int32_t>::centre(s2, q, n);
 
     if (!check_norm_bd(bd, s1, s2, n)) {
+        num_restarts++;
         goto restart;
     }
 
     packing::packer pack_enc(2 * n * q_bits);
-    for (size_t i = 0; i < n; i++) {
-        pack_enc.write_signed(s1[i], q_bits, packing::RAW);
-    }
     for (size_t i = 0; i < n; i++) {
         pack_enc.write_signed(s2[i], q_bits, packing::RAW);
     }
@@ -496,17 +507,15 @@ bool falcon_signature::verify(const std::unique_ptr<user_ctx>& ctx,
     uint32_t q_bits = ctx_falcon::m_params[myctx.get_set()].q_bits;
     size_t   n      = ctx_falcon::m_params[myctx.get_set()].n;
     size_t   logn   = ctx_falcon::m_params[myctx.get_set()].n_bits;
-    //float    bd     = ctx_falcon::m_params[myctx.get_set()].bd;
+    float    bd     = ctx_falcon::m_params[myctx.get_set()].bd;
 
-    int32_t* msg    = reinterpret_cast<int32_t*>(aligned_malloc(sizeof(int32_t) * n));
+    int32_t* msg    = reinterpret_cast<int32_t*>(aligned_malloc(sizeof(int32_t) * 2 * n));
+    uint32_t *s2_ntt = reinterpret_cast<uint32_t*>(msg) + n;
 
     // Unpack the signature into z1, z2 and u
     phantom_vector<int32_t> s1(n), s2(n);
 
     packing::unpacker unpack(s);
-    for (size_t i=0; i < n; i++) {
-        s1[i] = unpack.read_signed(q_bits, packing::RAW);
-    }
     for (size_t i=0; i < n; i++) {
         s2[i] = unpack.read_signed(q_bits, packing::RAW);
     }
@@ -514,28 +523,40 @@ bool falcon_signature::verify(const std::unique_ptr<user_ctx>& ctx,
     myctx.get_xof()->init(32);
     myctx.get_xof()->absorb(m.data(), m.size());
     myctx.get_xof()->final();
-    myctx.get_xof()->squeeze(reinterpret_cast<uint8_t*>(msg), 4 * n);
-    for (size_t i = 0; i < n; i++) {
-        uint32_t y = msg[i] & ((1 << q_bits) - 1);
-        y -= ((int32_t)(q - y) >> 31) * q;
-        msg[i] = y;
+    uint8_t hash_bytes[2];
+    size_t i = 0;
+    while (i < n)
+    {
+        myctx.get_xof()->squeeze(hash_bytes, 2);
+        uint32_t y = (static_cast<uint32_t>(hash_bytes[1]) << 8) | static_cast<uint32_t>(hash_bytes[0]);
+        if (y < 5*q)
+        {
+            while (y >= q) y -= q;
+            msg[i] = y;
+            i++;
+        }
     }
 
-    core::poly<int32_t>::mod_unsigned(s2.data(), n, q);
-    uint32_t* us2 = reinterpret_cast<uint32_t*>(s2.data());
-    myctx.get_reduction().convert_to(us2, us2, n);
-    myctx.get_ntt()->fwd(us2, logn);
-    myctx.get_ntt()->mul(us2, us2, myctx.h_ntt().data());
-    myctx.get_ntt()->inv(us2, logn);
-    myctx.get_reduction().convert_from(us2, us2, n);
+    for (size_t i=n; i--;) {
+        s2_ntt[i]  = s2[i];
+        s2_ntt[i] += (s2_ntt[i] >> (std::numeric_limits<uint32_t>::digits - 1)) * q;
+        s2_ntt[i] -= ((q - s2_ntt[i] - 1u) >> (std::numeric_limits<uint32_t>::digits - 1)) * q;
+    }
 
-    core::poly<int32_t>::sub(s1.data(), n, msg, s1.data());
+    myctx.get_reduction().convert_to(s2_ntt, s2_ntt, n);
+    myctx.get_ntt()->fwd(s2_ntt, logn);
+    myctx.get_ntt()->mul(s2_ntt, s2_ntt, myctx.h_ntt().data());
+    myctx.get_ntt()->inv(s2_ntt, logn);
+    myctx.get_reduction().convert_from(s2_ntt, s2_ntt, n);
+
+    core::poly<int32_t>::sub(s1.data(), n, msg, reinterpret_cast<int32_t*>(s2_ntt));
+
+    core::poly<int32_t>::mod_unsigned(s1.data(), n, q);
     core::poly<int32_t>::centre(s1.data(), q, n);
-    //core::poly<int32_t>::centre(s2.data(), q, n);
 
-    /*if (!check_norm_bd(bd, s1.data(), s2.data(), n)) {
+    if (!check_norm_bd(bd, s1.data(), s2.data(), n)) {
         return false;
-    }*/
+    }
 
     return true;
 }
