@@ -39,7 +39,7 @@
  */
 
 /// Check if a value is greater than or equal to a defined threshold
-#define ABOVE_THRESHOLD(v, t) ((t) == 0 || ((t) != std::numeric_limits<T>::max() && (v) >= (t)))
+#define ABOVE_THRESHOLD(v, t) ((t) == 0 || ((t) != std::numeric_limits<T>::max() && static_cast<T>(v) >= (t)))
 
 /// Check if a value is less than a defined threshold
 #define BELOW_THRESHOLD(v, t)  (!ABOVE_THRESHOLD(v, t))
