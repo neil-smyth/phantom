@@ -60,7 +60,10 @@ size_t rsaes_oaep_pke::bits_2_set(security_strength_e bits)
 
         case SECURITY_STRENGTH_160: set = 4; break;
 
-        default: throw std::invalid_argument("Security strength is invalid");
+        default: {
+            LOG_ERROR("Security strength is invalid", g_pkc_log_level);
+            throw std::invalid_argument("Security strength is invalid");
+        }
     }
 
     return set;
@@ -79,14 +82,15 @@ std::unique_ptr<user_ctx> rsaes_oaep_pke::create_ctx(security_strength_e bits,
                                                      cpu_word_size_e size_hint,
                                                      bool masking) const
 {
-    size_t set = bits_2_set(bits);
-    return create_ctx(set, size_hint, masking);
+    return create_ctx(bits_2_set(bits), size_hint, masking);
 }
 
 std::unique_ptr<user_ctx> rsaes_oaep_pke::create_ctx(size_t set,
                                                      cpu_word_size_e size_hint,
                                                      bool masking) const
 {
+    std::stringstream ss;
+
     // Obtain the hash from the parameter set
     hash_alg_e hash = static_cast<hash_alg_e>((set >> 8) & 0x1f);
 
@@ -107,18 +111,29 @@ std::unique_ptr<user_ctx> rsaes_oaep_pke::create_ctx(size_t set,
                                                            set, &m_params[0], 16, masking);
             break;
 #endif
-        default: throw std::invalid_argument("size_hint set is out of range");;
+        default: {
+            ss << "size_hint " << set << " is out of range";  // NOLINT
+            LOG_ERROR(ss.str(), g_pkc_log_level);
+            throw std::invalid_argument(ss.str());
+        }
     }
 
     if ((ctx->get_set() & 0xff) > 5) {
-        throw std::invalid_argument("Parameter set is out of range");
+        ss << "Parameter set " << ctx->get_set() << " is out of range";
+        LOG_ERROR(ss.str(), g_pkc_log_level);
+        throw std::invalid_argument(ss.str());
     }
+
+    ss << "RSAES OAEP PKE context created [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
     return std::unique_ptr<user_ctx>(ctx);
 }
 
 bool rsaes_oaep_pke::keygen(std::unique_ptr<user_ctx>& ctx)
 {
-    LOG_DEBUG("RSA KeyGen\n");
+    std::stringstream ss;
+    ss << "RSAES OAEP PKE KeyGen [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
 
     phantom::rsa::ctx_rsa& myctx = dynamic_cast<phantom::rsa::ctx_rsa&>(*ctx.get());
 
@@ -151,6 +166,10 @@ bool rsaes_oaep_pke::keygen(std::unique_ptr<user_ctx>& ctx)
 
 bool rsaes_oaep_pke::set_public_key(std::unique_ptr<user_ctx>& ctx, const phantom_vector<uint8_t>& k)
 {
+    std::stringstream ss;
+    ss << "RSAES OAEP PKE set public key [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     phantom::rsa::ctx_rsa& myctx = dynamic_cast<phantom::rsa::ctx_rsa&>(*ctx.get());
 
     switch (myctx.get_wordsize())
@@ -179,6 +198,10 @@ bool rsaes_oaep_pke::set_public_key(std::unique_ptr<user_ctx>& ctx, const phanto
 
 bool rsaes_oaep_pke::get_public_key(std::unique_ptr<user_ctx>& ctx, phantom_vector<uint8_t>& k)
 {
+    std::stringstream ss;
+    ss << "RSAES OAEP PKE get public key [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     phantom::rsa::ctx_rsa& myctx = dynamic_cast<phantom::rsa::ctx_rsa&>(*ctx.get());
 
     switch (myctx.get_wordsize())
@@ -207,6 +230,10 @@ bool rsaes_oaep_pke::get_public_key(std::unique_ptr<user_ctx>& ctx, phantom_vect
 
 bool rsaes_oaep_pke::set_private_key(std::unique_ptr<user_ctx>& ctx, const phantom_vector<uint8_t>& k)
 {
+    std::stringstream ss;
+    ss << "RSAES OAEP PKE set private key [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     phantom::rsa::ctx_rsa& myctx = dynamic_cast<phantom::rsa::ctx_rsa&>(*ctx.get());
 
     switch (myctx.get_wordsize())
@@ -235,6 +262,10 @@ bool rsaes_oaep_pke::set_private_key(std::unique_ptr<user_ctx>& ctx, const phant
 
 bool rsaes_oaep_pke::get_private_key(std::unique_ptr<user_ctx>& ctx, phantom_vector<uint8_t>& k)
 {
+    std::stringstream ss;
+    ss << "RSAES OAEP PKE get private key [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     phantom::rsa::ctx_rsa& myctx = dynamic_cast<phantom::rsa::ctx_rsa&>(*ctx.get());
 
     switch (myctx.get_wordsize())
@@ -264,7 +295,9 @@ bool rsaes_oaep_pke::get_private_key(std::unique_ptr<user_ctx>& ctx, phantom_vec
 bool rsaes_oaep_pke::encrypt(const std::unique_ptr<user_ctx>& ctx, const phantom_vector<uint8_t> pt,
             phantom_vector<uint8_t>& ct)
 {
-    LOG_DEBUG("RSA PKE Encrypt\n");
+    std::stringstream ss;
+    ss << "RSAES OAEP PKE Encrypt [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
 
     phantom::rsa::ctx_rsa& myctx = dynamic_cast<phantom::rsa::ctx_rsa&>(*ctx.get());
 
@@ -295,7 +328,9 @@ bool rsaes_oaep_pke::encrypt(const std::unique_ptr<user_ctx>& ctx, const phantom
 bool rsaes_oaep_pke::decrypt(const std::unique_ptr<user_ctx>& ctx, const phantom_vector<uint8_t> ct,
             phantom_vector<uint8_t>& pt)
 {
-    LOG_DEBUG("RSA PKE Decrypt\n");
+    std::stringstream ss;
+    ss << "RSAES OAEP PKE Decrypt [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
 
     phantom::rsa::ctx_rsa& myctx = dynamic_cast<phantom::rsa::ctx_rsa&>(*ctx.get());
 

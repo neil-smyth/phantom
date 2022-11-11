@@ -236,8 +236,8 @@ uint32_t dilithium::make_hint(int32_t *_RESTRICT_ h, const int32_t *_RESTRICT_ r
     uint32_t sum     = 0;
     int32_t  gamma_2 = m_params[m_set].gamma_2;
 
-    LOG_DEBUG_ARRAY("MAKE_HINT: r", r, k*n);
-    LOG_DEBUG_ARRAY("MAKE_HINT: r + z", z, k*n);
+    LOG_DEBUG_ARRAY("MAKE_HINT: r", g_pkc_log_level, r, k*n);
+    LOG_DEBUG_ARRAY("MAKE_HINT: r + z", g_pkc_log_level, z, k*n);
 
     for (size_t i=0; i < k*n; i++) {
         h[i] = r[i] > gamma_2 || r[i] < -gamma_2 || (r[i] == -gamma_2 && 0 != z[i]);
@@ -306,7 +306,7 @@ void dilithium::use_hint(uint8_t * _RESTRICT_ z, const int32_t * _RESTRICT_ h, c
 
 // Truncate the input ring polynomial x by d bits and write to y.
 // NOTE: x MUST be in the range 0 to q-1 inclusive
-void dilithium::pwr_2_round(int32_t * _RESTRICT_ y, int32_t * _RESTRICT_ x, uint32_t q,
+void dilithium::pwr_2_round(int32_t * _RESTRICT_ y, int32_t * _RESTRICT_ x,
    size_t n, size_t k, uint32_t d) const
 {
     int32_t sign      = 1 << (d - 1);
@@ -319,7 +319,7 @@ void dilithium::pwr_2_round(int32_t * _RESTRICT_ y, int32_t * _RESTRICT_ x, uint
 }
 
 void dilithium::expand_mask(const uint8_t *mu, uint32_t kappa,
-    uint32_t gamma_1, uint32_t gamma_1_bits, uint32_t q, size_t l, size_t n, int32_t *y, const uint8_t *K)
+    uint32_t gamma_1, uint32_t gamma_1_bits, size_t l, size_t n, int32_t *y)
 {
     int32_t samples[4];
     uint8_t seed[10];

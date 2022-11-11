@@ -23,6 +23,9 @@ using namespace core;     // NOLINT
 
 int main(int argc, char *argv[])
 {
+    (void) argc;
+    (void) argv;
+    
     std::cout << "ECDSA Test" << std::endl;
 
     phantom_vector<uint8_t> m(128);

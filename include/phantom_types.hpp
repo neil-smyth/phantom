@@ -22,8 +22,13 @@ typedef SSIZE_T ssize_t;
 #if defined(__SIZEOF_INT128__)
 // Define 128-bit integer types as per stdint naming convention if compiler supported
 /// @{
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
+
 using uint128_t = unsigned __int128;
 using int128_t  = __int128;
+
+#pragma GCC diagnostic pop
 /// @}
 #endif
 #endif
@@ -99,6 +104,16 @@ namespace utilities {}
 /// CSPRNG pool size used to store random 32-bit words
 #define RANDOM_POOL_SIZE        64
 
+/// The enumerated logging level
+enum log_level_e {
+    LOG_LEVEL_NONE = 0,
+    LOG_LEVEL_DEBUG,
+    LOG_LEVEL_WARNING,
+    LOG_LEVEL_ERROR,
+};
+
+
+extern log_level_e g_pkc_log_level;  ///< A global logging level associated with PKC
 
 /// An enumerated type for security strengths
 enum security_strength_e {

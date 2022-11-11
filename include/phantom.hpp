@@ -51,10 +51,14 @@ class user_ctx : public aligned_base<DEFAULT_MEM_ALIGNMENT>
 public:
     virtual ~user_ctx() {}
 
+    virtual const std::string& get_uuid();
     virtual pkc_e get_scheme() = 0;
     virtual size_t get_set() = 0;
     virtual const std::string& get_set_name() = 0;
     virtual const phantom_vector<std::string>& get_set_names() = 0;
+
+private:
+    std::string m_uuid;
 };
 
 // Forward declaration of the scheme interface class
@@ -68,8 +72,10 @@ class scheme;
 class pkc
 {
 public:
-    /// Class constructor based on the selected scheme and parameter set
-    explicit pkc(pkc_e type);
+    /// @brief Class constructor based on the selected scheme and parameter set
+    /// @param type The type of PKC algorithm to be used
+    /// @param logging Logging level to be used (default: NONE)
+    explicit pkc(pkc_e type, log_level_e logging = LOG_LEVEL_NONE);
 
     /// Class destructor
     ~pkc();

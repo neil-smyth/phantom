@@ -49,6 +49,9 @@ void tracer::traceline(trace_type_e type, std::string const &message,
         << std::setw(30)
         << std::left
         << file
+        << std::setw(30)
+        << std::left
+        << func
         << std::setw(5)
         << std::right
         << line

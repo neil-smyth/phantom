@@ -18,7 +18,7 @@
 namespace phantom {
 
 /**
- * @brief A pure abstract base class for all public key cryptography schemes
+ * @brief An abstract base class for all public key cryptography schemes
  */
 class scheme
 {
@@ -34,6 +34,7 @@ public:
     virtual std::unique_ptr<user_ctx> create_ctx(size_t set,
                                                  cpu_word_size_e size_hint,
                                                  bool masking) const = 0;
+
 
     /// @brief Key generation - creates a public/private key pair
     /// @param ctx The user context containing the key

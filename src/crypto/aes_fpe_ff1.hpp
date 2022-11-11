@@ -294,6 +294,8 @@ private:
         assert(Slen >= 16);
         assert(16 + 16 * cnt == Slen);
 
+        (void) Slen;
+
         std::copy(R.begin(), R.begin() + 16, S.begin());
 
         for (int j=1; j <= cnt; j++) {

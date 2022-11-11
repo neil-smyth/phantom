@@ -206,8 +206,6 @@ void number_impl::udiv_qrnnd_internal(uint64_t * const q, uint64_t * const r, ui
 {
 #if defined(__SIZEOF_INT128__)
     // The compiler has defined 128-bit integer types so they are used
-    using uint128_t = unsigned __int128;
-
     uint128_t n = (static_cast<uint128_t>(n1) << 64ULL) | static_cast<uint128_t>(n0);
     *q = n / d;
     *r = n % d;

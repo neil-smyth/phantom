@@ -41,7 +41,10 @@ size_t dilithium_signature::bits_2_set(security_strength_e bits)
 
         case SECURITY_STRENGTH_256: set = 4; break;
 
-        default: throw std::invalid_argument("Security strength is invalid");
+        default: {
+            LOG_ERROR("Security strength is invalid", g_pkc_log_level);
+            throw std::invalid_argument("Security strength is invalid");
+        }
     }
 
     return set;
@@ -59,28 +62,33 @@ std::unique_ptr<user_ctx> dilithium_signature::create_ctx(security_strength_e bi
                                                           cpu_word_size_e size_hint,
                                                           bool masking) const
 {
-    ctx_dilithium* ctx = new ctx_dilithium(dilithium_signature::bits_2_set(bits));
-    if (ctx->get_set() > 4) {
-        throw std::invalid_argument("Parameter set is out of range");
-    }
-    return std::unique_ptr<user_ctx>(ctx);
+    return create_ctx(dilithium_signature::bits_2_set(bits), size_hint, masking);
 }
 
 std::unique_ptr<user_ctx> dilithium_signature::create_ctx(size_t set,
                                                           cpu_word_size_e size_hint,
                                                           bool masking) const
 {
+    std::stringstream ss;
+
+    (void) size_hint;
+    (void) masking;
+
     ctx_dilithium* ctx = new ctx_dilithium(set);
     if (ctx->get_set() > 9) {
-        throw std::invalid_argument("Parameter set is out of range");
+        ss << "Parameter set " << ctx->get_set() << " is out of range";
+        LOG_ERROR(ss.str(), g_pkc_log_level);
+        throw std::invalid_argument(ss.str());
     }
+
+    ss << "Dilithium Signature context created [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
     return std::unique_ptr<user_ctx>(ctx);
 }
 
 // Uniform sampling of an mx1 matrix with coefficients of -eta to +eta
 void dilithium_signature::uniform_rand_sample_small(dilithium *dil, const phantom_vector<uint8_t>& seed,
-    uint32_t q, int32_t eta, size_t bits,
-    int32_t *s, size_t n, size_t m, uint16_t nonce) const
+    int32_t eta, int32_t *s, size_t n, size_t m, uint16_t nonce) const
 {
     auto xof = dil->get_xof();
 
@@ -122,8 +130,7 @@ void dilithium_signature::uniform_random_ring_q(dilithium* dil,
                                                 uint16_t nonce,
                                                 int32_t *a,
                                                 size_t n,
-                                                uint32_t q,
-                                                uint32_t q_bits) const
+                                                uint32_t q) const
 {
     const size_t shake128_rate          = 168;
     const size_t stream128_blockbytes   = shake128_rate;
@@ -154,7 +161,7 @@ void dilithium_signature::uniform_random_ring_q(dilithium* dil,
 }
 
 void dilithium_signature::create_rand_product(
-    ctx_dilithium& ctx, uint8_t *seed, uint32_t q, uint32_t q_bits, uint32_t *t, int32_t *y, size_t logn,
+    ctx_dilithium& ctx, uint8_t *seed, uint32_t q, uint32_t *t, int32_t *y, size_t logn,
     size_t k, size_t l, uint32_t *c) const
 {
     const size_t n = 1 << logn;
@@ -175,11 +182,11 @@ void dilithium_signature::create_rand_product(
 
     // k x l matrix multiplication of n-element rings
     for (size_t i=0; i < k; i++) {
-        uniform_random_ring_q(ctx.get_dilithium(), seed, (i << 8), reinterpret_cast<int32_t*>(c), n, q, q_bits);
+        uniform_random_ring_q(ctx.get_dilithium(), seed, (i << 8), reinterpret_cast<int32_t*>(c), n, q);
         ctx.get_ntt()->mul(t + i*n, yu, c);
 
         for (size_t j=1; j < l; j++) {
-            uniform_random_ring_q(ctx.get_dilithium(), seed, (i << 8) + j, reinterpret_cast<int32_t*>(c), n, q, q_bits);
+            uniform_random_ring_q(ctx.get_dilithium(), seed, (i << 8) + j, reinterpret_cast<int32_t*>(c), n, q);
             ctx.get_ntt()->mul(c, yu + j*n, c);
 
             for (size_t k=0; k < n; k++) {
@@ -231,19 +238,23 @@ void dilithium_signature::create_A_product(
 }
 
 void dilithium_signature::expand_A(
-    ctx_dilithium& ctx, uint8_t *seed, uint32_t q, uint32_t q_bits, int32_t *A, size_t n,
+    ctx_dilithium& ctx, uint8_t *seed, uint32_t q, int32_t *A, size_t n,
     size_t k, size_t l) const
 {
     // k x l matrix generation of n-element rings of uniform random samples
     for (size_t i=0; i < k; i++) {
         for (size_t j=0; j < l; j++) {
-            uniform_random_ring_q(ctx.get_dilithium(), seed, (i << 8) + j, A + i*l*n + j*n, n, q, q_bits);
+            uniform_random_ring_q(ctx.get_dilithium(), seed, (i << 8) + j, A + i*l*n + j*n, n, q);
         }
     }
 }
 
 bool dilithium_signature::keygen(std::unique_ptr<user_ctx>& ctx)
 {
+    std::stringstream ss;
+    ss << "Dilithium Signature KeyGen [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_dilithium& myctx = dynamic_cast<ctx_dilithium&>(*ctx.get());
 
     size_t   n        = myctx.get_dilithium()->get_params()->n;
@@ -251,7 +262,6 @@ bool dilithium_signature::keygen(std::unique_ptr<user_ctx>& ctx)
     uint32_t q        = myctx.get_dilithium()->get_params()->q;
     uint32_t q_bits   = myctx.get_dilithium()->get_params()->q_bits;
     uint32_t eta      = myctx.get_dilithium()->get_params()->eta;
-    uint32_t eta_bits = myctx.get_dilithium()->get_params()->eta_bits;
     uint32_t l        = myctx.get_dilithium()->get_params()->l;
     uint32_t k        = myctx.get_dilithium()->get_params()->k;
     uint32_t d        = myctx.get_dilithium()->get_params()->d;
@@ -263,19 +273,19 @@ bool dilithium_signature::keygen(std::unique_ptr<user_ctx>& ctx)
     myctx.get_csprng()->get_mem(myctx.rho(), 32);
     myctx.get_csprng()->get_mem(rho_prime.data(), rho_prime.size());
     myctx.get_csprng()->get_mem(myctx.K(), 32);
-    LOG_DEBUG_ARRAY("rho", myctx.rho(), 32);
-    LOG_DEBUG_ARRAY("rho_prime", rho_prime.data(), rho_prime.size());
-    LOG_DEBUG_ARRAY("K", myctx.K(), 32);
+    LOG_DEBUG_ARRAY("rho", g_pkc_log_level, myctx.rho(), 32);
+    LOG_DEBUG_ARRAY("rho_prime", g_pkc_log_level, rho_prime.data(), rho_prime.size());
+    LOG_DEBUG_ARRAY("K", g_pkc_log_level, myctx.K(), 32);
 
     // Generate s1 and s2 from a uniform random distribution with values of
     // -eta to +eta inclusive
     myctx.s1() = phantom_vector<int32_t>(l*n);
     myctx.s2() = phantom_vector<int32_t>(k*n);
-    uniform_rand_sample_small(myctx.get_dilithium(), rho_prime, q, eta, eta_bits, myctx.s1().data(), n, l, 0);
-    uniform_rand_sample_small(myctx.get_dilithium(), rho_prime, q, eta, eta_bits, myctx.s2().data(), n, k, l);
+    uniform_rand_sample_small(myctx.get_dilithium(), rho_prime, eta, myctx.s1().data(), n, l, 0);
+    uniform_rand_sample_small(myctx.get_dilithium(), rho_prime, eta, myctx.s2().data(), n, k, l);
     myctx.t()  = phantom_vector<int32_t>(k*n);
-    LOG_DEBUG_ARRAY("s1", myctx.s1().data(), myctx.s1().size());
-    LOG_DEBUG_ARRAY("s2", myctx.s2().data(), myctx.s2().size());
+    LOG_DEBUG_ARRAY("s1", g_pkc_log_level, myctx.s1().data(), myctx.s1().size());
+    LOG_DEBUG_ARRAY("s2", g_pkc_log_level, myctx.s2().data(), myctx.s2().size());
 
     myctx.ntt_s1() = phantom_vector<uint32_t>(l*n);
     myctx.ntt_s2() = phantom_vector<uint32_t>(k*n);
@@ -292,17 +302,17 @@ bool dilithium_signature::keygen(std::unique_ptr<user_ctx>& ctx)
     // sampled as a k x l matrix of ring polynomials with n coefficients.
     // The kxl A matrix is multiplied by the lx1 s1 matrix to form a kx1
     // matrix to which s2 is added.
-    create_rand_product(myctx, myctx.rho(), q, q_bits,
+    create_rand_product(myctx, myctx.rho(), q,
                         reinterpret_cast<uint32_t*>(myctx.t().data()), myctx.s1().data(), n_bits, k, l, c.data());
     core::poly<int32_t>::add(myctx.t().data(), k*n, myctx.t().data(), myctx.s2().data());
     core::poly<int32_t>::mod_unsigned(myctx.t().data(), k*n, q);
-    LOG_DEBUG_ARRAY("t", (uint32_t*)myctx.t().data(), myctx.t().size());
+    LOG_DEBUG_ARRAY("t", g_pkc_log_level, (uint32_t*)myctx.t().data(), myctx.t().size());
 
     // Truncate and round the t ring polynomial by d bits and write to the public key.
     myctx.t1() = phantom_vector<int32_t>(k*n);
-    myctx.get_dilithium()->pwr_2_round(myctx.t1().data(), myctx.t().data(), q, n, k, d);
-    LOG_DEBUG_ARRAY("t1", myctx.t1().data(), myctx.t1().size());
-    LOG_DEBUG_ARRAY("t0", myctx.t().data(), myctx.t().size());
+    myctx.get_dilithium()->pwr_2_round(myctx.t1().data(), myctx.t().data(), n, k, d);
+    LOG_DEBUG_ARRAY("t1", g_pkc_log_level, myctx.t1().data(), myctx.t1().size());
+    LOG_DEBUG_ARRAY("t0", g_pkc_log_level, myctx.t().data(), myctx.t().size());
 
     myctx.ntt_t0() = phantom_vector<uint32_t>(k*n);
     to_montgomery(myctx, myctx.ntt_t0().data(), myctx.t().data(), q, k*n, 0);
@@ -313,7 +323,7 @@ bool dilithium_signature::keygen(std::unique_ptr<user_ctx>& ctx)
     // Create tr (associated with the private key) for use in deterministic signature generation.
     // tr is formed from the 32 bytes of rho and the bit packed representation of t1.
     myctx.get_dilithium()->collision_resistant_hash_t1(myctx.rho(), myctx.t1().data(), n, k, q_bits - d, myctx.tr());
-    LOG_DEBUG_ARRAY("tr", myctx.tr(), 32);
+    LOG_DEBUG_ARRAY("tr", g_pkc_log_level, myctx.tr(), 32);
 
     // Convert t1 to Montgomery representation for use in verification
     myctx.ntt_t1() = phantom_vector<uint32_t>(k*n);
@@ -332,6 +342,10 @@ bool dilithium_signature::keygen(std::unique_ptr<user_ctx>& ctx)
 
 bool dilithium_signature::set_public_key(std::unique_ptr<user_ctx>& ctx, const phantom_vector<uint8_t>& key)
 {
+    std::stringstream ss;
+    ss << "Dilithium Signature set public key [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_dilithium& myctx = dynamic_cast<ctx_dilithium&>(*ctx.get());
 
     size_t   n      = myctx.get_dilithium()->get_params()->n;
@@ -355,6 +369,10 @@ bool dilithium_signature::set_public_key(std::unique_ptr<user_ctx>& ctx, const p
 
 bool dilithium_signature::get_public_key(std::unique_ptr<user_ctx>& ctx, phantom_vector<uint8_t>& key)
 {
+    std::stringstream ss;
+    ss << "Dilithium Signature get public key [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_dilithium& myctx = dynamic_cast<ctx_dilithium&>(*ctx.get());
 
     size_t   n      = myctx.get_dilithium()->get_params()->n;
@@ -379,6 +397,10 @@ bool dilithium_signature::get_public_key(std::unique_ptr<user_ctx>& ctx, phantom
 
 bool dilithium_signature::set_private_key(std::unique_ptr<user_ctx>& ctx, const phantom_vector<uint8_t>& key)
 {
+    std::stringstream ss;
+    ss << "Dilithium Signature set private key [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_dilithium& myctx = dynamic_cast<ctx_dilithium&>(*ctx.get());
 
     size_t   n        = myctx.get_dilithium()->get_params()->n;
@@ -419,6 +441,10 @@ bool dilithium_signature::set_private_key(std::unique_ptr<user_ctx>& ctx, const 
 
 bool dilithium_signature::get_private_key(std::unique_ptr<user_ctx>& ctx, phantom_vector<uint8_t>& key)
 {
+    std::stringstream ss;
+    ss << "Dilithium Signature get private key [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_dilithium& myctx = dynamic_cast<ctx_dilithium&>(*ctx.get());
 
     size_t   n        = myctx.get_dilithium()->get_params()->n;
@@ -468,6 +494,7 @@ void dilithium_signature::to_montgomery(ctx_dilithium& ctx, uint32_t *out, const
 void dilithium_signature::from_montgomery(ctx_dilithium& ctx, int32_t *out, const uint32_t *in,
     uint32_t q, size_t n, size_t offset) const
 {
+    (void) q;
     ctx.get_reduction().convert_from(reinterpret_cast<uint32_t*>(out) + offset, in, n);
 }
 
@@ -493,13 +520,16 @@ bool dilithium_signature::sign(const std::unique_ptr<user_ctx>& ctx,
                                const phantom_vector<uint8_t>& m,
                                phantom_vector<uint8_t>& s)
 {
+    std::stringstream ss;
+    ss << "Dilithium Signature Sign [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_dilithium& myctx = dynamic_cast<ctx_dilithium&>(*ctx.get());
     dilithium *dil       = myctx.get_dilithium();
 
     size_t    n            = dil->get_params()->n;
     size_t    n_bits       = dil->get_params()->n_bits;
     size_t    q            = dil->get_params()->q;
-    uint32_t  q_bits       = dil->get_params()->q_bits;
     uint32_t  z_bits       = dil->get_params()->z_bits;
     uint32_t  beta         = dil->get_params()->beta;
     uint32_t  omega        = dil->get_params()->omega;
@@ -532,7 +562,7 @@ bool dilithium_signature::sign(const std::unique_ptr<user_ctx>& ctx,
     uint32_t *ntt_temp     = w + k*n;
 
     dil->collision_resistant_hash_message(myctx.tr(), m, mu);
-    LOG_DEBUG_ARRAY("mu", mu, 64);
+    LOG_DEBUG_ARRAY("mu", g_pkc_log_level, mu, 64);
 
     phantom_vector<uint8_t> rho_prime(64);
     if (myctx.is_deterministic()) {
@@ -541,30 +571,30 @@ bool dilithium_signature::sign(const std::unique_ptr<user_ctx>& ctx,
     else {
         myctx.get_csprng()->get_mem(rho_prime.data(), 64);
     }
-    LOG_DEBUG_ARRAY("rho_prime", rho_prime.data(), 64);
+    LOG_DEBUG_ARRAY("rho_prime", g_pkc_log_level, rho_prime.data(), 64);
 
     // Create the matrix A outside of the rejection loop
-    expand_A(myctx, myctx.rho(), q, q_bits, A, n, k, l);
+    expand_A(myctx, myctx.rho(), q, A, n, k, l);
 
 restart:
 
     // Generate y using the deterministic ExpandMask(ρ′, κ) function
-    dil->expand_mask(rho_prime.data(), kappa, gamma_1, gamma_1_bits, q, l, n, y, myctx.K());
+    dil->expand_mask(rho_prime.data(), kappa, gamma_1, gamma_1_bits, l, n, y);
     kappa += l;
-    LOG_DEBUG_ARRAY("y", y, l*n);
+    LOG_DEBUG_ARRAY("y", g_pkc_log_level, y, l*n);
 
     // w = Ay
     create_A_product(myctx, w, A, y, q, n, n_bits, k, l, (reinterpret_cast<uint32_t*>(c)));
-    LOG_DEBUG_ARRAY("create_rand_product() w = Ay", w, k*n);
+    LOG_DEBUG_ARRAY("create_rand_product() w = Ay", g_pkc_log_level, w, k*n);
 
     // Generate the high order representation of w, i.e. HighOrderBits_q(w, 2*gamma_2)
     dil->high_bits(w1_bytes, w, n, k);
-    LOG_DEBUG_ARRAY("w1", w1_bytes, k*n);
+    LOG_DEBUG_ARRAY("w1", g_pkc_log_level, w1_bytes, k*n);
 
     // Calculate H(mu, w1) and use it to create sparse polynomial c with weight_of_c
     // coefficients and the values 1 or -1
     dil->h_function(c, mu, w1_bytes, n, k);
-    LOG_DEBUG_ARRAY("c", c, n);
+    LOG_DEBUG_ARRAY("c", g_pkc_log_level, c, n);
 
     // Convert c to the Montgomery and NTT domain
     to_montgomery(myctx, ntt_c, c, q, n, 0);
@@ -576,15 +606,15 @@ restart:
         myctx.get_ntt()->inv(reinterpret_cast<uint32_t*>(z + n*i), n_bits);
         from_montgomery(myctx, z, reinterpret_cast<const uint32_t*>(z) + n*i, q, n, n*i);
     }
-    LOG_DEBUG_ARRAY("cs1", z, l*n);
+    LOG_DEBUG_ARRAY("cs1", g_pkc_log_level, z, l*n);
 
     // Compute z = y + cs1
     core::poly<int32_t>::add_mod(z, l*n, z, y, q);
-    LOG_DEBUG_ARRAY("z = y + cs1", z, l*n);
+    LOG_DEBUG_ARRAY("z = y + cs1", g_pkc_log_level, z, l*n);
 
     // Check 1 - Verify that the norm of z = y + cs1 is less than gamma_1 - beta
     if (check_norm_inf(z, n, l, q, gamma_1 - beta)) {
-        LOG_DEBUG("RESTART: || y + c * s1 || >= gamma_1 - beta");
+        LOG_DEBUG("RESTART: || y + c * s1 || >= gamma_1 - beta", g_pkc_log_level);
         goto restart;
     }
 
@@ -594,21 +624,21 @@ restart:
         myctx.get_ntt()->inv(ntt_temp, n_bits);
         from_montgomery(myctx, wcs2, ntt_temp, q, n, n*i);
     }
-    LOG_DEBUG_ARRAY("cs2", wcs2, k*n);
+    LOG_DEBUG_ARRAY("cs2", g_pkc_log_level, wcs2, k*n);
 
     // Calculate w - cs2
     core::poly<int32_t>::sub_mod(wcs2, k*n, reinterpret_cast<int32_t*>(w), wcs2, q);
-    LOG_DEBUG_ARRAY("w - cs2", wcs2, k*n);
+    LOG_DEBUG_ARRAY("w - cs2", g_pkc_log_level, wcs2, k*n);
 
     // r0 = LowOrderBits_q(w - c*s2, 2* gamma2)
     dil->low_bits(r0, wcs2, n, k);
     core::poly<int32_t>::mod_unsigned(r0, k*n, q);
-    LOG_DEBUG_ARRAY("LowBits(w - c*s2, 2* gamma2)", r0, k*n);
+    LOG_DEBUG_ARRAY("LowBits(w - c*s2, 2* gamma2)", g_pkc_log_level, r0, k*n);
 
     // Check 2 - Verify that the norm of LowOrderBits_q(w - c*s2, 2*gamma_2) is
     // less than gamma_2 - beta
     if (check_norm_inf(r0, n, k, q, gamma_2 - beta)) {
-        LOG_DEBUG("RESTART: || r0 || >= gamma_2 - beta");
+        LOG_DEBUG("RESTART: || r0 || >= gamma_2 - beta", g_pkc_log_level);
         goto restart;
     }
 
@@ -619,11 +649,11 @@ restart:
         from_montgomery(myctx, ct0, ntt_temp, q, n, n*i);
     }
     core::poly<int32_t>::mod_unsigned(ct0, k*n, q);
-    LOG_DEBUG_ARRAY("ct0", ct0, k*n);
+    LOG_DEBUG_ARRAY("ct0", g_pkc_log_level, ct0, k*n);
 
     // Check 3 - Verify that the norm of c*t0 is less than gamma_2
     if (check_norm_inf(ct0, n, k, q, gamma_2)) {
-        LOG_DEBUG("RESTART: || c*t0 || >= gamma_2");
+        LOG_DEBUG("RESTART: || c*t0 || >= gamma_2", g_pkc_log_level);
         goto restart;
     }
 
@@ -632,20 +662,20 @@ restart:
     core::poly<int32_t>::add_mod(r0, k*n, r0, ct0, q);
     core::poly<int32_t>::centre(r0, q, k*n);
     size_t num_ones = dil->make_hint(h, r0, w1_bytes, n, k);
-    LOG_DEBUG_ARRAY("h", h, k*n);
-    LOG_DEBUG("num_ones = " << num_ones);
+    LOG_DEBUG_ARRAY("h", g_pkc_log_level, h, k*n);
+    LOG_DEBUG("num_ones = " << num_ones, g_pkc_log_level);
 
     // Check 4 - If the number of asserted bits in h is greater than omega then restart
     if (num_ones > omega) {
-        LOG_DEBUG("RESTART: Hint contains too many ones");
+        LOG_DEBUG("RESTART: Hint contains too many ones", g_pkc_log_level);
         goto restart;
     }
 
     core::poly<int32_t>::centre(z, q, l*n);
 
-    LOG_DEBUG_ARRAY("z", z, l*n);
-    LOG_DEBUG_ARRAY("h", h, k*n);
-    LOG_DEBUG_ARRAY("c", c, n);
+    LOG_DEBUG_ARRAY("z", g_pkc_log_level, z, l*n);
+    LOG_DEBUG_ARRAY("h", g_pkc_log_level, h, k*n);
+    LOG_DEBUG_ARRAY("c", g_pkc_log_level, c, n);
 
     size_t h_bits      = 8 + ((k + 1) >> 1);
     size_t packer_bits = l*n*z_bits + omega_bits + num_ones*h_bits + 2*n;
@@ -677,6 +707,10 @@ bool dilithium_signature::verify(const std::unique_ptr<user_ctx>& ctx,
                                  const phantom_vector<uint8_t>& m,
                                  const phantom_vector<uint8_t>& s)
 {
+    std::stringstream ss;
+    ss << "Dilithium Signature Verify [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_dilithium& myctx  = dynamic_cast<ctx_dilithium&>(*ctx.get());
     dilithium *dil        = myctx.get_dilithium();
 
@@ -724,24 +758,24 @@ bool dilithium_signature::verify(const std::unique_ptr<user_ctx>& ctx,
         c[i] = (3 == tmp)? -1 : tmp;
     }
 
-    LOG_DEBUG_ARRAY("z", z, l*n);
-    LOG_DEBUG_ARRAY("h", h, k*n);
-    LOG_DEBUG_ARRAY("c", c, n);
+    LOG_DEBUG_ARRAY("z", g_pkc_log_level, z, l*n);
+    LOG_DEBUG_ARRAY("h", g_pkc_log_level, h, k*n);
+    LOG_DEBUG_ARRAY("c", g_pkc_log_level, c, n);
 
     // Verify that the norm of z is less than or equal to gamma_1 - beta
     if (check_norm_inf(z, n, l, q, gamma_1 - beta)) {
-        LOG_ERROR("Norm of z is less than or equal to gamma_1 - beta");
+        LOG_ERROR("Norm of z is less than or equal to gamma_1 - beta", g_pkc_log_level);
         goto finish_error;
     }
 
     // Verify that the number of ones in the hint is <= omega
     if (dil->check_hint_ones(h, k, n) > omega) {
-        LOG_ERROR("Number of ones in the hint is <= omega");
+        LOG_ERROR("Number of ones in the hint is <= omega", g_pkc_log_level);
         goto finish_error;
     }
 
     // Create a XOF random oracle and generate the kx1 matrix w = A*z mod q
-    create_rand_product(myctx, myctx.rho(), q, q_bits, reinterpret_cast<uint32_t*>(w),
+    create_rand_product(myctx, myctx.rho(), q, reinterpret_cast<uint32_t*>(w),
         z, n_bits, k, l, reinterpret_cast<uint32_t*>(temp));
 
     // Convert c to Montgomery representation in the NTT domain
@@ -757,34 +791,34 @@ bool dilithium_signature::verify(const std::unique_ptr<user_ctx>& ctx,
 
     // Compute A*z - c*t1.2^d mod q
     core::poly<int32_t>::sub_mod(t0, k*n, w, t0, q);
-    LOG_DEBUG_ARRAY("A*z - c*t1.2^d mod q", t0, k*n);
+    LOG_DEBUG_ARRAY("A*z - c*t1.2^d mod q", g_pkc_log_level, t0, k*n);
 
     // Use the signature hint to recreate w (w') from A*z - c*t1.2^d
     dil->use_hint(w1_bytes, h, t0, n, k);
-    LOG_DEBUG_ARRAY("verify w'", w1_bytes, k*n);
+    LOG_DEBUG_ARRAY("verify w'", g_pkc_log_level, w1_bytes, k*n);
 
     // Compute μ
-    LOG_DEBUG_ARRAY("rho", myctx.rho(), 32);
+    LOG_DEBUG_ARRAY("rho", g_pkc_log_level, myctx.rho(), 32);
     dil->collision_resistant_hash_t1(myctx.rho(), myctx.t1().data(), n, k, q_bits - d, mu);
     dil->collision_resistant_hash_message(mu, m, mu);
-    LOG_DEBUG_ARRAY("mu", mu, 64);
+    LOG_DEBUG_ARRAY("mu", g_pkc_log_level, mu, 64);
 
     // Calculate H(μ, w1) such that a sparse polynomial with 60
     // coefficients have the values 1 or -1
     dil->h_function(temp, mu, w1_bytes, n, k);
-    LOG_DEBUG_ARRAY("H(mu, w')", temp, n);
-    LOG_DEBUG_ARRAY("c", c, n);
+    LOG_DEBUG_ARRAY("H(mu, w')", g_pkc_log_level, temp, n);
+    LOG_DEBUG_ARRAY("c", g_pkc_log_level, c, n);
 
     // Check the output of the H function against the received value
     // in the signature
     if (const_time<uint32_t>::cmp_array_not_equal(reinterpret_cast<uint32_t*>(temp),
                                                   reinterpret_cast<uint32_t*>(c),
                                                   n)) {
-        LOG_ERROR("H(μ, w1) !=c");
+        LOG_ERROR("H(μ, w1) !=c", g_pkc_log_level);
         goto finish_error;
     }
 
-    LOG_DEBUG("Verified");
+    LOG_DEBUG("Verified", g_pkc_log_level);
     return true;
 
 finish_error:

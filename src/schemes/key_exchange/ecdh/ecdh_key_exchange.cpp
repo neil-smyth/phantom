@@ -55,7 +55,10 @@ size_t ecdh_key_exchange::bits_2_set(security_strength_e bits)
 
         case SECURITY_STRENGTH_256: set = 4; break;
 
-        default: throw std::invalid_argument("Security strength is invalid");
+        default: {
+            LOG_ERROR("Security strength is invalid", g_pkc_log_level);
+            throw std::invalid_argument("Security strength is invalid");
+        }
     }
 
     return set;
@@ -74,29 +77,18 @@ std::unique_ptr<user_ctx> ecdh_key_exchange::create_ctx(security_strength_e bits
                                                         cpu_word_size_e size_hint,
                                                         bool masking) const
 {
-    user_ctx* ctx;
-    switch (size_hint)
-    {
-        case CPU_WORD_SIZE_16: ctx = new ctx_ecdh_tmpl<uint16_t>(bits_2_set(bits)); break;
-        case CPU_WORD_SIZE_32: ctx = new ctx_ecdh_tmpl<uint32_t>(bits_2_set(bits)); break;
-#if defined(IS_64BIT)
-        case CPU_WORD_SIZE_64: ctx = new ctx_ecdh_tmpl<uint64_t>(bits_2_set(bits)); break;
-#endif
-        default: throw std::invalid_argument("size_hint set is out of range");
-    }
-
-    if (ctx->get_set() > 16) {
-        delete ctx;
-        throw std::invalid_argument("Parameter set is out of range");
-    }
-    return std::unique_ptr<user_ctx>(ctx);
+    return create_ctx(ecdh_key_exchange::bits_2_set(bits), size_hint, masking);
 }
 
 std::unique_ptr<user_ctx> ecdh_key_exchange::create_ctx(size_t set,
                                                         cpu_word_size_e size_hint,
                                                         bool masking) const
 {
+    std::stringstream ss;
     user_ctx* ctx;
+
+    (void)masking;
+
     switch (size_hint)
     {
         case CPU_WORD_SIZE_16: ctx = new ctx_ecdh_tmpl<uint16_t>(set); break;
@@ -104,40 +96,62 @@ std::unique_ptr<user_ctx> ecdh_key_exchange::create_ctx(size_t set,
 #if defined(IS_64BIT)
         case CPU_WORD_SIZE_64: ctx = new ctx_ecdh_tmpl<uint64_t>(set); break;
 #endif
-        default: throw std::invalid_argument("size_hint set is out of range");;
+        default: {
+            ss << "size_hint " << set << " is out of range";  // NOLINT
+            LOG_ERROR(ss.str(), g_pkc_log_level);
+            throw std::invalid_argument(ss.str());
+        }
     }
 
     if (ctx->get_set() > 16) {
         delete ctx;
-        throw std::invalid_argument("Parameter set is out of range");
+
+        ss << "Parameter set " << ctx->get_set() << " is out of range";
+        LOG_ERROR(ss.str(), g_pkc_log_level);
+        throw std::invalid_argument(ss.str());
     }
+
+    ss << "ECDH context created [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
     return std::unique_ptr<user_ctx>(ctx);
 }
 
 bool ecdh_key_exchange::keygen(std::unique_ptr<user_ctx>& ctx)
 {
-    LOG_DEBUG("ECDH KeyGen\n");
-
+    (void) ctx;
+    LOG_WARNING("Illegal call", g_pkc_log_level);
     return false;
 }
 
 bool ecdh_key_exchange::set_public_key(std::unique_ptr<user_ctx>& ctx, const phantom_vector<uint8_t>& k)
 {
+    (void) ctx;
+    (void) k;
+    LOG_WARNING("Illegal call", g_pkc_log_level);
     return false;
 }
 
 bool ecdh_key_exchange::get_public_key(std::unique_ptr<user_ctx>& ctx, phantom_vector<uint8_t>& k)
 {
+    (void) ctx;
+    (void) k;
+    LOG_WARNING("Illegal call", g_pkc_log_level);
     return false;
 }
 
 bool ecdh_key_exchange::set_private_key(std::unique_ptr<user_ctx>& ctx, const phantom_vector<uint8_t>& k)
 {
+    (void) ctx;
+    (void) k;
+    LOG_WARNING("Illegal call", g_pkc_log_level);
     return false;
 }
 
 bool ecdh_key_exchange::get_private_key(std::unique_ptr<user_ctx>& ctx, phantom_vector<uint8_t>& k)
 {
+    (void) ctx;
+    (void) k;
+    LOG_WARNING("Illegal call", g_pkc_log_level);
     return false;
 }
 

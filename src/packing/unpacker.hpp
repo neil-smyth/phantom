@@ -32,7 +32,6 @@ public:
     explicit unpacker(const phantom_vector<uint8_t>& bytes);
     ~unpacker();
 
-    void append_stream(const phantom_vector<uint8_t>& bytes);
     size_t get_stream_size() const;
 
     bool is_data_available() const;

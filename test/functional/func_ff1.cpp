@@ -28,6 +28,9 @@ static void test_cb(size_t len, uint8_t* data)
 
 int main(int argc, char *argv[])
 {
+    (void) argc;
+    (void) argv;
+    
     std::cout << "FPE FF1 Test" << std::endl;
 
     std::unique_ptr<csprng> rng = std::unique_ptr<csprng>(csprng::make(0, &test_cb));

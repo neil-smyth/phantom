@@ -43,6 +43,8 @@ rsa_cryptosystem<T>::~rsa_cryptosystem()
 template<typename T>
 void rsa_cryptosystem<T>::precomputation_alloc(const core::mod_config<T>& cfg)
 {
+    (void) cfg;
+
     m_base_pre[0] = std::unique_ptr<core::mpz<T>>(new core::mpz<T>());
 
     switch (m_coding_type)
@@ -416,6 +418,8 @@ template<typename T>
 rsacode_e rsa_cryptosystem<T>::square_and_multiply(core::mpz<T>& r, const core::mpz<T>& b, core::scalar_parser& bitgen,
     size_t num_bits, size_t w, size_t sub_offset, const core::mod_config<T>& cfg)
 {
+    (void) b;
+
     // Pull the first encoded bit and ensure it is asserted
     uint32_t bit = bitgen.pull();
     num_bits--;
@@ -466,6 +470,7 @@ rsacode_e rsa_cryptosystem<T>::montgomery_ladder(core::mpz<T>& r, const core::mp
 {
     (void) w;
     (void) sub_offset;
+    (void) b;
 
     // Pull the first encoded bit and ensure it is asserted
     uint32_t bit = bitgen.pull();

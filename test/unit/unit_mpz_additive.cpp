@@ -280,7 +280,7 @@ const lest::test specification[] =
             mont_inv = t.is_negative()? t[0] : -t[0];
         }
 
-        mod_config<uint16_t> mod = { m, mu, m.sizeinbase(2), 12, 16, reduction_e::REDUCTION_MONTGOMERY, R2, mont_inv };
+        mod_config<uint16_t> mod = { m, mu, m.sizeinbase(2), 12, 16, reduction_e::REDUCTION_MONTGOMERY, R2, mont_inv, nullptr };
 
         mpz<uint16_t> one(uint16_t(1));
         a = a.mul_mont(R2, mod);
@@ -314,7 +314,7 @@ const lest::test specification[] =
             mont_inv = t.is_negative()? t[0] : -t[0];
         }
 
-        mod_config<uint16_t> mod = { m, mu, m.sizeinbase(2), 12, 16, reduction_e::REDUCTION_MONTGOMERY, R2, mont_inv };
+        mod_config<uint16_t> mod = { m, mu, m.sizeinbase(2), 12, 16, reduction_e::REDUCTION_MONTGOMERY, R2, mont_inv, nullptr };
 
         mpz<uint16_t> one(uint16_t(1));
         a = a.mul_mont(R2, mod);
@@ -347,7 +347,7 @@ const lest::test specification[] =
             mont_inv = t.is_negative()? t[0] : -t[0];
         }
 
-        mod_config<uint16_t> mod = { m, mu, m.sizeinbase(2), 12, 16, reduction_e::REDUCTION_MONTGOMERY, R2, mont_inv };
+        mod_config<uint16_t> mod = { m, mu, m.sizeinbase(2), 12, 16, reduction_e::REDUCTION_MONTGOMERY, R2, mont_inv, nullptr };
 
         mpz<uint16_t> one(uint16_t(1));
         a = a.mul_mont(R2, mod);

@@ -77,22 +77,22 @@ namespace phantom {
 class machine
 {
 public:
-    static const bool is_big_endian()
+    static bool is_big_endian()
     {
         return PLATFORM_BYTE_ORDER == IS_BIG_ENDIAN;
     }
 
-    static const bool is_little_endian()
+    static bool is_little_endian()
     {
         return PLATFORM_BYTE_ORDER == IS_LITTLE_ENDIAN;
     }
 
-    static const bool byte_order()
+    static bool byte_order()
     {
         return PLATFORM_BYTE_ORDER;
     }
 
-    static const bool bits_per_word()
+    static bool bits_per_word()
     {
 #if defined (__x86_64) || defined(_WIN64)
         return 64;
@@ -101,7 +101,7 @@ public:
 #endif
     }
 
-    static const bool log2_bits_per_word()
+    static bool log2_bits_per_word()
     {
 #if defined (__x86_64) || defined(_WIN64)
         return 6;

@@ -52,9 +52,13 @@ logger::~logger()
     }
 }
 
-void logger::logline(log_level_e level, std::string const &message,
+void logger::logline(log_level_e base_level, log_level_e level, std::string const &message,
     const char *file, const char *func, int32_t line)
 {
+    if (base_level < level) {
+        return;
+    }
+
     std::lock_guard<std::mutex> lock(m_mutex);
 
     m_file << std::dec;
@@ -75,6 +79,9 @@ void logger::logline(log_level_e level, std::string const &message,
            << std::setw(30)
            << std::left
            << file
+           << std::setw(30)
+           << std::left
+           << func
            << std::setw(5)
            << std::right
            << line
@@ -83,10 +90,10 @@ void logger::logline(log_level_e level, std::string const &message,
            << std::endl;
 }
 
-void logger::operator()(log_level_e level, std::string const &message,
+void logger::operator()(log_level_e base_level, log_level_e level, std::string const &message,
     const char *file, const char *func, int32_t line)
 {
-    logline(level, message, file, func, line);
+    logline(base_level, level, message, file, func, line);
     m_file.flush();
     check_lines();
 }

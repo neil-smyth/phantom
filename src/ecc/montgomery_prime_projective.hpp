@@ -217,6 +217,7 @@ public:
 
     retcode_e convert_to_mixed(const ecc_config<T>& config) override
     {
+        (void) config;
         return POINT_OK;
     }
 
@@ -249,6 +250,8 @@ public:
 
     retcode_e addition(const ecc_config<T>& config, const point<T>& rhs) override
     {
+        (void) config;
+        (void) rhs;
         return POINT_OK;
 
         /*const prime_point<T>& p_rhs = reinterpret_cast<const prime_point<T>&>(rhs);

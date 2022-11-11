@@ -98,12 +98,12 @@ public:
         const uint8_t *_RESTRICT_ z, size_t n, size_t k) const;
 
     /// Dilithium Power2Round()
-    void pwr_2_round(int32_t * _RESTRICT_ y, int32_t * _RESTRICT_ x, uint32_t q,
+    void pwr_2_round(int32_t * _RESTRICT_ y, int32_t * _RESTRICT_ x,
         size_t n, size_t k, uint32_t d) const;
 
     /// Dilithium ExpandMask()
     void expand_mask(const uint8_t *mu, uint32_t kappa,
-        uint32_t gamma_1, uint32_t gamma_1_bits, uint32_t q, size_t l, size_t n, int32_t *y, const uint8_t *K);
+        uint32_t gamma_1, uint32_t gamma_1_bits, size_t l, size_t n, int32_t *y);
 
     /// Dilithium H()
     void h_function(int32_t *c, const uint8_t *mu, const uint8_t *w1, size_t n, size_t k);

@@ -36,6 +36,7 @@ struct falcon_set_t {
     uint32_t inv_g;
     uint32_t R;
     uint32_t R2;
+    float    bd;
 };
 
 /// A class describing the Falcon user context
@@ -50,11 +51,11 @@ public:
     explicit ctx_falcon(size_t set) :
         m_scheme(PKC_SIG_FALCON),
         m_set(set),
-        m_reduce(reducer_falcon(m_params[set].q, m_params[set].inv_q, 31,
+        m_reduce(reducer_falcon(m_params[set].q, m_params[set].inv_q, 16,
                                 m_params[set].R, m_params[set].R2)),
         m_reduction(m_reduce)
     {
-        if (m_set > 2) {
+        if (m_set > 1) {
             throw std::invalid_argument("Parameter set is out of range");
         }
 

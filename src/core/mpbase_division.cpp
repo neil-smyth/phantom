@@ -331,7 +331,7 @@ template<typename T>
 T mpbase<T>::divrem_2(T* q_limbs, size_t q_offset, T* n_limbs, size_t n, const T* d_limbs)
 {
     T most_significant_q_limb;
-    size_t i;
+    ssize_t i;
     T r1, r0, d1, d0;
 
     // Rule checking for conditions of use
@@ -593,7 +593,8 @@ template<typename T>
 T mpbase<T>::divappr_qr_1(T* q_limbs, T* n_limbs, size_t nn, const T* d_limbs, size_t dn, T dinv)
 {
     T qh;
-    size_t qn, i;
+    size_t qn;
+    ssize_t i, sdn;
     T n1, n0;
     T d1, d0;
     T cy, cy1;
@@ -619,10 +620,10 @@ T mpbase<T>::divappr_qr_1(T* q_limbs, T* n_limbs, size_t nn, const T* d_limbs, s
 
     q_limbs += qn;
 
-    dn -= 2;          // offset dn by 2 for main division loops,
-                        // saving two iterations in submul_1
-    d1 = d_limbs[dn + 1];
-    d0 = d_limbs[dn + 0];
+    dn -= 2;          // offset dn by 2 for main division loops, saving two iterations in submul_1
+    sdn = dn;
+    d1  = d_limbs[dn + 1];
+    d0  = d_limbs[dn + 0];
 
     n_limbs -= 2;
 
@@ -657,7 +658,7 @@ T mpbase<T>::divappr_qr_1(T* q_limbs, T* n_limbs, size_t nn, const T* d_limbs, s
 
     flag = ~T(0);
 
-    if (dn >= 0) {
+    if (sdn >= 0) {
         for (i = dn; i > 0; i--) {
             n_limbs--;
             if (n1 >= (d1 & flag)) {
@@ -1989,11 +1990,11 @@ void mpbase<T>::tdiv_qr(T* q_limbs, T* r_limbs, const T* n_limbs, size_t nn, con
 
             T* tp;
             T cy;
-            size_t in, rn;
+            ssize_t in, rn;
             T quotient_too_large;
             size_t cnt;
 
-            size_t qn = nn - dn;
+            ssize_t qn = nn - dn;
             q_limbs[qn] = 0;             // zero high quotient limb
             qn += adjust;                // qn cannot become bigger
 
@@ -2225,8 +2226,7 @@ int mpbase<T>::divisible_p(const T *a_limbs, size_t an, const T *d_limbs, size_t
             twos = bit_manipulation::ctz(dlow);
             dlow = (dlow >> twos) | (dsecond << (std::numeric_limits<T>::digits - twos));
             assert(dlow);
-            return (an < 0) ? modexact_1_odd(a_limbs, an, dlow)
-                            : mod_1(a_limbs, an, dlow);
+            return mod_1(a_limbs, an, dlow);
         }
     }
 

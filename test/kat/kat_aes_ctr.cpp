@@ -149,6 +149,9 @@ phantom_vector<uint8_t> cstring_to_hex(const std::string& input)
 
 int main(int argc, char *argv[])
 {
+    (void) argc;
+    (void) argv;
+    
     std::cout << "AES CTR Known Answer Test" << std::endl;
 
     for (size_t i=1; i < 12; i++) {

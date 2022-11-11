@@ -40,10 +40,9 @@ public:
     explicit stream(const phantom_vector<uint8_t>& bytes);
     ~stream();
 
-    void append_stream(const phantom_vector<uint8_t>& bytes) {}
     uint32_t read(size_t bits);  // flawfinder: ignore
     void write(uint32_t data, size_t bits);
-    void flush(size_t alignment = 1);
+    void flush();
     const phantom_vector<uint8_t>& get() const;
 
 private:

@@ -176,11 +176,14 @@ public:
 
     retcode_e convert_to_mixed(const ecc_config<T>& config) override
     {
+        (void) config;
         return POINT_OK;
     }
 
     retcode_e doubling(const ecc_config<T>& config, size_t w) override
     {
+        (void) config;
+        (void) w;
         core::mpz<T> a, b, c, d, e;
 
         a.set(m_x).square_mod(config.mod);

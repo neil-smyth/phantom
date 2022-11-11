@@ -22,6 +22,9 @@ using namespace utilities;  // NOLINT
 
 int main(int argc, char *argv[])
 {
+    (void) argc;
+    (void) argv;
+    
     std::cout << "Kyber PKE Test" << std::endl;
 
     phantom_vector<uint8_t> m(128);

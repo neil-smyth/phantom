@@ -52,7 +52,10 @@ size_t ibe_dlp::bits_2_set(security_strength_e bits)
         case SECURITY_STRENGTH_112:
         case SECURITY_STRENGTH_128:
         case SECURITY_STRENGTH_160: set = 1; break;
-        default: throw std::invalid_argument("Security strength is invalid");
+        default: {
+            LOG_ERROR("Security strength is invalid", g_pkc_log_level);
+            throw std::invalid_argument("Security strength is invalid");
+        }
     }
 
     return set;
@@ -70,11 +73,7 @@ std::unique_ptr<user_ctx> ibe_dlp::create_ctx(security_strength_e bits,
                                               cpu_word_size_e size_hint,
                                               bool masking) const
 {
-    ctx_ibe_dlp* ctx = new ctx_ibe_dlp(ibe_dlp::bits_2_set(bits));
-    if (ctx->get_set() > 1) {
-        throw std::invalid_argument("Parameter set is out of range");
-    }
-    return std::unique_ptr<user_ctx>(ctx);
+    return create_ctx(ibe_dlp::bits_2_set(bits), size_hint, masking);
 }
 
 std::unique_ptr<user_ctx> ibe_dlp::create_ctx(size_t set,
@@ -82,14 +81,28 @@ std::unique_ptr<user_ctx> ibe_dlp::create_ctx(size_t set,
                                               bool masking) const
 {
     ctx_ibe_dlp* ctx = new ctx_ibe_dlp(set);
+    std::stringstream ss;
+
+    (void) size_hint;
+    (void) masking;
+
     if (ctx->get_set() > 1) {
-        throw std::invalid_argument("Parameter set is out of range");
+        ss << "Parameter set " << ctx->get_set() << " is out of range";
+        LOG_ERROR(ss.str(), g_pkc_log_level);
+        throw std::invalid_argument(ss.str());
     }
+
+    ss << "IBE-DLP context created [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
     return std::unique_ptr<user_ctx>(ctx);
 }
 
 bool ibe_dlp::keygen(std::unique_ptr<user_ctx>& ctx)
 {
+    std::stringstream ss;
+    ss << "IBE-DLP KeyGen [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_ibe_dlp& myctx = dynamic_cast<ctx_ibe_dlp&>(*ctx.get());
 
     size_t   n    = ctx_ibe_dlp::m_params[myctx.get_set()].n;
@@ -171,6 +184,10 @@ restart:
 
 bool ibe_dlp::set_public_key(std::unique_ptr<user_ctx>& ctx, const phantom_vector<uint8_t>& k)
 {
+    std::stringstream ss;
+    ss << "IBE-DLP set public key [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_ibe_dlp& myctx = dynamic_cast<ctx_ibe_dlp&>(*ctx.get());
 
     size_t   n      = ctx_ibe_dlp::m_params[myctx.get_set()].n;
@@ -199,6 +216,10 @@ bool ibe_dlp::set_public_key(std::unique_ptr<user_ctx>& ctx, const phantom_vecto
 
 bool ibe_dlp::get_public_key(std::unique_ptr<user_ctx>& ctx, phantom_vector<uint8_t>& k)
 {
+    std::stringstream ss;
+    ss << "IBE-DLP set public key [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_ibe_dlp& myctx = dynamic_cast<ctx_ibe_dlp&>(*ctx.get());
 
     size_t   n      = ctx_ibe_dlp::m_params[myctx.get_set()].n;
@@ -217,6 +238,10 @@ bool ibe_dlp::get_public_key(std::unique_ptr<user_ctx>& ctx, phantom_vector<uint
 
 bool ibe_dlp::set_private_key(std::unique_ptr<user_ctx>& ctx, const phantom_vector<uint8_t>& k)
 {
+    std::stringstream ss;
+    ss << "IBE-DLP set private key [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_ibe_dlp& myctx = dynamic_cast<ctx_ibe_dlp&>(*ctx.get());
 
     size_t n = ctx_ibe_dlp::m_params[myctx.get_set()].n;
@@ -253,6 +278,10 @@ bool ibe_dlp::set_private_key(std::unique_ptr<user_ctx>& ctx, const phantom_vect
 
 bool ibe_dlp::get_private_key(std::unique_ptr<user_ctx>& ctx, phantom_vector<uint8_t>& k)
 {
+    std::stringstream ss;
+    ss << "IBE-DLP get private key [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_ibe_dlp& myctx = dynamic_cast<ctx_ibe_dlp&>(*ctx.get());
 
     size_t n = ctx_ibe_dlp::m_params[myctx.get_set()].n;
@@ -318,6 +347,8 @@ bool ibe_dlp::load_user_key(std::unique_ptr<user_ctx>& ctx, const phantom_vector
     uint32_t q_bits = ctx_ibe_dlp::m_params[myctx.get_set()].q_bits;
     size_t   n      = ctx_ibe_dlp::m_params[myctx.get_set()].n;
     size_t   logn   = ctx_ibe_dlp::m_params[myctx.get_set()].logn;
+
+    (void) id;
 
     // Read the packed user secret key into s2
     myctx.s2() = phantom_vector<int32_t>(n);
@@ -557,7 +588,9 @@ bool ibe_dlp::verify(std::unique_ptr<user_ctx>& ctx,
 
     // Compare the received and generated c polynomials
     if (const_time<int32_t>::cmp_array_not_equal(z2.data(), u.data(), n)) {
-        LOG_DEBUG("Signature mismatch");
+        std::stringstream ss;
+        ss << "Signature mismatch [" << ctx->get_uuid() << "]";
+        LOG_WARNING(ss.str(), g_pkc_log_level);
         return false;
     }
 

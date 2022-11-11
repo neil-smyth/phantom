@@ -57,10 +57,13 @@ int calc(ec_params_t curve)
     std::cout << "y = " << yr.get_str(16) << std::endl;
 
     return 0;
-};
+}
 
 int main(int argc, char* argv[])
 {
+    (void) argc;
+    (void) argv;
+
     calc(curves::param_ec_secp192r1);
     calc(curves::param_ec_secp224r1);
     calc(curves::param_ec_secp256r1);
@@ -68,4 +71,4 @@ int main(int argc, char* argv[])
     calc(curves::param_ec_secp521r1);
 
     return 0;
-};
+}

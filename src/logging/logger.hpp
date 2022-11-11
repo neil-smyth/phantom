@@ -19,6 +19,7 @@
 #include <mutex>  // NOLINT
 #include <limits>
 
+#include "./phantom_types.hpp"
 
 #define LOGGER_DEFAULT_BASENAME          "debug"
 #define LOGGER_DEFAULT_BASE_EXTENSION    "log"
@@ -32,12 +33,6 @@
 namespace phantom {
 namespace logging {
 
-/// The enumerated debug level
-enum log_level_e {
-    LOG_LEVEL_DEBUG = 0,
-    LOG_LEVEL_WARNING,
-    LOG_LEVEL_ERROR,
-};
 
 /**
  * @brief A logging class that ping pongs between two files with a common base name
@@ -54,22 +49,24 @@ public:
     ~logger();
 
     /// Methods to write log lines
-    void operator() (log_level_e        level,
+    void operator() (log_level_e        base_level,
+                     log_level_e        level,
                      std::string const &message,
                      const char        *file,
                      const char        *func,
                      int32_t            line);
 
     template<typename T>
-    void operator()(log_level_e        level,
-                    std::string const &message,
-                    const T           *data,
-                    size_t             len,
-                    const char        *file,
-                    const char        *func,
-                    int32_t            line)
+    void operator() (log_level_e        base_level,
+                     log_level_e        level,
+                     std::string const &message,
+                     const T           *data,
+                     size_t             len,
+                     const char        *file,
+                     const char        *func,
+                     int32_t            line)
     {
-        logline(level, message, file, func, line);
+        logline(base_level, level, message, file, func, line);
         size_t i;
         for (i=0; i < len; i++) {
             if (0 == (i&ARRAY_BYTE_MARKER)) {
@@ -95,7 +92,8 @@ public:
 protected:
     void insert_datetime();
     void check_lines();
-    void logline(log_level_e        level,
+    void logline(log_level_e        base_level,
+                 log_level_e        level,
                  std::string const &message,
                  const char        *file,
                  const char        *func,
@@ -119,17 +117,18 @@ protected:
 
 
 #ifndef _ENABLE_LOGGING
-#define LOG_DEBUG(_) do {} while (0)
-#define LOG_DEBUG_ARRAY(message_, data_, len_) do {} while (0)
-#define LOG_WARNING(_) do {} while (0)
-#define LOG_WARNING_ARRAY(message_, data_, len_) do {} while (0)
-#define LOG_ERROR(_) do {} while (0)
-#define LOG_ERROR_ARRAY(message_, data_, len_) do {} while (0)
+#define LOG_DEBUG(message_, level_) do {} while (0)
+#define LOG_DEBUG_ARRAY(message_, level_, data_, len_) do {} while (0)
+#define LOG_WARNING(message_, level_) do {} while (0)
+#define LOG_WARNING_ARRAY(message_, level_, data_, len_) do {} while (0)
+#define LOG_ERROR(message_, level_) do {} while (0)
+#define LOG_ERROR_ARRAY(message_, level_, data_, len_) do {} while (0)
 #else
 extern logger& debug_logger();
 
-#define LOG(logger_, level_, message_)        \
+#define LOG(logger_, base_level_, level_, message_)        \
 logger_(                                      \
+base_level_,                                  \
 level_,                                       \
 static_cast<std::ostringstream&>(             \
     std::ostringstream().flush() << message_  \
@@ -139,8 +138,9 @@ __FUNCTION__,                                 \
 __LINE__                                      \
 );
 
-#define LOG_ARRAY(logger_, level_, message_, data_, len_) \
+#define LOG_ARRAY(logger_, base_level_, level_, message_, data_, len_) \
 logger_(                                                  \
+base_level_,                                              \
 level_,                                                   \
 static_cast<std::ostringstream&>(                         \
     std::ostringstream().flush() << message_              \
@@ -152,18 +152,18 @@ __FUNCTION__,                                             \
 __LINE__                                                  \
 );
 
-#define LOG_DEBUG(message_) LOG(logging::debug_logger(), \
-    logging::log_level_e::LOG_LEVEL_DEBUG, message_)
-#define LOG_DEBUG_ARRAY(message_, data_, len_) LOG_ARRAY(logging::debug_logger(), \
-    logging::log_level_e::LOG_LEVEL_DEBUG, message_, data_, len_)
-#define LOG_WARNING(message_) LOG(logging::debug_logger(), \
-    logging::log_level_e::LOG_LEVEL_WARNING, message_)
-#define LOG_WARNING_ARRAY(message_, data_, len_) LOG_ARRAY(logging::debug_logger(), \
-    logging::log_level_e::LOG_LEVEL_WARNING, message_, data_, len_)
-#define LOG_ERROR(message_) LOG(logging::debug_logger(), \
-    logging::log_level_e::LOG_LEVEL_ERROR, message_)
-#define LOG_ERROR_ARRAY(message_, data_, len_) LOG_ARRAY(logging::debug_logger(), \
-    logging::log_level_e::LOG_LEVEL_ERROR, message_, data_, len_)
+#define LOG_DEBUG(message_, level_) LOG(logging::debug_logger(), level_, \
+    log_level_e::LOG_LEVEL_DEBUG, message_)
+#define LOG_DEBUG_ARRAY(message_, level_, data_, len_) LOG_ARRAY(logging::debug_logger(), level_, \
+    log_level_e::LOG_LEVEL_DEBUG, message_, data_, len_)
+#define LOG_WARNING(message_, level_) LOG(logging::debug_logger(), level_, \
+    log_level_e::LOG_LEVEL_WARNING, message_)
+#define LOG_WARNING_ARRAY(message_, level_, data_, len_) LOG_ARRAY(logging::debug_logger(), level_, \
+    log_level_e::LOG_LEVEL_WARNING, message_, data_, len_)
+#define LOG_ERROR(message_, level_) LOG(logging::debug_logger(), level_, \
+    log_level_e::LOG_LEVEL_ERROR, message_)
+#define LOG_ERROR_ARRAY(message_, level_, data_, len_) LOG_ARRAY(logging::debug_logger(), level_, \
+    log_level_e::LOG_LEVEL_ERROR, message_, data_, len_)
 
 #endif  // _ENABLE_LOGGING
 

@@ -44,7 +44,10 @@ size_t eddsa_signature::bits_2_set(security_strength_e bits)
         case SECURITY_STRENGTH_256:
         case SECURITY_STRENGTH_288:
         case SECURITY_STRENGTH_320:
-        default: throw std::invalid_argument("Security strength is invalid");
+        default: {
+            LOG_ERROR("Security strength is invalid", g_pkc_log_level);
+            throw std::invalid_argument("Security strength is invalid");
+        }
     }
 
     return set;
@@ -65,29 +68,18 @@ std::unique_ptr<user_ctx> eddsa_signature::create_ctx(security_strength_e bits,
                                                       cpu_word_size_e size_hint,
                                                       bool masking) const
 {
-    user_ctx* ctx;
-    switch (size_hint)
-    {
-        case CPU_WORD_SIZE_16: ctx = new ctx_eddsa_tmpl<uint16_t>(bits_2_set(bits)); break;
-        case CPU_WORD_SIZE_32: ctx = new ctx_eddsa_tmpl<uint32_t>(bits_2_set(bits)); break;
-#if defined(IS_64BIT)
-        case CPU_WORD_SIZE_64: ctx = new ctx_eddsa_tmpl<uint64_t>(bits_2_set(bits)); break;
-#endif
-        default: throw std::invalid_argument("size_hint set is out of range");;
-    }
-
-    if (ctx->get_set() > 4) {
-        delete ctx;
-        throw std::invalid_argument("Parameter set is out of range");
-    }
-    return std::unique_ptr<user_ctx>(ctx);
+    return create_ctx(eddsa_signature::bits_2_set(bits), size_hint, masking);
 }
 
 std::unique_ptr<user_ctx> eddsa_signature::create_ctx(size_t set,
                                                       cpu_word_size_e size_hint,
                                                       bool masking) const
 {
+    std::stringstream ss;
     user_ctx* ctx;
+
+    (void) masking;
+
     switch (size_hint)
     {
         case CPU_WORD_SIZE_16: ctx = new ctx_eddsa_tmpl<uint16_t>(set); break;
@@ -95,18 +87,31 @@ std::unique_ptr<user_ctx> eddsa_signature::create_ctx(size_t set,
 #if defined(IS_64BIT)
         case CPU_WORD_SIZE_64: ctx = new ctx_eddsa_tmpl<uint64_t>(set); break;
 #endif
-        default: throw std::invalid_argument("size_hint set is out of range");;
+        default: {
+            ss << "size_hint " << set << " is out of range";  // NOLINT
+            LOG_ERROR(ss.str(), g_pkc_log_level);
+            throw std::invalid_argument(ss.str());
+        }
     }
 
     if (ctx->get_set() > 4) {
         delete ctx;
-        throw std::invalid_argument("Parameter set is out of range");
+        ss << "Parameter set " << ctx->get_set() << " is out of range";
+        LOG_ERROR(ss.str(), g_pkc_log_level);
+        throw std::invalid_argument(ss.str());
     }
+
+    ss << "EdDSA Signature context created [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
     return std::unique_ptr<user_ctx>(ctx);
 }
 
 bool eddsa_signature::keygen(std::unique_ptr<user_ctx>& ctx)
 {
+    std::stringstream ss;
+    ss << "EdDSA Signature KeyGen [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_eddsa& myctx = dynamic_cast<ctx_eddsa&>(*ctx.get());
 
 restart:
@@ -146,6 +151,10 @@ restart:
 
 bool eddsa_signature::set_public_key(std::unique_ptr<user_ctx>& ctx, const phantom_vector<uint8_t>& key)
 {
+    std::stringstream ss;
+    ss << "EdDSA Signature set public key [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_eddsa& myctx = dynamic_cast<ctx_eddsa&>(*ctx.get());
 
     switch (myctx.get_wordsize())
@@ -176,6 +185,10 @@ bool eddsa_signature::set_public_key(std::unique_ptr<user_ctx>& ctx, const phant
 
 bool eddsa_signature::get_public_key(std::unique_ptr<user_ctx>& ctx, phantom_vector<uint8_t>& key)
 {
+    std::stringstream ss;
+    ss << "EdDSA Signature get public key [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_eddsa& myctx = dynamic_cast<ctx_eddsa&>(*ctx.get());
 
     switch (myctx.get_wordsize())
@@ -209,6 +222,10 @@ bool eddsa_signature::get_public_key(std::unique_ptr<user_ctx>& ctx, phantom_vec
 
 bool eddsa_signature::set_private_key(std::unique_ptr<user_ctx>& ctx, const phantom_vector<uint8_t>& key)
 {
+    std::stringstream ss;
+    ss << "EdDSA Signature set private key [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_eddsa& myctx = dynamic_cast<ctx_eddsa&>(*ctx.get());
 
     myctx.sk() = key;
@@ -243,6 +260,10 @@ bool eddsa_signature::set_private_key(std::unique_ptr<user_ctx>& ctx, const phan
 
 bool eddsa_signature::get_private_key(std::unique_ptr<user_ctx>& ctx, phantom_vector<uint8_t>& key)
 {
+    std::stringstream ss;
+    ss << "EdDSA Signature get private key [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_eddsa& myctx = dynamic_cast<ctx_eddsa&>(*ctx.get());
 
     uint8_t* sk = myctx.sk().data();
@@ -282,6 +303,10 @@ bool eddsa_signature::sign(const std::unique_ptr<user_ctx>& ctx,
                            phantom_vector<uint8_t>& s,
                            const phantom_vector<uint8_t>& c)
 {
+    std::stringstream ss;
+    ss << "EdDSA Signature Sign [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_eddsa& myctx = dynamic_cast<ctx_eddsa&>(*ctx.get());
 
     switch (myctx.get_wordsize())
@@ -331,6 +356,10 @@ bool eddsa_signature::verify(const std::unique_ptr<user_ctx>& ctx,
                              const phantom_vector<uint8_t>& s,
     const phantom_vector<uint8_t>& c)
 {
+    std::stringstream ss;
+    ss << "EdDSA Signature Verify [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_eddsa& myctx = dynamic_cast<ctx_eddsa&>(*ctx.get());
 
     switch (myctx.get_wordsize())

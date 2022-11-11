@@ -8,6 +8,7 @@
  *****************************************************************************/
 
 #include "schemes/signature/falcon/falcon_signature.hpp"
+#include <limits>
 #include "schemes/signature/falcon/ctx_falcon.hpp"
 #include "ntru/ntru_master_tree.hpp"
 #include "ntru/ntru.hpp"
@@ -25,10 +26,10 @@ namespace schemes {
 
 const falcon_set_t ctx_falcon::m_params[2] = {
     {
-        0, 12289, 12289 - 2, 14, 512, 9, 0x403001, 0x77402FFF, 4091, 10952
+        0, 12289, 12289 - 2, 14, 512, 9, 49, 1254, 4091, 10952, 5833
     },
     {
-        1, 12289, 12289 - 2, 14, 1024, 10, 0x403001, 0x77402FFF, 4091, 10952
+        1, 12289, 12289 - 2, 14, 1024, 10, 7, 8778, 4091, 10952, 8382
     }
 };
 
@@ -46,7 +47,10 @@ size_t falcon_signature::bits_2_set(security_strength_e bits)
 
         case SECURITY_STRENGTH_160: set = 1; break;
 
-        default: throw std::invalid_argument("Security strength is invalid");
+        default: {
+            LOG_ERROR("Security strength is invalid", g_pkc_log_level);
+            throw std::invalid_argument("Security strength is invalid");
+        }
     }
 
     return set;
@@ -64,26 +68,36 @@ std::unique_ptr<user_ctx> falcon_signature::create_ctx(security_strength_e bits,
                                                        cpu_word_size_e size_hint,
                                                        bool masking) const
 {
-    ctx_falcon* ctx = new ctx_falcon(falcon_signature::bits_2_set(bits));
-    if (ctx->get_set() > 1) {
-        throw std::invalid_argument("Parameter set is out of range");
-    }
-    return std::unique_ptr<user_ctx>(ctx);
+    return create_ctx(falcon_signature::bits_2_set(bits), size_hint, masking);
 }
 
 std::unique_ptr<user_ctx> falcon_signature::create_ctx(size_t set,
                                                        cpu_word_size_e size_hint,
                                                        bool masking) const
 {
+    std::stringstream ss;
+
+    (void) size_hint;
+    (void) masking;
+
     ctx_falcon* ctx = new ctx_falcon(set);
     if (ctx->get_set() > 1) {
-        throw std::invalid_argument("Parameter set is out of range");
+        ss << "Parameter set " << ctx->get_set() << " is out of range";
+        LOG_ERROR(ss.str(), g_pkc_log_level);
+        throw std::invalid_argument(ss.str());
     }
+
+    ss << "Falcon Signature context created [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
     return std::unique_ptr<user_ctx>(ctx);
 }
 
 bool falcon_signature::keygen(std::unique_ptr<user_ctx>& ctx)
 {
+    std::stringstream ss;
+    ss << "Falcon Signature KeyGen [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_falcon& myctx = dynamic_cast<ctx_falcon&>(*ctx.get());
 
     size_t   n    = ctx_falcon::m_params[myctx.get_set()].n;
@@ -213,6 +227,10 @@ restart:
 
 bool falcon_signature::set_public_key(std::unique_ptr<user_ctx>& ctx, const phantom_vector<uint8_t>& key)
 {
+    std::stringstream ss;
+    ss << "Falcon Signature set public key [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_falcon& myctx = dynamic_cast<ctx_falcon&>(*ctx.get());
 
     size_t   n      = ctx_falcon::m_params[myctx.get_set()].n;
@@ -240,6 +258,10 @@ bool falcon_signature::set_public_key(std::unique_ptr<user_ctx>& ctx, const phan
 
 bool falcon_signature::get_public_key(std::unique_ptr<user_ctx>& ctx, phantom_vector<uint8_t>& key)
 {
+    std::stringstream ss;
+    ss << "Falcon Signature get public key [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_falcon& myctx = dynamic_cast<ctx_falcon&>(*ctx.get());
 
     size_t   n      = ctx_falcon::m_params[myctx.get_set()].n;
@@ -261,6 +283,10 @@ bool falcon_signature::get_public_key(std::unique_ptr<user_ctx>& ctx, phantom_ve
 
 bool falcon_signature::set_private_key(std::unique_ptr<user_ctx>& ctx, const phantom_vector<uint8_t>& key)
 {
+    std::stringstream ss;
+    ss << "Falcon Signature set private key [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_falcon& myctx = dynamic_cast<ctx_falcon&>(*ctx.get());
 
     size_t n = ctx_falcon::m_params[myctx.get_set()].n;
@@ -301,6 +327,10 @@ bool falcon_signature::set_private_key(std::unique_ptr<user_ctx>& ctx, const pha
 
 bool falcon_signature::get_private_key(std::unique_ptr<user_ctx>& ctx, phantom_vector<uint8_t>& key)
 {
+    std::stringstream ss;
+    ss << "Falcon Signature get private key [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_falcon& myctx = dynamic_cast<ctx_falcon&>(*ctx.get());
 
     size_t n = ctx_falcon::m_params[myctx.get_set()].n;
@@ -381,36 +411,76 @@ void falcon_signature::sign_h_function(crypto::xof_sha3 *xof, int32_t *a, const 
     }
 }
 
+bool falcon_signature::check_norm_bd(float bd, const int32_t *s1, const int32_t *s2, size_t n)
+{
+    size_t i;
+    float norm = 0;
+    for (i=n; i--;) {
+        norm += s1[i] * s1[i] + s2[i] * s2[i];
+    }
+    norm = sqrtf(norm);
+
+    return norm < bd;
+}
+
 bool falcon_signature::sign(const std::unique_ptr<user_ctx>& ctx,
                             const phantom_vector<uint8_t>& m,
                             phantom_vector<uint8_t>& s)
 {
+    std::stringstream ss;
+    ss << "Falcon Signature Sign [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_falcon& myctx = dynamic_cast<ctx_falcon&>(*ctx.get());
 
     uint32_t q      = ctx_falcon::m_params[myctx.get_set()].q;
     uint32_t q_bits = ctx_falcon::m_params[myctx.get_set()].q_bits;
     size_t   n      = ctx_falcon::m_params[myctx.get_set()].n;
     size_t   logn   = ctx_falcon::m_params[myctx.get_set()].n_bits;
+    float    bd     = ctx_falcon::m_params[myctx.get_set()].bd;
 
     int32_t* tmp    = reinterpret_cast<int32_t*>(aligned_malloc(sizeof(int32_t) * 3 * n));
     int32_t* s1     = tmp;
     int32_t* s2     = s1 + n;
     int32_t* msg    = s2 + n;
 
-    for (size_t i = 0; i < n; i++) {
-        msg[i] = m[i];
+    uint32_t num_restarts = 0;
+
+    myctx.get_xof()->init(32);
+    myctx.get_xof()->absorb(m.data(), m.size());
+    myctx.get_xof()->final();
+    uint8_t hash_bytes[2];
+    size_t i = 0;
+    while (i < n)
+    {
+        myctx.get_xof()->squeeze(hash_bytes, 2);
+        uint32_t y = (static_cast<uint32_t>(hash_bytes[1]) << 8) | static_cast<uint32_t>(hash_bytes[0]);
+        if (y < 5*q)
+        {
+            while (y >= q) y -= q;
+            msg[i] = y;
+            i++;
+        }
     }
 
     const double* sk = myctx.master_tree().data();
-    ntru::ntru_master_tree::gaussian_sample_with_tree(myctx.get_csprng(), sk, logn, q, msg, 0, s1, s2);
+
+restart:
+
+    if (!ntru::ntru_master_tree::gaussian_sample_with_tree(myctx.get_csprng(), sk, logn, q, msg, 0, s1, s2)) {
+        num_restarts++;
+        goto restart;
+    }
 
     core::poly<int32_t>::centre(s1, q, n);
     core::poly<int32_t>::centre(s2, q, n);
 
-    packing::packer pack_enc(2 * n * q_bits);
-    for (size_t i = 0; i < n; i++) {
-        pack_enc.write_signed(s1[i], q_bits, packing::RAW);
+    if (!check_norm_bd(bd, s1, s2, n)) {
+        num_restarts++;
+        goto restart;
     }
+
+    packing::packer pack_enc(2 * n * q_bits);
     for (size_t i = 0; i < n; i++) {
         pack_enc.write_signed(s2[i], q_bits, packing::RAW);
     }
@@ -428,34 +498,66 @@ bool falcon_signature::verify(const std::unique_ptr<user_ctx>& ctx,
                               const phantom_vector<uint8_t>& m,
                               const phantom_vector<uint8_t>& s)
 {
+    std::stringstream ss;
+    ss << "Falcon Signature Verify [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_falcon& myctx = dynamic_cast<ctx_falcon&>(*ctx.get());
 
     uint32_t q      = ctx_falcon::m_params[myctx.get_set()].q;
     uint32_t q_bits = ctx_falcon::m_params[myctx.get_set()].q_bits;
     size_t   n      = ctx_falcon::m_params[myctx.get_set()].n;
     size_t   logn   = ctx_falcon::m_params[myctx.get_set()].n_bits;
+    float    bd     = ctx_falcon::m_params[myctx.get_set()].bd;
+
+    int32_t* msg    = reinterpret_cast<int32_t*>(aligned_malloc(sizeof(int32_t) * 2 * n));
+    uint32_t *s2_ntt = reinterpret_cast<uint32_t*>(msg) + n;
 
     // Unpack the signature into z1, z2 and u
     phantom_vector<int32_t> s1(n), s2(n);
 
     packing::unpacker unpack(s);
     for (size_t i=0; i < n; i++) {
-        s1[i] = unpack.read_signed(q_bits, packing::HUFFMAN);
-    }
-    for (size_t i=0; i < n; i++) {
-        s2[i] = unpack.read_signed(q_bits, packing::HUFFMAN);
+        s2[i] = unpack.read_signed(q_bits, packing::RAW);
     }
 
-    core::poly<int32_t>::mod_unsigned(s2.data(), n, q);
-    uint32_t* us2 = reinterpret_cast<uint32_t*>(s2.data());
-    myctx.get_reduction().convert_to(us2, us2, n);
-    myctx.get_ntt()->fwd(us2, logn);
-    myctx.get_ntt()->mul(us2, us2, myctx.h_ntt().data());
-    myctx.get_ntt()->inv(us2, logn);
-    myctx.get_reduction().convert_from(us2, us2, n);
+    myctx.get_xof()->init(32);
+    myctx.get_xof()->absorb(m.data(), m.size());
+    myctx.get_xof()->final();
+    uint8_t hash_bytes[2];
+    size_t i = 0;
+    while (i < n)
+    {
+        myctx.get_xof()->squeeze(hash_bytes, 2);
+        uint32_t y = (static_cast<uint32_t>(hash_bytes[1]) << 8) | static_cast<uint32_t>(hash_bytes[0]);
+        if (y < 5*q)
+        {
+            while (y >= q) y -= q;
+            msg[i] = y;
+            i++;
+        }
+    }
 
-    core::poly<int32_t>::sub_single(s1.data(), n, s2.data());
+    for (size_t i=n; i--;) {
+        s2_ntt[i]  = s2[i];
+        s2_ntt[i] += (s2_ntt[i] >> (std::numeric_limits<uint32_t>::digits - 1)) * q;
+        s2_ntt[i] -= ((q - s2_ntt[i] - 1u) >> (std::numeric_limits<uint32_t>::digits - 1)) * q;
+    }
+
+    myctx.get_reduction().convert_to(s2_ntt, s2_ntt, n);
+    myctx.get_ntt()->fwd(s2_ntt, logn);
+    myctx.get_ntt()->mul(s2_ntt, s2_ntt, myctx.h_ntt().data());
+    myctx.get_ntt()->inv(s2_ntt, logn);
+    myctx.get_reduction().convert_from(s2_ntt, s2_ntt, n);
+
+    core::poly<int32_t>::sub(s1.data(), n, msg, reinterpret_cast<int32_t*>(s2_ntt));
+
+    core::poly<int32_t>::mod_unsigned(s1.data(), n, q);
     core::poly<int32_t>::centre(s1.data(), q, n);
+
+    if (!check_norm_bd(bd, s1.data(), s2.data(), n)) {
+        return false;
+    }
 
     return true;
 }

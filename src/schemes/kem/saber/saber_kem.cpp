@@ -32,11 +32,7 @@ std::unique_ptr<user_ctx> saber_kem::create_ctx(security_strength_e bits,
                                                 cpu_word_size_e size_hint,
                                                 bool masking) const
 {
-    ctx_saber* ctx = new ctx_saber(saber_indcpa::bits_2_set(bits));
-    if (ctx->get_set() > 2) {
-        throw std::invalid_argument("Parameter set is out of range");
-    }
-    return std::unique_ptr<user_ctx>(ctx);
+    return create_ctx(saber_indcpa::bits_2_set(bits), size_hint, masking);
 }
 
 std::unique_ptr<user_ctx> saber_kem::create_ctx(size_t set,
@@ -44,15 +40,27 @@ std::unique_ptr<user_ctx> saber_kem::create_ctx(size_t set,
                                                 bool masking) const
 {
     ctx_saber* ctx = new ctx_saber(set);
+    std::stringstream ss;
+
+    (void) size_hint;
+    (void) masking;
+
     if (ctx->get_set() > 2) {
-        throw std::invalid_argument("Parameter set is out of range");
+        ss << "Parameter set " << ctx->get_set() << " is out of range";
+        LOG_ERROR(ss.str(), g_pkc_log_level);
+        throw std::invalid_argument(ss.str());
     }
+
+    ss << "SABER KEM context created [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
     return std::unique_ptr<user_ctx>(ctx);
 }
 
 bool saber_kem::keygen(std::unique_ptr<user_ctx>& ctx)
 {
-    LOG_DEBUG("Saber KeyGen\n");
+    std::stringstream ss;
+    ss << "SABER KEM KeyGen [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
 
     ctx_saber& myctx = dynamic_cast<ctx_saber&>(*ctx.get());
 
@@ -73,6 +81,10 @@ bool saber_kem::keygen(std::unique_ptr<user_ctx>& ctx)
 
 bool saber_kem::set_public_key(std::unique_ptr<user_ctx>& ctx, const phantom_vector<uint8_t>& k)
 {
+    std::stringstream ss;
+    ss << "SABER KEM set public key [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_saber& myctx = dynamic_cast<ctx_saber&>(*ctx.get());
 
     size_t   l        = saber_indcpa::m_params[myctx.get_set()].l;
@@ -90,6 +102,10 @@ bool saber_kem::set_public_key(std::unique_ptr<user_ctx>& ctx, const phantom_vec
 
 bool saber_kem::get_public_key(std::unique_ptr<user_ctx>& ctx, phantom_vector<uint8_t>& k)
 {
+    std::stringstream ss;
+    ss << "SABER KEM get public key [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_saber& myctx = dynamic_cast<ctx_saber&>(*ctx.get());
 
     size_t   l        = saber_indcpa::m_params[myctx.get_set()].l;
@@ -110,6 +126,10 @@ bool saber_kem::get_public_key(std::unique_ptr<user_ctx>& ctx, phantom_vector<ui
 
 bool saber_kem::set_private_key(std::unique_ptr<user_ctx>& ctx, const phantom_vector<uint8_t>& k)
 {
+    std::stringstream ss;
+    ss << "SABER KEM set set_private_key key [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_saber& myctx = dynamic_cast<ctx_saber&>(*ctx.get());
 
     size_t   l        = saber_indcpa::m_params[myctx.get_set()].l;
@@ -134,6 +154,10 @@ bool saber_kem::set_private_key(std::unique_ptr<user_ctx>& ctx, const phantom_ve
 
 bool saber_kem::get_private_key(std::unique_ptr<user_ctx>& ctx, phantom_vector<uint8_t>& k)
 {
+    std::stringstream ss;
+    ss << "SABER KEM get set_private_key key [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
+
     ctx_saber& myctx = dynamic_cast<ctx_saber&>(*ctx.get());
 
     size_t   l        = saber_indcpa::m_params[myctx.get_set()].l;
@@ -161,7 +185,9 @@ bool saber_kem::get_private_key(std::unique_ptr<user_ctx>& ctx, phantom_vector<u
 bool saber_kem::encapsulate(std::unique_ptr<user_ctx>& ctx, const phantom_vector<uint8_t>& pk,
     phantom_vector<uint8_t>& c, phantom_vector<uint8_t>& key)
 {
-    LOG_DEBUG("Saber Encapsulation\n");
+    std::stringstream ss;
+    ss << "SABER KEM Encapsulation [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
 
     ctx_saber& myctx = dynamic_cast<ctx_saber&>(*ctx.get());
 
@@ -210,7 +236,9 @@ bool saber_kem::decapsulate(std::unique_ptr<user_ctx>& ctx,
                             const phantom_vector<uint8_t>& c,
                             phantom_vector<uint8_t>& key)
 {
-    LOG_DEBUG("Saber Decapsulation\n");
+    std::stringstream ss;
+    ss << "SABER KEM Decapsulation [" << ctx->get_uuid() << "]";
+    LOG_DEBUG(ss.str(), g_pkc_log_level);
 
     ctx_saber& myctx = dynamic_cast<ctx_saber&>(*ctx.get());
 
@@ -257,6 +285,7 @@ bool saber_kem::decapsulate(std::unique_ptr<user_ctx>& ctx,
 
 size_t saber_kem::get_msg_len(const std::unique_ptr<user_ctx>& ctx) const
 {
+    (void) ctx;
     return SABRE_MSG_LEN;
 }
 

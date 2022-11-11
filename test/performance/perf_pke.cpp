@@ -145,6 +145,7 @@ json perf_pke::run(phantom::pkc_e pkc_type, size_t duration_us, cpu_word_size_e 
 
         pke_performance.push_back(pke_metrics);
 
+        std::cout << "param_set = " << param_set << std::endl;
         param_set++;
     } while (param_set < ctx_a->get_set_names().size());
 

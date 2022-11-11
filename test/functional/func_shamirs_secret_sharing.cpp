@@ -25,6 +25,9 @@ using namespace utilities;  // NOLINT
 
 int main(int argc, char *argv[])
 {
+    (void) argc;
+    (void) argv;
+    
     std::cout << "Shamir's Secret Sharing" << std::endl;
 
     auto prng = std::shared_ptr<csprng>(csprng::make(0x10000000, random_seed::seed_cb));

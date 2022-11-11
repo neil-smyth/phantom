@@ -42,6 +42,9 @@ aes_ff3_tv tv[] = {
 
 int main(int argc, char *argv[])
 {
+    (void) argc;
+    (void) argv;
+    
     std::cout << "FPE FF3-1 Known Answer Test" << std::endl;
 
     for (size_t i=0; i < 1; i++) {

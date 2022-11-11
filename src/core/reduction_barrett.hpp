@@ -110,12 +110,14 @@ public:
     /// Convert a value to a representation used for Barrett reduction, i.e. do nothing
     static T static_convert_to(const reducer<T>& r, T x)
     {
+        (void) r;
         return x;
     }
 
     /// Convert a value from a representation used for Barrett reduction, i.e. do nothing
     static T static_convert_from(const reducer<T>& r, T x)
     {
+        (void) r;
         return x;
     }
 

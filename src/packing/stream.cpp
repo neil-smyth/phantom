@@ -256,7 +256,7 @@ void stream::write(uint32_t data, size_t bits)
     return;
 }
 
-void stream::flush(size_t alignment)
+void stream::flush()
 {
     // Flush any outstanding bits in the scratch buffer to the output buffer
     if (m_bits_left < HOST_PACKER_BITS) {

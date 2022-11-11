@@ -278,7 +278,7 @@ public:
         T z1 = y;
 
         // 1/x = x^(q-2) mod q using a square-and-multiply algorithm
-        for (size_t i = std::numeric_limits<T>::digits - 2; i >= 0; i--) {
+        for (ssize_t i = std::numeric_limits<T>::digits - 2; i >= 0; i--) {
             T z2;
             z1  = static_sqr(r, z1);
             z2  = static_mul(r, z1, x);
@@ -300,7 +300,7 @@ public:
         T z1 = static_convert_to(mont, x);
 
         // 1/x = x^(q-2) mod q using a square-and-multiply algorithm
-        for (size_t i = std::numeric_limits<T>::digits - 2; i >= 0; i--) {
+        for (ssize_t i = std::numeric_limits<T>::digits - 2; i >= 0; i--) {
             T z2;
             z1  = static_sqr(r, z1);
             z2  = static_mul(r, z1, x);

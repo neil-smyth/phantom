@@ -224,6 +224,7 @@ public:
     /// Deallocate an aligned memory pointer
     void deallocate(T* p, size_t n)
     {
+        (void) n;
         aligned_free(p, ALIGNMENT);
     }
 
