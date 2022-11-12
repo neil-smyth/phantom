@@ -10,6 +10,7 @@
 #include "./phantom.hpp"
 #include "./config.hpp"
 
+#if defined(ENABLE_PKC)
 #include "schemes/ibe/dlp/ibe_dlp.hpp"
 #include "schemes/kem/kyber/kyber_kem.hpp"
 #include "schemes/kem/saber/saber_kem.hpp"
@@ -22,12 +23,20 @@
 #include "schemes/pke/kyber/kyber_pke.hpp"
 #include "schemes/pke/saber/saber_pke.hpp"
 #include "schemes/pke/rsaes_oaep/rsaes_oaep_pke.hpp"
+#endif
 #include "crypto/aes.hpp"
 #include "crypto/aes_ctr.hpp"
 #include "crypto/aes_gcm.hpp"
 #include "crypto/aes_ccm.hpp"
+#include "crypto/csprng.hpp"
 #include "crypto/fpe.hpp"
+#if defined(ENABLE_HASH)
+#include "crypto/hash_sha2.hpp"
+#include "crypto/hash_sha3.hpp"
+#endif
+#if defined(ENABLE_XOF)
 #include "crypto/xof_sha3.hpp"
+#endif
 #include "crypto/shamirs_secret_sharing.hpp"
 #include "utils/uuid.hpp"
 
@@ -116,6 +125,8 @@ const std::string build_info::compiler()
     return COMPILER_VERSION;
 }
 
+
+#if defined(ENABLE_PKC)
 
 const std::string& user_ctx::get_uuid()
 {
@@ -441,6 +452,8 @@ bool pkc::ibe_decrypt(std::unique_ptr<user_ctx>& ctx, const phantom_vector<uint8
 }
 
 
+#endif  // ENABLE_PKC
+
 
 std::unique_ptr<fpe_ctx> format_preserving_encryption::create_ctx(const phantom_vector<uint8_t>& user_key,
     fpe_type_e type, fpe_format_e format, const phantom_vector<uint8_t>& tweak)
@@ -529,12 +542,14 @@ symmetric_key_ctx* symmetric_key_cipher::make(symmetric_key_type_e key_len)
 
     switch (key_len)
     {
+#if defined(ENABLE_AES_ECB)
         case SYMKEY_AES_128_ENC: obj = aes_encrypt::make(aes_keylen_e::AES_128); break;
         case SYMKEY_AES_192_ENC: obj = aes_encrypt::make(aes_keylen_e::AES_192); break;
         case SYMKEY_AES_256_ENC: obj = aes_encrypt::make(aes_keylen_e::AES_256); break;
         case SYMKEY_AES_128_DEC: obj = aes_decrypt::make(aes_keylen_e::AES_128); break;
         case SYMKEY_AES_192_DEC: obj = aes_decrypt::make(aes_keylen_e::AES_192); break;
         case SYMKEY_AES_256_DEC: obj = aes_decrypt::make(aes_keylen_e::AES_256); break;
+#endif
 #if defined(ENABLE_AES_CTR)
         case SYMKEY_AES_128_CTR: obj = crypto::aes_ctr::make(aes_keylen_e::AES_128); break;
         case SYMKEY_AES_192_CTR: obj = crypto::aes_ctr::make(aes_keylen_e::AES_192); break;
@@ -561,6 +576,7 @@ int32_t symmetric_key_cipher::set_key(symmetric_key_ctx* ctx, const uint8_t *key
 {
     switch (ctx->get_keylen())
     {
+#if defined(ENABLE_AES_ECB)
         case SYMKEY_AES_128_ENC: {
             if (key_len_bytes == 16) {
                 return reinterpret_cast<aes_encrypt*>(ctx)->set_key(key, AES_128);
@@ -591,6 +607,7 @@ int32_t symmetric_key_cipher::set_key(symmetric_key_ctx* ctx, const uint8_t *key
                 return reinterpret_cast<aes_decrypt*>(ctx)->set_key(key, AES_256);
             }
         } break;
+#endif
 #if defined(ENABLE_AES_CTR)
         case SYMKEY_AES_128_CTR: {
             if (key_len_bytes == 16) {
@@ -642,7 +659,11 @@ int32_t symmetric_key_cipher::set_key(symmetric_key_ctx* ctx, const uint8_t *key
             }
         } break;
 #endif
-        default: {}
+        default:
+        {
+            (void)key;
+            (void)key_len_bytes;
+        }
     }
     return EXIT_FAILURE;
 }
@@ -652,15 +673,28 @@ int32_t symmetric_key_cipher::encrypt_start(symmetric_key_ctx* ctx, const uint8_
 {
     switch (ctx->get_keylen())
     {
+#if defined(ENABLE_AES_ECB)
         case SYMKEY_AES_128_ENC:
         case SYMKEY_AES_192_ENC:
         case SYMKEY_AES_256_ENC:
         {
-        } break;
+            (void)iv;
+            (void)iv_len;
+            (void)authdata;
+            (void)authdata_len;
+            (void)msg_len;
+            (void)tag_len;
+        }
+        break;
+#endif
 #if defined(ENABLE_AES_CTR)
         case SYMKEY_AES_128_CTR:
         case SYMKEY_AES_192_CTR:
         case SYMKEY_AES_256_CTR: {
+            (void)authdata;
+            (void)authdata_len;
+            (void)msg_len;
+            (void)tag_len;
             reinterpret_cast<crypto::aes_ctr*>(ctx)->encrypt_start(iv, iv_len);
         } break;
 #endif
@@ -668,6 +702,8 @@ int32_t symmetric_key_cipher::encrypt_start(symmetric_key_ctx* ctx, const uint8_
         case SYMKEY_AES_128_GCM:
         case SYMKEY_AES_192_GCM:
         case SYMKEY_AES_256_GCM: {
+            (void)msg_len;
+            (void)tag_len;
             reinterpret_cast<crypto::aes_gcm*>(ctx)->encrypt_start(iv, iv_len, authdata, authdata_len);
          } break;
 #endif
@@ -679,7 +715,16 @@ int32_t symmetric_key_cipher::encrypt_start(symmetric_key_ctx* ctx, const uint8_
                                                                    msg_len, tag_len);
          } break;
 #endif
-        default: return EXIT_FAILURE;
+        default:
+        {
+            (void)iv;
+            (void)iv_len;
+            (void)authdata;
+            (void)authdata_len;
+            (void)msg_len;
+            (void)tag_len;
+            return EXIT_FAILURE;
+        }
     }
     return EXIT_SUCCESS;
 }
@@ -688,6 +733,7 @@ int32_t symmetric_key_cipher::encrypt(symmetric_key_ctx* ctx, uint8_t *out, cons
 {
     switch (ctx->get_keylen())
     {
+#if defined(ENABLE_AES_ECB)
         case SYMKEY_AES_128_ENC:
         case SYMKEY_AES_192_ENC:
         case SYMKEY_AES_256_ENC:
@@ -703,6 +749,7 @@ int32_t symmetric_key_cipher::encrypt(symmetric_key_ctx* ctx, uint8_t *out, cons
                 out += 16;
             }
         } break;
+#endif
 #if defined(ENABLE_AES_CTR)
         case SYMKEY_AES_128_CTR:
         case SYMKEY_AES_192_CTR:
@@ -727,7 +774,13 @@ int32_t symmetric_key_cipher::encrypt(symmetric_key_ctx* ctx, uint8_t *out, cons
             reinterpret_cast<crypto::aes_ccm*>(ctx)->encrypt_update(out, in, len);
         } break;
 #endif
-        default: return EXIT_FAILURE;
+        default:
+        {
+            (void)out;
+            (void)in;
+            (void)len;
+            return EXIT_FAILURE;
+        }
     }
     return EXIT_SUCCESS;
 }
@@ -752,7 +805,12 @@ int32_t symmetric_key_cipher::encrypt_finish(symmetric_key_ctx* ctx, uint8_t *ta
             return reinterpret_cast<crypto::aes_ccm*>(ctx)->encrypt_finish(tag, tag_len);
         } break;
 #endif
-        default: return EXIT_FAILURE;
+        default:
+        {
+            (void)tag;
+            (void)tag_len;
+            return EXIT_FAILURE;
+        }
     }
 }
 
@@ -761,11 +819,19 @@ int32_t symmetric_key_cipher::decrypt_start(symmetric_key_ctx* ctx, const uint8_
 {
     switch (ctx->get_keylen())
     {
+#if defined(ENABLE_AES_ECB)
         case SYMKEY_AES_128_DEC:
         case SYMKEY_AES_192_DEC:
         case SYMKEY_AES_256_DEC:
         {
+            (void)iv;
+            (void)iv_len;
+            (void)authdata;
+            (void)authdata_len;
+            (void)msg_len;
+            (void)tag_len;
         } break;
+#endif
 #if defined(ENABLE_AES_CTR)
         case SYMKEY_AES_128_CTR:
         case SYMKEY_AES_192_CTR:
@@ -788,7 +854,16 @@ int32_t symmetric_key_cipher::decrypt_start(symmetric_key_ctx* ctx, const uint8_
                                                                    msg_len, tag_len);
         } break;
 #endif
-        default:                 return EXIT_FAILURE;
+        default:
+        {
+            (void)iv;
+            (void)iv_len;
+            (void)authdata;
+            (void)authdata_len;
+            (void)msg_len;
+            (void)tag_len;
+            return EXIT_FAILURE;
+        }
     }
     return EXIT_SUCCESS;
 }
@@ -797,6 +872,7 @@ int32_t symmetric_key_cipher::decrypt(symmetric_key_ctx* ctx, uint8_t *out, cons
 {
     switch (ctx->get_keylen())
     {
+#if defined(ENABLE_AES_ECB)
         case SYMKEY_AES_128_DEC:
         case SYMKEY_AES_192_DEC:
         case SYMKEY_AES_256_DEC:
@@ -811,6 +887,7 @@ int32_t symmetric_key_cipher::decrypt(symmetric_key_ctx* ctx, uint8_t *out, cons
                 out += 16;
             }
         } break;
+#endif
 #if defined(ENABLE_AES_CTR)
         case SYMKEY_AES_128_CTR:
         case SYMKEY_AES_192_CTR:
@@ -835,7 +912,13 @@ int32_t symmetric_key_cipher::decrypt(symmetric_key_ctx* ctx, uint8_t *out, cons
             reinterpret_cast<crypto::aes_ccm*>(ctx)->decrypt_update(out, in, len);
         } break;
 #endif
-        default: return EXIT_FAILURE;
+        default:
+        {
+            (void)out;
+            (void)in;
+            (void)len;
+            return EXIT_FAILURE;
+        }
     }
     return EXIT_SUCCESS;
 }
@@ -860,10 +943,17 @@ int32_t symmetric_key_cipher::decrypt_finish(symmetric_key_ctx* ctx, uint8_t *ta
             return reinterpret_cast<crypto::aes_ccm*>(ctx)->decrypt_finish(tag, tag_len);
         } break;
 #endif
-        default: return EXIT_FAILURE;
+        default:
+        {
+            (void)tag;
+            (void)tag_len;
+            return EXIT_FAILURE;
+        }
     }
 }
 
+
+#if defined(ENABLE_HASH) || defined(ENABLE_XOF)
 
 hashing_function::hashing_function()
 {
@@ -873,6 +963,7 @@ hashing_function::~hashing_function()
 {
 }
 
+#if defined(ENABLE_HASH)
 hashing_function* hashing_function::make(hash_alg_e type)
 {
     hashing_function* obj = new hashing_function();
@@ -894,7 +985,9 @@ hashing_function* hashing_function::make(hash_alg_e type)
 
     return obj;
 }
+#endif
 
+#if defined(ENABLE_XOF)
 hashing_function* hashing_function::make(xof_alg_e type)
 {
     hashing_function* obj = new hashing_function();
@@ -910,6 +1003,7 @@ hashing_function* hashing_function::make(xof_alg_e type)
 
     return obj;
 }
+#endif
 
 size_t hashing_function::get_length() const
 {
@@ -994,6 +1088,8 @@ void hashing_function::squeeze(uint8_t *data, size_t len)
     }
 }
 
+#endif
+
 
 key_sharing* key_sharing::make(key_sharing_type_e type, size_t key_len, std::shared_ptr<csprng>& prng)
 {
@@ -1006,7 +1102,10 @@ key_sharing* key_sharing::make(key_sharing_type_e type, size_t key_len, std::sha
 #if defined(ENABLE_SHAMIRS_SECRET_SHARING)
         case KEY_SHARING_SHAMIRS: ctx = new shamirs_secret_sharing(prng); break;
 #endif
-        default: {};
+        default:
+        {
+            (void)prng;
+        };
     }
 
     return ctx;

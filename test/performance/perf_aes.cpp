@@ -37,8 +37,6 @@ json perf_aes::run(symmetric_key_type_e key_type, size_t duration_us)
     std::unique_ptr<csprng> rng = std::unique_ptr<csprng>(csprng::make(0, &random_seed::seed_cb));
     json aes_performance = json::array();
 
-    std::unique_ptr<user_ctx> ctx;
-
     if (SYMKEY_AES_128_ENC == key_type || SYMKEY_AES_192_ENC == key_type || SYMKEY_AES_256_ENC == key_type) {
 
         std::cout << "  SYMMETRIC KEY :: AES-ECB" << std::endl;

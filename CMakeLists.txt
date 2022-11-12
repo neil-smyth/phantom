@@ -60,6 +60,9 @@ option(ENABLE_SIGNATURE_ECDSA "Build Signature ECDSA" OFF)
 option(ENABLE_SIGNATURE_EDDSA "Build Signature EDDSA" OFF)
 option(ENABLE_SIGNATURE_FALCON "Build Signature Falcon" OFF)
 option(ENABLE_SIGNATURE_RSASSA_PSS "Build Signature RSASSA-PSS" OFF)
+option(ENABLE_HASH "Build hashes" OFF)
+option(ENABLE_XOF "Build XOF's" OFF)
+option(ENABLE_CSPRNG "Build CSPRNG" OFF)
 option(ENABLE_AES_CTR "Build AES-CTR" OFF)
 option(ENABLE_AES_GCM "Build AES-GCM" OFF)
 option(ENABLE_AES_CCM "Build AES-CCM" OFF)
@@ -90,6 +93,12 @@ if (ENABLE_ALL OR ENABLE_PKC OR ENABLE_PKC_IBE)
     if (NOT ENABLE_IBE_DLP)
         set (ENABLE_IBE_DLP ON CACHE BOOL "" FORCE)
     endif (NOT ENABLE_IBE_DLP)
+
+    set (ENABLE_PKC_IBE ON CACHE BOOL "" FORCE)
+    
+    if (ENABLE_IBE_DLP)
+        add_definitions("-DENABLE_PKC_IBE")
+    endif (ENABLE_IBE_DLP)
 endif (ENABLE_ALL OR ENABLE_PKC OR ENABLE_PKC_IBE)
 
 if (ENABLE_ALL OR ENABLE_PKC OR ENABLE_PKC_KEM)
@@ -99,12 +108,24 @@ if (ENABLE_ALL OR ENABLE_PKC OR ENABLE_PKC_KEM)
     if (NOT ENABLE_KEM_SABER)
         set (ENABLE_KEM_SABER ON CACHE BOOL "" FORCE)
     endif (NOT ENABLE_KEM_SABER)
+
+    set (ENABLE_PKC_KEM ON CACHE BOOL "" FORCE)
+
+    if (ENABLE_KEM_KYBER OR ENABLE_KEM_SABER)
+        add_definitions("-DENABLE_PKC_KEM")
+    endif (ENABLE_KEM_KYBER OR ENABLE_KEM_SABER)
 endif (ENABLE_ALL OR ENABLE_PKC OR ENABLE_PKC_KEM)
 
 if (ENABLE_ALL OR ENABLE_PKC OR ENABLE_PKC_KEX)
     if (NOT ENABLE_KEY_EXCHANGE_ECDH)
         set (ENABLE_KEY_EXCHANGE_ECDH ON CACHE BOOL "" FORCE)
     endif (NOT ENABLE_KEY_EXCHANGE_ECDH)
+
+    set (ENABLE_PKC_KEX ON CACHE BOOL "" FORCE)
+
+    if (ENABLE_KEY_EXCHANGE_ECDH)
+        add_definitions("-DENABLE_PKC_KEX")
+    endif (ENABLE_KEY_EXCHANGE_ECDH)
 endif (ENABLE_ALL OR ENABLE_PKC OR ENABLE_PKC_KEX)
 
 if (ENABLE_ALL OR ENABLE_PKC OR ENABLE_PKC_PKE)
@@ -117,6 +138,12 @@ if (ENABLE_ALL OR ENABLE_PKC OR ENABLE_PKC_PKE)
     if (NOT ENABLE_PKE_RSAES_OAEP)
         set (ENABLE_PKE_RSAES_OAEP ON CACHE BOOL "" FORCE)
     endif (NOT ENABLE_PKE_RSAES_OAEP)
+
+    set (ENABLE_PKC_PKE ON CACHE BOOL "" FORCE)
+
+    if (ENABLE_PKE_KYBER OR ENABLE_PKE_KYBER OR ENABLE_PKE_SABER)
+        add_definitions("-DENABLE_PKC_PKE")
+    endif (ENABLE_PKE_KYBER OR ENABLE_PKE_KYBER OR ENABLE_PKE_SABER)
 endif (ENABLE_ALL OR ENABLE_PKC OR ENABLE_PKC_PKE)
 
 if (ENABLE_ALL OR ENABLE_PKC OR ENABLE_PKC_SIG)
@@ -135,6 +162,12 @@ if (ENABLE_ALL OR ENABLE_PKC OR ENABLE_PKC_SIG)
     if (NOT ENABLE_SIGNATURE_RSASSA_PSS)
         set (ENABLE_SIGNATURE_RSASSA_PSS ON CACHE BOOL "" FORCE)
     endif (NOT ENABLE_SIGNATURE_RSASSA_PSS)
+
+    set (ENABLE_PKC_SIG ON CACHE BOOL "" FORCE)
+
+    if (ENABLE_SIGNATURE_DILITHIUM OR ENABLE_SIGNATURE_ECDSA OR ENABLE_SIGNATURE_EDDSA OR ENABLE_SIGNATURE_FALCON OR ENABLE_SIGNATURE_RSASSA_PSS)
+        add_definitions("-DENABLE_PKC_SIG")
+    endif (ENABLE_SIGNATURE_DILITHIUM OR ENABLE_SIGNATURE_ECDSA OR ENABLE_SIGNATURE_EDDSA OR ENABLE_SIGNATURE_FALCON OR ENABLE_SIGNATURE_RSASSA_PSS)
 endif (ENABLE_ALL OR ENABLE_PKC OR ENABLE_PKC_SIG)
 
 if (ENABLE_ALL OR ENABLE_FPE)
@@ -154,6 +187,9 @@ if (ENABLE_ALL OR ENABLE_KEY_SHARING)
 endif (ENABLE_ALL OR ENABLE_KEY_SHARING)
 
 if (ENABLE_ALL)
+    if (NOT ENABLE_CSPRNG)
+        set (ENABLE_CSPRNG ON CACHE BOOL "" FORCE)
+    endif (NOT ENABLE_CSPRNG)
     if (NOT ENABLE_AES_CTR)
         set (ENABLE_AES_CTR ON CACHE BOOL "" FORCE)
     endif (NOT ENABLE_AES_CTR)
@@ -163,6 +199,13 @@ if (ENABLE_ALL)
     if (NOT ENABLE_AES_CCM)
         set (ENABLE_AES_CCM ON CACHE BOOL "" FORCE)
     endif (NOT ENABLE_AES_CCM)
+
+    if (NOT ENABLE_HASH)
+        set (ENABLE_HASH ON CACHE BOOL "" FORCE)
+    endif (NOT ENABLE_HASH)
+    if (NOT ENABLE_XOF)
+        set (ENABLE_XOF ON CACHE BOOL "" FORCE)
+    endif (NOT ENABLE_XOF)
 endif (ENABLE_ALL)
 
 # If AES-GCM is enabled then AES-CTR must also be enabled
@@ -207,6 +250,9 @@ if (ENABLE_SIGNATURE_RSASSA_PSS)
     add_definitions("-DENABLE_SIGNATURE_RSASSA_PSS")
 endif (ENABLE_SIGNATURE_RSASSA_PSS)
 
+if (ENABLE_CSPRNG)
+    add_definitions("-DENABLE_AES_ECB")
+endif (ENABLE_CSPRNG)
 if (ENABLE_AES_CTR)
     add_definitions("-DENABLE_AES_CTR")
 endif (ENABLE_AES_CTR)
@@ -242,7 +288,19 @@ if (ENABLE_IBE_DLP OR
     ENABLE_SIGNATURE_RSASSA_PSS)
     set(REQUIRE_PKC_LIBS ON)
     set(REQUIRE_MPZ ON)
+    set (ENABLE_HASH ON CACHE BOOL "" FORCE)
+    set (ENABLE_XOF ON CACHE BOOL "" FORCE)
+    set (ENABLE_PKC ON CACHE BOOL "" FORCE)
+    add_definitions("-DENABLE_PKC")
 endif ()
+
+if (ENABLE_HASH)
+    add_definitions("-DENABLE_HASH")
+endif (ENABLE_HASH)
+
+if (ENABLE_XOF)
+    add_definitions("-DENABLE_XOF")
+endif (ENABLE_XOF)
 
 
 # -------- Guard against in-source builds and bad build-type strings -------- #
@@ -325,54 +383,59 @@ if (ENABLE_SHAMIRS_SECRET_SHARING)
     set(libsrc ${libsrc} ${PROJECT_SOURCE_DIR}/bindings/c/shamirs_secret_sharing_wrapper.cpp)
 endif (ENABLE_SHAMIRS_SECRET_SHARING)
 
+
+set(libsrc_static ${libsrc})
+set(libsrc_shared ${libsrc})
+
 add_subdirectory(src/crypto)
-add_subdirectory(src/core)
-if (REQUIRE_PKC_LIBS)
+add_subdirectory(src/logging)
+add_subdirectory(src/packing)
+
+if (REQUIRE_PKC_LIBS OR REQUIRE_MPZ)
+    add_subdirectory(src/core)
+
+    set(libsrc_static ${libsrc_static} $<TARGET_OBJECTS:core_obj>)
+    set(libsrc_shared ${libsrc_shared} $<TARGET_OBJECTS:core_shared_obj>)
+endif (REQUIRE_PKC_LIBS OR REQUIRE_MPZ)
+
+if (ENABLE_PKC)
     add_subdirectory(src/ecc)
     add_subdirectory(src/fft)
     add_subdirectory(src/ntru)
     add_subdirectory(src/rsa)
     add_subdirectory(src/sampling)
-endif (REQUIRE_PKC_LIBS)
-add_subdirectory(src/logging)
-add_subdirectory(src/packing)
-add_subdirectory(src/schemes)
+    add_subdirectory(src/schemes)
 
-set(libsrc_static ${libsrc})
-set(libsrc_shared ${libsrc})
-if (REQUIRE_PKC_LIBS)
     set(libsrc_static ${libsrc_static}
         $<TARGET_OBJECTS:ecc_obj>
-        $<TARGET_OBJECTS:core_obj>
         $<TARGET_OBJECTS:rsa_obj>
         $<TARGET_OBJECTS:ntru_obj>
         $<TARGET_OBJECTS:sampling_obj>
-        $<TARGET_OBJECTS:fft_obj>)
+        $<TARGET_OBJECTS:fft_obj>
+        $<TARGET_OBJECTS:schemes_obj>)
     set(libsrc_shared ${libsrc_shared}
         $<TARGET_OBJECTS:ecc_shared_obj>
-        $<TARGET_OBJECTS:core_shared_obj>
         $<TARGET_OBJECTS:rsa_shared_obj>
         $<TARGET_OBJECTS:ntru_shared_obj>
         $<TARGET_OBJECTS:sampling_shared_obj>
-        $<TARGET_OBJECTS:fft_shared_obj>)
-endif (REQUIRE_PKC_LIBS)
+        $<TARGET_OBJECTS:fft_shared_obj>
+        $<TARGET_OBJECTS:schemes_shared_obj>)
+endif (ENABLE_PKC)
+
 if (REQUIRE_MPZ)
-    set(libsrc_static ${libsrc_static}
-        $<TARGET_OBJECTS:core_obj>)
-    set(libsrc_shared ${libsrc_shared}
-        $<TARGET_OBJECTS:core_shared_obj>)
+    set(libsrc_static ${libsrc_static} $<TARGET_OBJECTS:core_obj>)
+    set(libsrc_shared ${libsrc_shared} $<TARGET_OBJECTS:core_shared_obj>)
 endif (REQUIRE_MPZ)
 
 
 # ----------------------------- Static library ------------------------------ #
 
 if (BUILD_STATIC_LIBS)
-    add_library(phantom_static STATIC
-                ${libsrc_static}
-                $<TARGET_OBJECTS:logging_obj>
-                $<TARGET_OBJECTS:crypto_obj>
-                $<TARGET_OBJECTS:packing_obj>
-                $<TARGET_OBJECTS:schemes_obj>)
+    set(libsrc_static ${libsrc_static}
+        $<TARGET_OBJECTS:logging_obj>
+        $<TARGET_OBJECTS:crypto_obj>
+        $<TARGET_OBJECTS:packing_obj>)
+    add_library(phantom_static STATIC ${libsrc_static})
     set_target_properties(phantom_static PROPERTIES
         OUTPUT_NAME phantom_static
         VERSION ${PROJECT_VERSION}
@@ -383,12 +446,11 @@ endif (BUILD_STATIC_LIBS)
 # ----------------------------- Shared library ------------------------------ #
 
 if (BUILD_SHARED_LIBS)
-    add_library(phantom_shared SHARED
-                ${libsrc_shared}
-                $<TARGET_OBJECTS:logging_shared_obj>
-                $<TARGET_OBJECTS:crypto_shared_obj>
-                $<TARGET_OBJECTS:packing_shared_obj>
-                $<TARGET_OBJECTS:schemes_shared_obj>)
+    set(libsrc_shared ${libsrc_shared}
+        $<TARGET_OBJECTS:logging_shared_obj>
+        $<TARGET_OBJECTS:crypto_shared_obj>
+        $<TARGET_OBJECTS:packing_shared_obj>)
+    add_library(phantom_shared SHARED ${libsrc_shared})
     set_property(TARGET phantom_shared PROPERTY POSITION_INDEPENDENT_CODE 1)
     set_target_properties(phantom_shared PROPERTIES
         OUTPUT_NAME phantom

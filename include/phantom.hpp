@@ -41,10 +41,13 @@ public:
     static const std::string compiler();
 };
 
+
+#if defined(ENABLE_PKC)
+
 /** 
  * @brief User context
  * 
- * An interface class for the user context to a specific scheme and parameter set
+ * An interface class for the user context to a specific PKC scheme and parameter set
  */
 class user_ctx : public aligned_base<DEFAULT_MEM_ALIGNMENT>
 {
@@ -233,6 +236,8 @@ private:
     /// An instance of the selected PKC scheme - PIMPL idiom
     std::unique_ptr<scheme> m_scheme;
 };
+
+#endif  // ENABLE_PKC
 
 
 /// Forward declaration of classes required by csprng
@@ -473,10 +478,16 @@ private:
 
 namespace crypto {
 
+#if defined(ENABLE_HASH)
 class hash;
+#endif
+#if defined(ENABLE_XOF)
 class xof;
+#endif
 
 }  // namespace crypto
+
+#if defined(ENABLE_HASH) || defined(ENABLE_XOF)
 
 /**
  * @brief Cryptographic hashing function
@@ -488,6 +499,7 @@ class hashing_function
 public:
     virtual ~hashing_function();
 
+#if defined(ENABLE_HASH)
     /**
      * @brief Create a hashing context for a user specified hashing function
      * 
@@ -495,7 +507,9 @@ public:
      * @return hashing_function* A pointer to a hashing object
      */
     static hashing_function* make(hash_alg_e type);
+#endif
 
+#if defined(ENABLE_XOF)
     /**
      * @brief Create a hashing context for a user specified XOF
      * 
@@ -503,6 +517,7 @@ public:
      * @return hashing_function* A pointer to a XOF object
      */
     static hashing_function* make(xof_alg_e type);
+#endif
 
     /**
      * @brief Get the length of hash that will be generated
@@ -519,6 +534,7 @@ public:
      */
     bool init();
 
+#if defined(ENABLE_HASH)
     /**
      * @brief Update the hash with a specified number of bytes
      * 
@@ -528,7 +544,9 @@ public:
      * @param len The number of bytes to be consumed
      */
     void update(const uint8_t *data, size_t len);
+#endif
 
+#if defined(ENABLE_XOF)
     /**
      * @brief Update the XOF with a specified number of bytes
      * 
@@ -538,14 +556,18 @@ public:
      * @param len The number of bytes to be consumed
      */
     void absorb(const uint8_t *data, size_t len);
+#endif
 
+#if defined(ENABLE_HASH)
     /**
      * @brief Generate the final hash value and copy to the output
      * 
      * @param data A pointer to the hash value output
      */
     void final(uint8_t *data);
+#endif
 
+#if defined(ENABLE_XOF)
     /**
      * @brief Generate the final XOF value and copy to the output
      */
@@ -558,23 +580,30 @@ public:
      * @param len The number of bytes to output
      */
     void squeeze(uint8_t *data, size_t len);
+#endif
 
 private:
     // Private constructor (factory method used)
     hashing_function();
 
+#if defined(ENABLE_HASH)
     /// An instance of the selected hashing function - PIMPL idiom
     std::unique_ptr<crypto::hash> m_hash;
 
     /// The type of hash
     hash_alg_e m_hash_type;
+#endif
 
+#if defined(ENABLE_XOF)
     /// An instance of the selected XOF - PIMPL idiom
     std::unique_ptr<crypto::xof> m_xof;
 
     /// The type of XOF
     xof_alg_e m_xof_type;
+#endif
 };
+
+#endif
 
 
 /**

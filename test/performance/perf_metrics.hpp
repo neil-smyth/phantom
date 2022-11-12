@@ -19,14 +19,5 @@ class perf_metrics
 {
 public:
     virtual json run(size_t duration_us) = 0;
-
-protected:
-    phantom::pkc_e m_pkc_type;
-    friend class perf_metrics_factory;
 };
 
-class perf_metrics_factory
-{
-public:
-    static perf_metrics* make(phantom::pkc_e pkc_type);
-};
