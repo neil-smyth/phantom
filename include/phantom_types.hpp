@@ -37,6 +37,8 @@ using int128_t  = __int128;
 namespace phantom {
 
 
+#if defined(ENABLE_PKC)
+
 /**
  * @brief Core implementation
  * 
@@ -100,6 +102,8 @@ namespace schemes {}
  */
 namespace utilities {}
 
+#endif  // ENABLE_PKC
+
 
 /// CSPRNG pool size used to store random 32-bit words
 #define RANDOM_POOL_SIZE        64
@@ -146,6 +150,9 @@ enum cpu_word_size_e {
 #define NATIVE_CPU_WORD_SIZE    phantom::cpu_word_size_e::CPU_WORD_SIZE_32
 #endif
 
+
+#if defined(ENABLE_PKC)
+
 /// The public-key crypto types
 enum pkc_e {
     PKC_IBE_DLP = 0,
@@ -161,6 +168,9 @@ enum pkc_e {
     PKC_SIG_EDDSA,
     PKC_SIG_RSASSA_PSS,
 };
+
+#endif  // ENABLE_PKC
+
 
 /// FPE types (algorithm and key size)
 enum fpe_type_e

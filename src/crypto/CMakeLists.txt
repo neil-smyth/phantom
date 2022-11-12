@@ -15,24 +15,17 @@ set(libsrc
     ${PROJECT_SOURCE_DIR}/aes_sw.hpp /
     ${PROJECT_SOURCE_DIR}/aes.cpp /
     ${PROJECT_SOURCE_DIR}/aes.hpp /
-    ${PROJECT_SOURCE_DIR}/aes_ccm.cpp /
-    ${PROJECT_SOURCE_DIR}/aes_ccm.hpp /
     ${PROJECT_SOURCE_DIR}/aes_ctr_drbg.cpp /
     ${PROJECT_SOURCE_DIR}/aes_ctr_drbg.hpp /
     ${PROJECT_SOURCE_DIR}/csprng.cpp /
     ${PROJECT_SOURCE_DIR}/csprng.hpp /
-    ${PROJECT_SOURCE_DIR}/fpe.cpp /
-    ${PROJECT_SOURCE_DIR}/hash.hpp /
-    ${PROJECT_SOURCE_DIR}/hash_sha2.cpp /
-    ${PROJECT_SOURCE_DIR}/hash_sha2.hpp /
-    ${PROJECT_SOURCE_DIR}/hash_sha3.cpp /
-    ${PROJECT_SOURCE_DIR}/hash_sha3.hpp /
-    ${PROJECT_SOURCE_DIR}/keccak.cpp /
-    ${PROJECT_SOURCE_DIR}/keccak.hpp /
-    ${PROJECT_SOURCE_DIR}/xof.hpp /
-    ${PROJECT_SOURCE_DIR}/xof_sha3.cpp /
-    ${PROJECT_SOURCE_DIR}/xof_sha3.hpp
+    ${PROJECT_SOURCE_DIR}/fpe.cpp
 )
+
+if (ENABLE_AES_CCM)
+    set(libsrc ${libsrc} ${PROJECT_SOURCE_DIR}/aes_ccm.cpp)
+    set(libsrc ${libsrc} ${PROJECT_SOURCE_DIR}/aes_ccm.hpp)
+endif (ENABLE_AES_CCM)
 
 if (ENABLE_AES_CTR)
     set(libsrc ${libsrc} ${PROJECT_SOURCE_DIR}/aes_ctr.cpp)
@@ -54,6 +47,28 @@ if (ENABLE_SHAMIRS_SECRET_SHARING)
   set(libsrc ${libsrc} ${PROJECT_SOURCE_DIR}/shamirs_secret_sharing.cpp)
   set(libsrc ${libsrc} ${PROJECT_SOURCE_DIR}/shamirs_secret_sharing.hpp)
 endif (ENABLE_SHAMIRS_SECRET_SHARING)
+
+if (ENABLE_HASH)
+  set(libsrc ${libsrc} /
+      ${PROJECT_SOURCE_DIR}/hash.hpp /
+      ${PROJECT_SOURCE_DIR}/hash_sha2.cpp /
+      ${PROJECT_SOURCE_DIR}/hash_sha2.hpp /
+      ${PROJECT_SOURCE_DIR}/hash_sha3.cpp /
+      ${PROJECT_SOURCE_DIR}/hash_sha3.hpp)
+endif (ENABLE_HASH)
+
+if (ENABLE_XOF)
+  set(libsrc ${libsrc}  /
+      ${PROJECT_SOURCE_DIR}/xof.hpp /
+      ${PROJECT_SOURCE_DIR}/xof_sha3.cpp /
+      ${PROJECT_SOURCE_DIR}/xof_sha3.hpp)
+endif (ENABLE_XOF)
+
+if (ENABLE_HASH OR ENABLE_XOF)
+  set(libsrc ${libsrc}  /
+      ${PROJECT_SOURCE_DIR}/keccak.cpp /
+      ${PROJECT_SOURCE_DIR}/keccak.hpp)
+endif (ENABLE_HASH OR ENABLE_XOF)
 
 # static library
 add_library(crypto_obj OBJECT ${libsrc})

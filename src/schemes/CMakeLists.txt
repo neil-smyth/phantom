@@ -86,55 +86,61 @@ set(libsrc_signatue_rsassa_pss
     ${PROJECT_SOURCE_DIR}/signature/rsassa_pss/rsassa_pss_signature.hpp
 )
 
-set(libsrc
-    ${PROJECT_SOURCE_DIR}/scheme.hpp /
-    ${PROJECT_SOURCE_DIR}/kem/kem.hpp /
-    ${PROJECT_SOURCE_DIR}/key_exchange/key_exchange.hpp /
-    ${PROJECT_SOURCE_DIR}/pke/pke.hpp /
-    ${PROJECT_SOURCE_DIR}/signature/signature.hpp
-)
+set(libsrc "")
 
-if (ENABLE_IBE_DLP)
-    set(libsrc ${libsrc} ${libsrc_ibe_dlp})
-endif (ENABLE_IBE_DLP)
-if (ENABLE_KEM_KYBER)
-    set(libsrc ${libsrc} ${libsrc_kem_kyber})
-endif (ENABLE_KEM_KYBER)
-if (ENABLE_KEM_SABER)
-    set(libsrc ${libsrc} ${libsrc_kem_saber})
-endif (ENABLE_KEM_SABER)
-if (ENABLE_KEY_EXCHANGE_ECDH)
-    set(libsrc ${libsrc} ${libsrc_key_exchange_ecdh})
-endif (ENABLE_KEY_EXCHANGE_ECDH)
-if (ENABLE_PKE_KYBER)
-    set(libsrc ${libsrc} ${libsrc_pke_kyber})
-endif (ENABLE_PKE_KYBER)
-if (ENABLE_PKE_SABER)
-    set(libsrc ${libsrc} ${libsrc_pke_saber})
-endif (ENABLE_PKE_SABER)
-if (ENABLE_PKE_RSAES_OAEP)
-    set(libsrc ${libsrc} ${libsrc_pke_rsaes_oaep})
-endif (ENABLE_PKE_RSAES_OAEP)
-if (ENABLE_SIGNATURE_DILITHIUM)
-    set(libsrc ${libsrc} ${libsrc_signatue_dilithium})
-endif (ENABLE_SIGNATURE_DILITHIUM)
-if (ENABLE_SIGNATURE_ECDSA)
-    set(libsrc ${libsrc} ${libsrc_signatue_ecdsa})
-endif (ENABLE_SIGNATURE_ECDSA)
-if (ENABLE_SIGNATURE_EDDSA)
-    set(libsrc ${libsrc} ${libsrc_signatue_eddsa})
-endif (ENABLE_SIGNATURE_EDDSA)
-if (ENABLE_SIGNATURE_FALCON)
-    set(libsrc ${libsrc} ${libsrc_signatue_falcon})
-endif (ENABLE_SIGNATURE_FALCON)
-if (ENABLE_SIGNATURE_RSASSA_PSS)
-    set(libsrc ${libsrc} ${libsrc_signatue_rsassa_pss})
-endif (ENABLE_SIGNATURE_RSASSA_PSS)
+if (ENABLE_PKC)
+    set(libsrc ${libsrc}
+        ${PROJECT_SOURCE_DIR}/scheme.hpp /
+        ${PROJECT_SOURCE_DIR}/kem/kem.hpp /
+        ${PROJECT_SOURCE_DIR}/key_exchange/key_exchange.hpp /
+        ${PROJECT_SOURCE_DIR}/pke/pke.hpp /
+        ${PROJECT_SOURCE_DIR}/signature/signature.hpp
+    )
 
-# static library
-add_library(schemes_obj OBJECT ${libsrc})
+    if (ENABLE_IBE_DLP)
+        set(libsrc ${libsrc} ${libsrc_ibe_dlp})
+    endif (ENABLE_IBE_DLP)
+    if (ENABLE_KEM_KYBER)
+        set(libsrc ${libsrc} ${libsrc_kem_kyber})
+    endif (ENABLE_KEM_KYBER)
+    if (ENABLE_KEM_SABER)
+        set(libsrc ${libsrc} ${libsrc_kem_saber})
+    endif (ENABLE_KEM_SABER)
+    if (ENABLE_KEY_EXCHANGE_ECDH)
+        set(libsrc ${libsrc} ${libsrc_key_exchange_ecdh})
+    endif (ENABLE_KEY_EXCHANGE_ECDH)
+    if (ENABLE_PKE_KYBER)
+        set(libsrc ${libsrc} ${libsrc_pke_kyber})
+    endif (ENABLE_PKE_KYBER)
+    if (ENABLE_PKE_SABER)
+        set(libsrc ${libsrc} ${libsrc_pke_saber})
+    endif (ENABLE_PKE_SABER)
+    if (ENABLE_PKE_RSAES_OAEP)
+        set(libsrc ${libsrc} ${libsrc_pke_rsaes_oaep})
+    endif (ENABLE_PKE_RSAES_OAEP)
+    if (ENABLE_SIGNATURE_DILITHIUM)
+        set(libsrc ${libsrc} ${libsrc_signatue_dilithium})
+    endif (ENABLE_SIGNATURE_DILITHIUM)
+    if (ENABLE_SIGNATURE_ECDSA)
+        set(libsrc ${libsrc} ${libsrc_signatue_ecdsa})
+    endif (ENABLE_SIGNATURE_ECDSA)
+    if (ENABLE_SIGNATURE_EDDSA)
+        set(libsrc ${libsrc} ${libsrc_signatue_eddsa})
+    endif (ENABLE_SIGNATURE_EDDSA)
+    if (ENABLE_SIGNATURE_FALCON)
+        set(libsrc ${libsrc} ${libsrc_signatue_falcon})
+    endif (ENABLE_SIGNATURE_FALCON)
+    if (ENABLE_SIGNATURE_RSASSA_PSS)
+        set(libsrc ${libsrc} ${libsrc_signatue_rsassa_pss})
+    endif (ENABLE_SIGNATURE_RSASSA_PSS)
+
+    
+    # static library
+    add_library(schemes_obj OBJECT ${libsrc})
 
 
-# shared library
-add_library(schemes_shared_obj OBJECT ${libsrc})
-set_property(TARGET schemes_shared_obj PROPERTY POSITION_INDEPENDENT_CODE 1)
+    # shared library
+    add_library(schemes_shared_obj OBJECT ${libsrc})
+    set_property(TARGET schemes_shared_obj PROPERTY POSITION_INDEPENDENT_CODE 1)
+
+endif (ENABLE_PKC)

@@ -39,8 +39,6 @@ json perf_sha3::run(size_t duration_us)
     std::unique_ptr<csprng> rng = std::unique_ptr<csprng>(csprng::make(0, &random_seed::seed_cb));
     json hash_performance = json::array();
 
-    std::unique_ptr<user_ctx> ctx;
-
     size_t hash_type = 0;
     do {
 
