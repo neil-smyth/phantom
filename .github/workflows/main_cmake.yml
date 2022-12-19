@@ -34,16 +34,16 @@ jobs:
     if: ${{ github.event_name == 'push' || github.event_name == 'pull_request' || needs.check_date.outputs.BUILD_REQUIRED != 'false' }}
 
     runs-on: ubuntu-latest
-    name: Build and test main branch
+    name: Build main branch
 
     steps:
     - name: Checkout
       uses: actions/checkout@v3
       with:
         submodules: true
-
+    
     - name: Configure CMake
-      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DBUILD_TESTS=ON
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/install -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DBUILD_TESTS=ON
     
     - name: Build
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
@@ -60,4 +60,14 @@ jobs:
       working-directory: ${{github.workspace}}/build
       run: ctest -C ${{env.BUILD_TYPE}} -R "KAT"
 
-    # TODO Nightly builds for a variety of platforms rather than every push
+    - name: Create a temporary artifact downloads folder
+      run: mkdir -p ${{github.workspace}}/install
+      
+    - name: Build the install target
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --target install 
+  
+    - name: Upload the artifact
+      uses: actions/upload-artifact@v2
+      with: 
+        name: linux-amd64
+        path: ${{github.workspace}}/install
