@@ -64,7 +64,7 @@ jobs:
       run: mkdir -p ${{github.workspace}}/install
       
     - name: Build the install target
-      run: cmake --build --target=install ${{github.workspace}}/build
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --target install 
   
     - name: Upload the artifact
       uses: actions/upload-artifact@v2
