@@ -1,0 +1,27 @@
+FROM ubuntu:20.04
+
+LABEL Description="Build environment"
+
+ENV HOME /root
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+ARG GIT_COMMIT
+ENV GIT_COMMIT=$GIT_COMMIT
+
+SHELL ["/bin/bash", "-c"]
+
+RUN apt-get update && apt-get -y --no-install-recommends install \
+    build-essential \
+    cmake \
+    gdb \
+    uuid-dev \
+    doxygen \
+    graphviz \
+    python3.5 \
+    python3-pip \
+    && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN pip3 install cpplint

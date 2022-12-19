@@ -72,6 +72,8 @@ This software is MIT licensed. Please see the attached _LICENSE_ file.
 
 CMake should be used to build and install the library using an out-of-source build: create a folder within the root directory of the project (or elsewhere) and change directory to it, run cmake using the script in the root directory and then use make to build and then optionally run the tests if they are enabled. A static and shared library will be built by default together with all available cryptographic algorithms.
 
+### Local
+
 The following will create and test an optimised release build supporting all available cryptographic algorithms:
 
 ```
@@ -107,6 +109,23 @@ The toolchain file can be selected using the _CMAKE_TOOLCHAIN_FILE_ option:
 
 ```
 cmake -DCMAKE_TOOLCHAIN_FILE=x86_linux.gnu.cmake ..
+```
+
+### Dockerized
+
+THe git commit tag must be passed to docker as the argument _GIT\_COMMIT_ in order that it be included in the build information. Otherwise the string _unknown_ will be used.
+
+The _Phantom_ root directory is mounted as the folder _phantom_ when we run the built image and run bash inside.
+
+```
+docker build -t phantom/phantom_build:0.1 --build-arg GIT_COMMIT=$(git rev-parse HEAD) -f DockerfileBuildEnv .
+docker run -it --rm --name=phantom --mount type=bind,source=${PWD},target=/phantom phantom/phantom_build:0.1 bash
+
+cd phantom
+mkdir build and cd build
+cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON ..
+cmake --build .
+ctest
 ```
 
 ## Bindings
