@@ -427,6 +427,16 @@ if (REQUIRE_MPZ)
 endif (REQUIRE_MPZ)
 
 
+# ------------------------------ Header files ------------------------------- #
+
+set(PHANTOM_PUBLIC_HEADERS
+    ${PROJECT_SOURCE_DIR}/include/phantom_machine.hpp
+    ${PROJECT_SOURCE_DIR}/include/phantom_memory.hpp
+    ${PROJECT_SOURCE_DIR}/include/phantom_types.hpp
+    ${PROJECT_SOURCE_DIR}/include/phantom.hpp
+)
+
+
 # ----------------------------- Static library ------------------------------ #
 
 if (BUILD_STATIC_LIBS)
@@ -438,7 +448,7 @@ if (BUILD_STATIC_LIBS)
     set_target_properties(phantom_static PROPERTIES
         OUTPUT_NAME phantom_static
         VERSION ${PROJECT_VERSION}
-        PUBLIC_HEADER ${PROJECT_SOURCE_DIR}/include/phantom.hpp)
+        PUBLIC_HEADER "${PHANTOM_PUBLIC_HEADERS}")
 endif (BUILD_STATIC_LIBS)
 
 
@@ -455,7 +465,7 @@ if (BUILD_SHARED_LIBS)
         OUTPUT_NAME phantom
         VERSION ${PROJECT_VERSION}
         SOVERSION 1
-        PUBLIC_HEADER ${PROJECT_SOURCE_DIR}/include/phantom.hpp)
+        PUBLIC_HEADER "${PHANTOM_PUBLIC_HEADERS}")
 endif (BUILD_SHARED_LIBS)
 
 
