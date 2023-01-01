@@ -57,7 +57,7 @@ class Program
 
         // Recreate the KDC by loading the key pair, then extract the key pair
 
-        IntPtr ibeObjKDC2 = IdentityBasedEncryption.Create(PKC_IBE_DLP);
+        IntPtr ibeObjKDC2 = IdentityBasedEncryption.Create(PKC.PKC_IBE_DLP);
         IntPtr ibeCtxKDC2 = IdentityBasedEncryption.CreateCtx(ibeObjKDC2, IdentityBasedEncryption.SecurityStrength.SECURITY_STRENGTH_80);
 
         IdentityBasedEncryption.LoadMasterKey(ibeObjKDC2, ibeCtxKDC2, masterKey, masterKeySize);
