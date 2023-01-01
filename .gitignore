@@ -1,4 +1,5 @@
 .vscode/
+bindings/c#/FormatPreservingEncryption/bin/
 bindings/c#/FormatPreservingEncryption/obj/
 bindings/c#/PhantomDotNet/bin/
 bindings/c#/PhantomDotNet/obj/
@@ -8,4 +9,6 @@ bindings/c#/UnitTest/bin/
 bindings/c#/UnitTest/obj/
 bindings/c#/FPE/bin/
 bindings/c#/FPE/obj/
+bindings/c#/IdentityBasedEncryption/bin/
+bindings/c#/IdentityBasedEncryption/obj/
 docs/doxygen/
