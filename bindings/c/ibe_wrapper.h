@@ -61,7 +61,7 @@ extern "C" {
                  const uint8_t *id, size_t id_len,
                  const uint8_t *m, size_t m_len,
                  size_t *c_len);
-    
+
     // Decrypt a message using the user key
     uint8_t * ibe_decrypt(cibe *p_ibe, cibe_ctx *ctx,
                  const uint8_t *c, size_t c_len,
