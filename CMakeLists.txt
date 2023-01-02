@@ -381,6 +381,9 @@ endif (ENABLE_FPE_AES_FF1 OR ENABLE_FPE_AES_FF3_1)
 if (ENABLE_SHAMIRS_SECRET_SHARING)
     set(libsrc ${libsrc} ${PROJECT_SOURCE_DIR}/bindings/c/shamirs_secret_sharing_wrapper.cpp)
 endif (ENABLE_SHAMIRS_SECRET_SHARING)
+if (ENABLE_PKC_IBE)
+    set(libsrc ${libsrc} ${PROJECT_SOURCE_DIR}/bindings/c/ibe_wrapper.cpp)
+endif (ENABLE_PKC_IBE)
 
 
 set(libsrc_static ${libsrc})
